@@ -1,0 +1,2494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevOps Zero to Hero — Learn DevOps from Scratch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00d4aa;
+    --accent2: #ff6b35;
+    --accent3: #7c3aed;
+    --accent4: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --heading: #f8fafc;
+    --code-bg: #0d1117;
+    --sidebar-w: 280px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Lora', Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  /* ===== SIDEBAR ===== */
+  #sidebar {
+    position: fixed;
+    left: 0; top: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+  }
+
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-track { background: transparent; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sidebar-logo h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .sidebar-logo p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .sidebar-nav { padding: 16px 0; flex: 1; }
+
+  .nav-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 12px 20px 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    border-left: 2px solid transparent;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(0,212,170,0.06); }
+  .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+  .nav-item .nav-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  #main {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+  }
+
+  /* ===== HERO ===== */
+  #hero {
+    padding: 80px 60px 60px;
+    background: linear-gradient(135deg, #0a0e1a 0%, #0d1f3c 50%, #0a1628 100%);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  #hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,212,170,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  #hero::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; left: 30%;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,212,170,0.1);
+    border: 1px solid rgba(0,212,170,0.25);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    margin-bottom: 28px;
+    animation: fadeInDown 0.6s ease;
+  }
+  .hero-badge::before { content: '●'; font-size: 0.5rem; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  #hero h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 4vw, 3.6rem);
+    font-weight: 800;
+    color: var(--heading);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.7s ease 0.1s both;
+  }
+  #hero h2 .hl { color: var(--accent); }
+  #hero h2 .hl2 { color: var(--accent2); }
+
+  #hero p {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 600px;
+    margin-bottom: 36px;
+    animation: fadeInUp 0.7s ease 0.2s both;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 32px;
+    animation: fadeInUp 0.7s ease 0.3s both;
+  }
+  .stat { text-align: left; }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--heading);
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  @keyframes fadeInDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ===== PROGRESS BAR ===== */
+  #progress-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 60px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+  .progress-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+  }
+
+  /* ===== CONTENT SECTIONS ===== */
+  .module {
+    display: none;
+    padding: 60px;
+    max-width: 900px;
+    animation: fadeInUp 0.4s ease;
+  }
+  .module.visible { display: block; }
+
+  .module-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  .module-icon {
+    font-size: 3rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 20px rgba(0,212,170,0.3));
+  }
+  .module-meta {}
+  .module-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 6px;
+  }
+  .module-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 800;
+    color: var(--heading);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  /* Section types */
+  .section { margin-bottom: 48px; }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--heading);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  p { margin-bottom: 14px; color: var(--text); }
+  p:last-child { margin-bottom: 0; }
+
+  /* Callout boxes */
+  .callout {
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-left: 3px solid;
+    font-size: 0.95rem;
+  }
+  .callout-analogy {
+    background: rgba(251,191,36,0.06);
+    border-color: var(--accent4);
+  }
+  .callout-analogy .callout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent4);
+    margin-bottom: 8px;
+  }
+  .callout-tip {
+    background: rgba(0,212,170,0.06);
+    border-color: var(--accent);
+  }
+  .callout-tip .callout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .callout-warn {
+    background: rgba(255,107,53,0.06);
+    border-color: var(--accent2);
+  }
+  .callout-warn .callout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent2);
+    margin-bottom: 8px;
+  }
+  .callout-project {
+    background: rgba(124,58,237,0.07);
+    border-color: var(--accent3);
+  }
+  .callout-project .callout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent3);
+    margin-bottom: 8px;
+  }
+
+  /* Code blocks */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+    font-family: 'DM Mono', monospace;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-lang {
+    font-size: 0.65rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .code-dots { display: flex; gap: 5px; }
+  .code-dots span {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .code-dots span:nth-child(1) { background: #ff5f56; }
+  .code-dots span:nth-child(2) { background: #ffbd2e; }
+  .code-dots span:nth-child(3) { background: #27c93f; }
+  .code-body {
+    padding: 20px;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    color: #a8d8a8;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .code-body .comment { color: #5c6e4e; font-style: italic; }
+  .code-body .kw { color: #c792ea; }
+  .code-body .str { color: #c3e88d; }
+  .code-body .cmd { color: #82aaff; }
+  .code-body .out { color: var(--accent); }
+
+  /* Step list */
+  .steps { list-style: none; margin: 20px 0; }
+  .steps li {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 800;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  /* Comparison table */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.9rem;
+  }
+  .compare-table th {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 16px;
+    background: var(--surface2);
+    color: var(--muted);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: top;
+  }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge-bad {
+    display: inline-block;
+    background: rgba(255,107,53,0.15);
+    color: var(--accent2);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .badge-good {
+    display: inline-block;
+    background: rgba(0,212,170,0.12);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* Concept cards */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .concept-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .concept-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .concept-card .cc-icon { font-size: 1.5rem; margin-bottom: 10px; }
+  .concept-card .cc-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--heading);
+    margin-bottom: 6px;
+  }
+  .concept-card .cc-desc { font-size: 0.85rem; color: var(--muted); }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 48px 0;
+  }
+
+  /* Next module card */
+  .next-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .next-card:hover { border-color: var(--accent); background: rgba(0,212,170,0.04); }
+  .next-card .next-text { flex: 1; }
+  .next-card .next-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .next-card .next-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--heading);
+  }
+  .next-card .next-why {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .next-arrow {
+    font-size: 1.5rem;
+    color: var(--accent);
+  }
+
+  /* Summary checklist */
+  .checklist { list-style: none; margin: 16px 0; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.93rem;
+  }
+  .checklist li::before {
+    content: '✓';
+    color: var(--accent);
+    font-weight: 700;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Mobile toggle */
+  #menu-toggle {
+    display: none;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 200;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    #sidebar { transform: translateX(-100%); }
+    #sidebar.open { transform: translateX(0); }
+    #main { margin-left: 0; }
+    #menu-toggle { display: block; }
+    .module { padding: 60px 24px 40px; }
+    #hero { padding: 80px 24px 40px; }
+    #progress-bar { padding: 14px 24px; }
+    .hero-stats { flex-wrap: wrap; gap: 20px; }
+  }
+
+  /* Highlight */
+  strong { color: var(--heading); font-weight: 600; }
+  em { color: var(--accent4); font-style: italic; }
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82em;
+    background: rgba(255,255,255,0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  /* Architecture diagram */
+  .arch-diagram {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    margin: 20px 0;
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.6;
+  }
+
+  /* Flow steps */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 20px 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    overflow-x: auto;
+  }
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .flow-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .flow-box.active { border-color: var(--accent); color: var(--accent); }
+  .flow-arrow {
+    font-size: 1.2rem;
+    color: var(--muted);
+    padding: 0 8px;
+  }
+
+  /* Landing module grid */
+  #landing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 32px 0;
+  }
+  .landing-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .landing-card:hover { border-color: var(--accent); transform: translateY(-3px); background: rgba(0,212,170,0.04); }
+  .landing-card .lc-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .landing-card .lc-icon { font-size: 1.6rem; margin-bottom: 8px; }
+  .landing-card .lc-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--heading);
+  }
+</style>
+</head>
+<body>
+
+<button id="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <h1>DevOps Zero to Hero</h1>
+    <p>// your complete learning path</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Start Here</div>
+    <a class="nav-item active" onclick="showModule('home')">
+      <span class="nav-icon">🏠</span> Home
+    </a>
+
+    <div class="nav-section-label">Module 1 — Foundation</div>
+    <a class="nav-item" onclick="showModule('cloud')">
+      <span class="nav-icon">☁️</span> Why Cloud Computing <span class="nav-num">01</span>
+    </a>
+    <a class="nav-item" onclick="showModule('aws')">
+      <span class="nav-icon">🔶</span> AWS Core Services <span class="nav-num">02</span>
+    </a>
+    <a class="nav-item" onclick="showModule('linux')">
+      <span class="nav-icon">🐧</span> Linux Basics <span class="nav-num">03</span>
+    </a>
+
+    <div class="nav-section-label">Module 2 — Code & Build</div>
+    <a class="nav-item" onclick="showModule('git')">
+      <span class="nav-icon">🌿</span> Git & GitHub <span class="nav-num">04</span>
+    </a>
+    <a class="nav-item" onclick="showModule('shell')">
+      <span class="nav-icon">⚡</span> Shell Scripting <span class="nav-num">05</span>
+    </a>
+    <a class="nav-item" onclick="showModule('maven')">
+      <span class="nav-icon">🔨</span> Maven <span class="nav-num">06</span>
+    </a>
+
+    <div class="nav-section-label">Module 3 — CI/CD & Containers</div>
+    <a class="nav-item" onclick="showModule('jenkins')">
+      <span class="nav-icon">🤖</span> Jenkins <span class="nav-num">07</span>
+    </a>
+    <a class="nav-item" onclick="showModule('docker')">
+      <span class="nav-icon">🐳</span> Docker <span class="nav-num">08</span>
+    </a>
+    <a class="nav-item" onclick="showModule('kubernetes')">
+      <span class="nav-icon">☸️</span> Kubernetes <span class="nav-num">09</span>
+    </a>
+
+    <div class="nav-section-label">Module 4 — IaC & Monitoring</div>
+    <a class="nav-item" onclick="showModule('terraform')">
+      <span class="nav-icon">🏗️</span> Terraform <span class="nav-num">10</span>
+    </a>
+    <a class="nav-item" onclick="showModule('monitoring')">
+      <span class="nav-icon">📊</span> Prometheus & Grafana <span class="nav-num">11</span>
+    </a>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<main id="main">
+
+  <!-- HERO -->
+  <div id="hero">
+    <div class="hero-badge">Zero to Hero Learning Path</div>
+    <h2>Master <span class="hl">DevOps</span> from<br><span class="hl2">absolute scratch</span></h2>
+    <p>A structured, beginner-friendly journey through cloud computing, automation, containers, and monitoring — explained with real-world analogies and hands-on examples.</p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">11</div>
+        <div class="stat-label">Modules</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">50+</div>
+        <div class="stat-label">Hands-on Examples</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">8</div>
+        <div class="stat-label">Mini Projects</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Assumed Knowledge</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div id="progress-bar">
+    <span class="progress-label">Your Progress</span>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <span class="progress-pct" id="progress-pct">0%</span>
+  </div>
+
+  <!-- ========== HOME ========== -->
+  <section class="module visible" id="mod-home">
+    <div class="module-header">
+      <div class="module-icon">🗺️</div>
+      <div class="module-meta">
+        <div class="module-tag">Start Here</div>
+        <h2 class="module-title">Your DevOps Learning Roadmap</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">What is DevOps?</h3>
+      <p><strong>DevOps</strong> is the combination of two words: <em>Development</em> (writing software) and <em>Operations</em> (running and managing that software). In simple terms, DevOps is a way of working where the people who build software and the people who run it work together smoothly, automatically, and continuously.</p>
+      <p>Before DevOps, developers would write code and "throw it over the wall" to operations teams who would then struggle to deploy it. Bugs were found late, deployments were scary, and things broke in production all the time.</p>
+    </div>
+
+    <div class="callout callout-analogy">
+      <div class="callout-label">🍕 Real-World Analogy</div>
+      <p>Think of a pizza restaurant. The <strong>chef</strong> (developer) makes the pizza, and the <strong>delivery team</strong> (operations) delivers it. In old-school IT, the chef makes the pizza and just hands it to delivery — but delivery doesn't know the right address, it's not packed properly, and it arrives cold. DevOps is like giving the chef and delivery team a shared system, clear communication, and automated processes — so every pizza is delivered hot, on time, every time.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Your Learning Path</h3>
+      <p>Each module below builds on the previous one. Don't skip ahead — every concept is connected. Click any card to start learning!</p>
+      <div id="landing-grid">
+        <div class="landing-card" onclick="showModule('cloud')">
+          <div class="lc-num">01</div>
+          <div class="lc-icon">☁️</div>
+          <div class="lc-title">Why Cloud Computing</div>
+        </div>
+        <div class="landing-card" onclick="showModule('aws')">
+          <div class="lc-num">02</div>
+          <div class="lc-icon">🔶</div>
+          <div class="lc-title">AWS Core Services</div>
+        </div>
+        <div class="landing-card" onclick="showModule('linux')">
+          <div class="lc-num">03</div>
+          <div class="lc-icon">🐧</div>
+          <div class="lc-title">Linux Basics</div>
+        </div>
+        <div class="landing-card" onclick="showModule('git')">
+          <div class="lc-num">04</div>
+          <div class="lc-icon">🌿</div>
+          <div class="lc-title">Git & GitHub</div>
+        </div>
+        <div class="landing-card" onclick="showModule('shell')">
+          <div class="lc-num">05</div>
+          <div class="lc-icon">⚡</div>
+          <div class="lc-title">Shell Scripting</div>
+        </div>
+        <div class="landing-card" onclick="showModule('maven')">
+          <div class="lc-num">06</div>
+          <div class="lc-icon">🔨</div>
+          <div class="lc-title">Maven</div>
+        </div>
+        <div class="landing-card" onclick="showModule('jenkins')">
+          <div class="lc-num">07</div>
+          <div class="lc-icon">🤖</div>
+          <div class="lc-title">Jenkins CI/CD</div>
+        </div>
+        <div class="landing-card" onclick="showModule('docker')">
+          <div class="lc-num">08</div>
+          <div class="lc-icon">🐳</div>
+          <div class="lc-title">Docker</div>
+        </div>
+        <div class="landing-card" onclick="showModule('kubernetes')">
+          <div class="lc-num">09</div>
+          <div class="lc-icon">☸️</div>
+          <div class="lc-title">Kubernetes</div>
+        </div>
+        <div class="landing-card" onclick="showModule('terraform')">
+          <div class="lc-num">10</div>
+          <div class="lc-icon">🏗️</div>
+          <div class="lc-title">Terraform</div>
+        </div>
+        <div class="landing-card" onclick="showModule('monitoring')">
+          <div class="lc-num">11</div>
+          <div class="lc-icon">📊</div>
+          <div class="lc-title">Monitoring</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="next-card" onclick="showModule('cloud')">
+      <div class="next-text">
+        <div class="next-label">Start Your Journey →</div>
+        <div class="next-title">☁️ Module 1: Why Cloud Computing</div>
+        <div class="next-why">Understand the problem that DevOps solves — starting from how software is deployed in the real world.</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </div>
+  </section>
+
+  <!-- ========== CLOUD COMPUTING ========== -->
+  <section class="module" id="mod-cloud">
+    <div class="module-header">
+      <div class="module-icon">☁️</div>
+      <div class="module-meta">
+        <div class="module-tag">Module 01 — Foundation</div>
+        <h2 class="module-title">Why Cloud Computing?</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">The Problem: Traditional Servers</h3>
+      <p>Imagine you want to launch a website. In the old world (<strong>on-premise</strong> infrastructure), here's what you had to do:</p>
+      <ul class="steps">
+        <li><span class="step-num">1</span>Buy expensive physical servers (₹5–50 lakhs)</li>
+        <li><span class="step-num">2</span>Set up a data center room with cooling and power backup</li>
+        <li><span class="step-num">3</span>Hire people to manage it 24/7</li>
+        <li><span class="step-num">4</span>Wait weeks or months before going live</li>
+        <li><span class="step-num">5</span>If traffic spikes, your site crashes — you can't add more servers instantly</li>
+      </ul>
+    </div>
+
+    <div class="callout callout-analogy">
+      <div class="callout-label">🏨 Real-World Analogy — Hotel vs Airbnb</div>
+      <p>Traditional servers are like <strong>building your own hotel</strong> every time you travel. You spend months constructing it, buying furniture, hiring staff — just for a 3-day trip. Then you have to maintain it forever even when no one's using it.</p>
+      <p>Cloud computing is like <strong>Airbnb or OYO</strong> — you book only when you need, pay only for what you use, scale up for a holiday weekend and scale down after. No ownership headaches. No maintenance worries.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">What is Cloud Computing?</h3>
+      <p><strong>Cloud computing</strong> means renting computing resources (servers, storage, databases, networking) over the internet from a provider instead of owning physical hardware. You pay only for what you use, like an electricity bill.</p>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="cc-icon">⚡</div>
+          <div class="cc-title">On-Demand</div>
+          <div class="cc-desc">Get a server in 60 seconds. No procurement process.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">📈</div>
+          <div class="cc-title">Scalable</div>
+          <div class="cc-desc">Handle 10 users or 10 million users with the same ease.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">💳</div>
+          <div class="cc-title">Pay-as-you-go</div>
+          <div class="cc-desc">Pay only for resources you actually use, by the hour.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🌍</div>
+          <div class="cc-title">Global</div>
+          <div class="cc-desc">Deploy your app close to users worldwide.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Old vs New: Side by Side</h3>
+      <table class="compare-table">
+        <thead><tr><th>Factor</th><th>Traditional (On-Premise)</th><th>Cloud Computing</th></tr></thead>
+        <tbody>
+          <tr><td>Setup Time</td><td><span class="badge-bad">Weeks to months</span></td><td><span class="badge-good">Minutes</span></td></tr>
+          <tr><td>Cost</td><td><span class="badge-bad">High upfront capital</span></td><td><span class="badge-good">Pay as you use</span></td></tr>
+          <tr><td>Scaling</td><td><span class="badge-bad">Buy new hardware</span></td><td><span class="badge-good">Click of a button</span></td></tr>
+          <tr><td>Maintenance</td><td><span class="badge-bad">Your team's problem</span></td><td><span class="badge-good">Provider handles it</span></td></tr>
+          <tr><td>Disaster Recovery</td><td><span class="badge-bad">Expensive backup systems</span></td><td><span class="badge-good">Built-in redundancy</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Types of Cloud Services</h3>
+      <p>Cloud providers offer different "layers" of service. Think of it as how much of the stack they manage for you:</p>
+      <div class="arch-diagram">  🏗️  IaaS — Infrastructure as a Service
+       You manage: OS, Runtime, Apps, Data
+       Provider manages: Servers, Storage, Networking
+       Example: AWS EC2 (rent a virtual machine)
+
+  🔧  PaaS — Platform as a Service
+       You manage: Apps, Data
+       Provider manages: OS, Runtime, Middleware, Servers
+       Example: AWS Elastic Beanstalk, Heroku
+
+  📦  SaaS — Software as a Service
+       You just USE the software
+       Provider manages: Everything
+       Example: Gmail, Salesforce, Zoom</div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Why do we need DevOps in the Cloud era?</h3>
+      <p>Cloud gave us power — unlimited servers, global reach, instant scaling. But now teams were deploying dozens of times a day. How do you manage all that? You need <strong>automation, consistency, and speed</strong>. That's exactly what DevOps tools (Jenkins, Docker, Kubernetes, Terraform) provide.</p>
+      <p><em>Cloud is the land. DevOps is how you build on it.</em></p>
+    </div>
+
+    <div class="callout callout-project">
+      <div class="callout-label">🚀 Mini Project — Host a Static Website on AWS S3</div>
+      <p>By the end of the AWS module, you'll deploy a real website to the internet using just an AWS S3 bucket — no server required, costs almost nothing, and is globally available.</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">✅ Module Summary</div>
+      <ul class="checklist">
+        <li>Traditional servers are expensive, slow, and hard to scale</li>
+        <li>Cloud computing lets you rent servers over the internet, pay-as-you-go</li>
+        <li>Three service types: IaaS, PaaS, SaaS</li>
+        <li>Cloud makes DevOps possible by giving us on-demand, programmable infrastructure</li>
+      </ul>
+    </div>
+
+    <div class="next-card" onclick="showModule('aws')">
+      <div class="next-text">
+        <div class="next-label">Next Module →</div>
+        <div class="next-title">🔶 AWS Core Services</div>
+        <div class="next-why">Now that you know WHY we use cloud, let's learn HOW — specifically with Amazon Web Services (the world's most popular cloud platform).</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </div>
+  </section>
+
+  <!-- ========== AWS ========== -->
+  <section class="module" id="mod-aws">
+    <div class="module-header">
+      <div class="module-icon">🔶</div>
+      <div class="module-meta">
+        <div class="module-tag">Module 02 — Foundation</div>
+        <h2 class="module-title">AWS Core Services</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">What is AWS?</h3>
+      <p><strong>Amazon Web Services (AWS)</strong> is the world's most popular cloud platform, used by Netflix, Airbnb, NASA, and millions of companies. AWS has 200+ services, but as a DevOps beginner, you only need to master the core 6.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Core Service #1 — EC2 (Virtual Servers)</h3>
+      <div class="callout callout-analogy">
+        <div class="callout-label">💻 Analogy — Renting a Laptop</div>
+        <p><strong>EC2 (Elastic Compute Cloud)</strong> is like renting a computer in Amazon's data center. You choose the size (1 CPU or 64 CPUs), the operating system (Linux or Windows), and you pay by the hour. It's just a computer you control via the internet.</p>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">AWS CLI — Launch EC2 Instance</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># Launch a free-tier EC2 instance (Amazon Linux 2)</span>
+aws ec2 run-instances \
+  --image-id ami-0c55b159cbfafe1f0 \
+  --instance-type t2.micro \
+  --key-name MyKeyPair \
+  --security-group-ids sg-0a1b2c3d4e5f
+
+<span class="comment"># SSH into your new server</span>
+ssh -i "MyKeyPair.pem" ec2-user@<span class="str">your-public-ip</span>
+
+<span class="out"># You're now inside a cloud server! 🎉</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Core Service #2 — S3 (Object Storage)</h3>
+      <div class="callout callout-analogy">
+        <div class="callout-label">📦 Analogy — Google Drive for Your App</div>
+        <p><strong>S3 (Simple Storage Service)</strong> is like Google Drive but for developers. Store images, videos, backups, website files — anything. Files are stored in "buckets" and accessed via URLs. You can even host a full website from S3!</p>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">AWS CLI — S3 Operations</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># Create a bucket</span>
+aws s3 mb s3://my-awesome-website
+
+<span class="comment"># Upload a file</span>
+aws s3 cp index.html s3://my-awesome-website/
+
+<span class="comment"># Enable static website hosting</span>
+aws s3 website s3://my-awesome-website \
+  --index-document index.html
+
+<span class="out"># Your site is now live at:</span>
+<span class="out"># http://my-awesome-website.s3-website-us-east-1.amazonaws.com</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Core Service #3 — IAM (Access Control)</h3>
+      <div class="callout callout-analogy">
+        <div class="callout-label">🔑 Analogy — Office ID Cards</div>
+        <p><strong>IAM (Identity and Access Management)</strong> is like an office building with different access cards. The security guard can enter the lobby. The developer can enter the server room. The manager can access everything. IAM lets you control WHO can do WHAT in your AWS account.</p>
+      </div>
+      <p>Key IAM concepts: <strong>Users</strong> (people), <strong>Groups</strong> (teams), <strong>Roles</strong> (permissions for services), <strong>Policies</strong> (JSON rules that define what's allowed).</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">IAM Policy — Allow S3 Read Only</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body">{
+  <span class="str">"Version"</span>: <span class="str">"2012-10-17"</span>,
+  <span class="str">"Statement"</span>: [
+    {
+      <span class="str">"Effect"</span>: <span class="str">"Allow"</span>,
+      <span class="str">"Action"</span>: [
+        <span class="str">"s3:GetObject"</span>,
+        <span class="str">"s3:ListBucket"</span>
+      ],
+      <span class="str">"Resource"</span>: <span class="str">"arn:aws:s3:::my-bucket/*"</span>
+    }
+  ]
+}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Core Service #4 — VPC (Your Private Network)</h3>
+      <div class="callout callout-analogy">
+        <div class="callout-label">🏘️ Analogy — Gated Community</div>
+        <p><strong>VPC (Virtual Private Cloud)</strong> is like a gated community for your servers. You define the roads (subnets), the gates (security groups), and who can come in or go out. Your database lives in the private area (no internet access), while your web server lives in a public area (accessible to users).</p>
+      </div>
+      <div class="arch-diagram">   INTERNET
+       |
+   [Internet Gateway]
+       |
+   [Public Subnet]  ←→  Web Server (EC2)
+       |
+   [Private Subnet] ←→  Database (RDS)
+                         (No direct internet access)</div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Other Key Services</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="cc-icon">🗄️</div>
+          <div class="cc-title">RDS</div>
+          <div class="cc-desc">Managed relational databases (MySQL, PostgreSQL). No server management needed.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">λ</div>
+          <div class="cc-title">Lambda</div>
+          <div class="cc-desc">Run code without any server. Pay only when your code actually runs.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">👀</div>
+          <div class="cc-title">CloudWatch</div>
+          <div class="cc-desc">Monitor your AWS resources. Get alerts when something goes wrong.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">⚖️</div>
+          <div class="cc-title">ELB</div>
+          <div class="cc-desc">Load Balancer — distributes traffic across multiple servers.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-project">
+      <div class="callout-label">🚀 Mini Project — Deploy a Static Website</div>
+      <p><strong>Goal:</strong> Host your personal portfolio site on S3 with HTTPS via CloudFront.</p>
+      <ol class="steps" style="margin-top:10px">
+        <li><span class="step-num">1</span>Create an S3 bucket with a unique name</li>
+        <li><span class="step-num">2</span>Upload your HTML/CSS files</li>
+        <li><span class="step-num">3</span>Enable "Static Website Hosting" in bucket settings</li>
+        <li><span class="step-num">4</span>Set bucket policy to allow public read</li>
+        <li><span class="step-num">5</span>Your site is live! Share the URL 🎉</li>
+      </ol>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">✅ Module Summary</div>
+      <ul class="checklist">
+        <li>EC2 = Virtual servers you rent in the cloud</li>
+        <li>S3 = Unlimited file/object storage with web hosting capability</li>
+        <li>IAM = Control who can access what in your account</li>
+        <li>VPC = Your private, isolated network in the cloud</li>
+        <li>RDS, Lambda, CloudWatch = Managed database, serverless compute, monitoring</li>
+      </ul>
+    </div>
+
+    <div class="next-card" onclick="showModule('linux')">
+      <div class="next-text">
+        <div class="next-label">Next Module →</div>
+        <div class="next-title">🐧 Linux Basics</div>
+        <div class="next-why">All cloud servers run Linux. You need to be comfortable on the command line to configure, deploy, and manage them effectively.</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </div>
+  </section>
+
+  <!-- ========== LINUX ========== -->
+  <section class="module" id="mod-linux">
+    <div class="module-header">
+      <div class="module-icon">🐧</div>
+      <div class="module-meta">
+        <div class="module-tag">Module 03 — Foundation</div>
+        <h2 class="module-title">Linux Basics</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">What is Linux & Why Does It Matter?</h3>
+      <p><strong>Linux</strong> is a free, open-source operating system (like Windows or macOS). About <strong>96% of the world's servers run Linux</strong> — including all major cloud providers. If you're doing DevOps, you're doing Linux.</p>
+      <p>Instead of clicking around with a mouse, you control Linux by typing commands. This feels scary at first, but it's actually faster and more powerful than any GUI.</p>
+    </div>
+
+    <div class="callout callout-analogy">
+      <div class="callout-label">🎮 Analogy — Cheat Codes</div>
+      <p>Using a GUI (graphical interface) is like playing a game normally. Using the Linux terminal is like knowing the cheat codes — you can do in 1 second what takes 5 minutes with a mouse.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Essential Commands — Navigation</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — File Navigation</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># Print current directory (where am I?)</span>
+<span class="cmd">pwd</span>
+<span class="out">/home/arjun</span>
+
+<span class="comment"># List files in current directory</span>
+<span class="cmd">ls</span>
+<span class="out">Documents  Downloads  projects  script.sh</span>
+
+<span class="comment"># List with details (permissions, size, date)</span>
+<span class="cmd">ls -la</span>
+
+<span class="comment"># Change directory</span>
+<span class="cmd">cd projects</span>
+<span class="cmd">cd ..</span>          <span class="comment"># go one level up</span>
+<span class="cmd">cd ~</span>           <span class="comment"># go to home directory</span>
+
+<span class="comment"># Create a new directory</span>
+<span class="cmd">mkdir my-app</span>
+
+<span class="comment"># Create a file</span>
+<span class="cmd">touch hello.txt</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Essential Commands — Files</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — File Operations</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># View file contents</span>
+<span class="cmd">cat hello.txt</span>
+<span class="cmd">less hello.txt</span>     <span class="comment"># scrollable view</span>
+
+<span class="comment"># Write to a file</span>
+<span class="cmd">echo "Hello World" > hello.txt</span>
+<span class="cmd">echo "Line 2" >> hello.txt</span>   <span class="comment"># append (don't overwrite)</span>
+
+<span class="comment"># Copy, Move, Delete</span>
+<span class="cmd">cp hello.txt backup.txt</span>
+<span class="cmd">mv hello.txt greetings.txt</span>   <span class="comment"># also used for renaming</span>
+<span class="cmd">rm greetings.txt</span>
+<span class="cmd">rm -rf old-folder/</span>           <span class="comment"># delete folder (careful!)</span>
+
+<span class="comment"># Search inside files</span>
+<span class="cmd">grep "error" app.log</span>
+<span class="cmd">grep -r "TODO" ./src</span>         <span class="comment"># search in all files</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Permissions (chmod)</h3>
+      <p>Linux controls who can read, write, or execute a file. Think of it as setting access rules.</p>
+      <div class="arch-diagram">  File permissions look like: -rwxr-xr--
+
+  - = regular file (d = directory)
+  rwx = owner can Read, Write, Execute
+  r-x = group can Read, Execute (not write)
+  r-- = others can only Read
+
+  chmod 755 script.sh   →  owner=rwx, group=rx, others=rx
+  chmod 644 config.txt  →  owner=rw, group=r, others=r
+  chmod +x deploy.sh    →  make executable for everyone</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — Permissions</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># Make a script executable</span>
+<span class="cmd">chmod +x deploy.sh</span>
+<span class="cmd">./deploy.sh</span>          <span class="comment"># now you can run it</span>
+
+<span class="comment"># Change file owner</span>
+<span class="cmd">chown arjun:developers myfile.txt</span>
+
+<span class="comment"># Run as superuser (admin)</span>
+<span class="cmd">sudo apt update</span>      <span class="comment"># sudo = "do as super user"</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Process & System Commands</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — System Management</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># See running processes</span>
+<span class="cmd">ps aux</span>
+<span class="cmd">top</span>                  <span class="comment"># live view (like task manager)</span>
+<span class="cmd">htop</span>                 <span class="comment"># better version of top</span>
+
+<span class="comment"># Kill a process</span>
+<span class="cmd">kill 1234</span>            <span class="comment"># 1234 = process ID</span>
+<span class="cmd">kill -9 1234</span>         <span class="comment"># force kill</span>
+
+<span class="comment"># Disk and memory</span>
+<span class="cmd">df -h</span>                <span class="comment"># disk usage</span>
+<span class="cmd">free -h</span>              <span class="comment"># memory usage</span>
+
+<span class="comment"># Network</span>
+<span class="cmd">curl https://example.com</span>     <span class="comment"># make HTTP request</span>
+<span class="cmd">wget https://example.com/file.zip</span>
+<span class="cmd">netstat -tuln</span>        <span class="comment"># see open ports</span>
+
+<span class="comment"># Install software (Ubuntu/Debian)</span>
+<span class="cmd">sudo apt update && sudo apt install nginx -y</span></div>
+      </div>
+    </div>
+
+    <div class="callout callout-project">
+      <div class="callout-label">🚀 Mini Project — Set Up a Web Server</div>
+      <p>On your EC2 instance, install Nginx and serve a webpage:</p>
+      <div class="code-block" style="margin-top:10px">
+        <div class="code-header"><span class="code-lang">Commands</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="cmd">sudo apt update</span>
+<span class="cmd">sudo apt install nginx -y</span>
+<span class="cmd">sudo systemctl start nginx</span>
+<span class="cmd">sudo systemctl enable nginx</span>
+<span class="cmd">echo "&lt;h1&gt;Hello from my EC2 server!&lt;/h1&gt;" | sudo tee /var/www/html/index.html</span>
+<span class="comment"># Visit http://your-ec2-ip in a browser 🎉</span></div>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">✅ Module Summary</div>
+      <ul class="checklist">
+        <li>Linux powers 96% of servers — essential for DevOps</li>
+        <li>Navigation: pwd, ls, cd, mkdir, touch</li>
+        <li>Files: cat, cp, mv, rm, grep</li>
+        <li>Permissions: chmod, chown, sudo</li>
+        <li>System: ps, top, kill, df, free, apt</li>
+      </ul>
+    </div>
+
+    <div class="next-card" onclick="showModule('git')">
+      <div class="next-text">
+        <div class="next-label">Next Module →</div>
+        <div class="next-title">🌿 Git & GitHub</div>
+        <div class="next-why">Now that you can navigate servers, you need to track your code changes and collaborate with teams — that's where Git comes in.</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </div>
+  </section>
+
+  <!-- ========== GIT ========== -->
+  <section class="module" id="mod-git">
+    <div class="module-header">
+      <div class="module-icon">🌿</div>
+      <div class="module-meta">
+        <div class="module-tag">Module 04 — Code & Build</div>
+        <h2 class="module-title">Git & GitHub</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">The Problem Without Version Control</h3>
+      <p>Imagine you and your friend are both editing the same Word document. You each make changes and email it back and forth. After 5 rounds, nobody knows which version is the latest. Someone accidentally overwrites the other's changes. The file is now a mess called <code>final_final_v3_ACTUAL_FINAL.docx</code>.</p>
+      <p>In software, this is catastrophic. A team of 10 developers could be working on the same codebase. Without coordination, everything breaks.</p>
+    </div>
+
+    <div class="callout callout-analogy">
+      <div class="callout-label">⏰ Analogy — Google Docs + Time Machine</div>
+      <p><strong>Git</strong> is like Google Docs for code — everyone can work on it at the same time, every change is tracked, and you can go back to any previous version instantly. It's also like a <strong>time machine</strong> — if you break something, you press rewind and your code is perfectly restored.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Git vs GitHub — They're Different!</h3>
+      <table class="compare-table">
+        <thead><tr><th></th><th>Git</th><th>GitHub</th></tr></thead>
+        <tbody>
+          <tr><td>What it is</td><td>Version control tool (software)</td><td>Website that hosts Git repos</td></tr>
+          <tr><td>Where it runs</td><td>On your computer</td><td>In the cloud</td></tr>
+          <tr><td>Analogy</td><td>The camera taking photos</td><td>The photo album (online)</td></tr>
+          <tr><td>Can work offline?</td><td><span class="badge-good">Yes</span></td><td><span class="badge-bad">No</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">The Core Git Workflow</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-box active">Edit Code</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box">git add</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box">git commit</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box">git push</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box active">GitHub</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — Complete Git Workflow</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># 1. Set up git (one time only)</span>
+<span class="cmd">git config --global user.name "Arjun"</span>
+<span class="cmd">git config --global user.email "arjun@email.com"</span>
+
+<span class="comment"># 2. Initialize a new project</span>
+<span class="cmd">mkdir my-project && cd my-project</span>
+<span class="cmd">git init</span>
+<span class="out">Initialized empty Git repository in /my-project/.git/</span>
+
+<span class="comment"># 3. Create a file and track it</span>
+<span class="cmd">echo "print('Hello DevOps!')" > app.py</span>
+<span class="cmd">git add app.py</span>              <span class="comment"># stage the file</span>
+<span class="cmd">git add .</span>                   <span class="comment"># stage ALL files</span>
+
+<span class="comment"># 4. Save a snapshot (commit)</span>
+<span class="cmd">git commit -m "feat: add initial app"</span>
+<span class="out">[main (root-commit) a1b2c3d] feat: add initial app</span>
+<span class="out"> 1 file changed, 1 insertion(+)</span>
+
+<span class="comment"># 5. Connect to GitHub and push</span>
+<span class="cmd">git remote add origin https://github.com/arjun/my-project.git</span>
+<span class="cmd">git push -u origin main</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Branching — Working Without Breaking Things</h3>
+      <p>A <strong>branch</strong> is a separate copy of your code where you can experiment without touching the working version. Think of it as a sandbox.</p>
+      <div class="arch-diagram">  main branch:   A---B---C---D  (production, always working)
+                              \
+  feature branch:             E---F---G  (your new feature)
+                                        \
+  After testing:          merged back → D---H (new version)</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — Git Branching</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># Create and switch to a new branch</span>
+<span class="cmd">git checkout -b feature/login-page</span>
+<span class="out">Switched to a new branch 'feature/login-page'</span>
+
+<span class="comment"># Make changes, commit them</span>
+<span class="cmd">git add . && git commit -m "feat: add login page"</span>
+
+<span class="comment"># Switch back to main and merge</span>
+<span class="cmd">git checkout main</span>
+<span class="cmd">git merge feature/login-page</span>
+
+<span class="comment"># View all branches</span>
+<span class="cmd">git branch</span>
+<span class="out">* main</span>
+<span class="out">  feature/login-page</span></div>
+      </div>
+    </div>
+
+    <div class="callout callout-project">
+      <div class="callout-label">🚀 Mini Project — Open Source Contribution Simulation</div>
+      <p>Fork a GitHub repo → Clone it locally → Create a feature branch → Make a change → Push → Open a Pull Request. This is exactly how professional developers collaborate!</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">✅ Module Summary</div>
+      <ul class="checklist">
+        <li>Git tracks every change to your code — like a time machine</li>
+        <li>GitHub is the cloud home for your Git repositories</li>
+        <li>Core workflow: edit → add → commit → push</li>
+        <li>Branches let you work safely without breaking production</li>
+        <li>Pull Requests are how teams review and merge code</li>
+      </ul>
+    </div>
+
+    <div class="next-card" onclick="showModule('shell')">
+      <div class="next-text">
+        <div class="next-label">Next Module →</div>
+        <div class="next-title">⚡ Shell Scripting</div>
+        <div class="next-why">You know Linux commands. Now learn to chain them into automated scripts that run on their own — saving hours of manual work.</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </div>
+  </section>
+
+  <!-- ========== SHELL ========== -->
+  <section class="module" id="mod-shell">
+    <div class="module-header">
+      <div class="module-icon">⚡</div>
+      <div class="module-meta">
+        <div class="module-tag">Module 05 — Code & Build</div>
+        <h2 class="module-title">Shell Scripting</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">What is Shell Scripting?</h3>
+      <p>A <strong>shell script</strong> is a text file containing a list of Linux commands that run automatically, one by one, like a recipe. Instead of typing 20 commands every morning, you write them once in a script and run them with a single command.</p>
+    </div>
+
+    <div class="callout callout-analogy">
+      <div class="callout-label">🤖 Analogy — Teaching a Robot</div>
+      <p>Imagine training a robot to clean your house. Instead of telling it "go to kitchen, pick up broom, sweep floor, go to living room..." every day, you write it all down as a set of instructions once. Shell scripting is exactly that — you write instructions for your computer to follow automatically.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Your First Shell Script</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Shell Script — hello.sh</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment">#!/bin/bash</span>
+<span class="comment"># The line above tells the system: use bash to run this script</span>
+
+<span class="cmd">echo "=== DevOps Setup Script ==="</span>
+<span class="cmd">echo "Today is: $(date)"</span>
+<span class="cmd">echo "You are: $(whoami)"</span>
+<span class="cmd">echo "Script is running!"</span></div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — Run the Script</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="cmd">chmod +x hello.sh</span>    <span class="comment"># make it executable</span>
+<span class="cmd">./hello.sh</span>
+<span class="out">=== DevOps Setup Script ===</span>
+<span class="out">Today is: Sat Apr 18 11:23:45 IST 2026</span>
+<span class="out">You are: arjun</span>
+<span class="out">Script is running!</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Variables, Conditions & Loops</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Shell Script — Variables & If/Else</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment">#!/bin/bash</span>
+
+<span class="comment"># Variables</span>
+APP_NAME=<span class="str">"myapp"</span>
+VERSION=<span class="str">"1.0.0"</span>
+echo "Deploying $APP_NAME version $VERSION"
+
+<span class="comment"># Conditions</span>
+<span class="kw">if</span> [ -f "package.json" ]; <span class="kw">then</span>
+    echo "Node.js project detected"
+    npm install
+<span class="kw">elif</span> [ -f "pom.xml" ]; <span class="kw">then</span>
+    echo "Java/Maven project detected"
+    mvn package
+<span class="kw">else</span>
+    echo "Unknown project type"
+    exit 1
+<span class="kw">fi</span>
+
+<span class="comment"># Loops</span>
+SERVERS=(<span class="str">"server1"</span> <span class="str">"server2"</span> <span class="str">"server3"</span>)
+<span class="kw">for</span> server <span class="kw">in</span> "${SERVERS[@]}"; <span class="kw">do</span>
+    echo "Deploying to $server..."
+    ssh $server "sudo systemctl restart nginx"
+<span class="kw">done</span>
+echo "✅ Deployment complete!"</div>
+      </div>
+    </div>
+
+    <div class="callout callout-project">
+      <div class="callout-label">🚀 Mini Project — Automated Backup Script</div>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-header"><span class="code-lang">backup.sh</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment">#!/bin/bash</span>
+DATE=$(date +%Y-%m-%d)
+BACKUP_DIR=<span class="str">"/backups/$DATE"</span>
+SOURCE_DIR=<span class="str">"/var/www/html"</span>
+
+mkdir -p $BACKUP_DIR
+cp -r $SOURCE_DIR $BACKUP_DIR
+echo "Backup completed: $BACKUP_DIR"
+
+<span class="comment"># Upload to S3</span>
+aws s3 cp $BACKUP_DIR s3://my-backups/$DATE --recursive
+echo "✅ Backup uploaded to S3"</div>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">✅ Module Summary</div>
+      <ul class="checklist">
+        <li>Shell scripts automate repetitive Linux commands</li>
+        <li>Start every script with #!/bin/bash</li>
+        <li>Use variables, if/else, and loops to add logic</li>
+        <li>Scripts are the foundation of CI/CD pipelines</li>
+      </ul>
+    </div>
+
+    <div class="next-card" onclick="showModule('maven')">
+      <div class="next-text">
+        <div class="next-label">Next Module →</div>
+        <div class="next-title">🔨 Maven — Build Tool</div>
+        <div class="next-why">Software needs to be "built" (compiled, tested, packaged) before deployment. Maven automates this for Java projects.</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </div>
+  </section>
+
+  <!-- ========== MAVEN ========== -->
+  <section class="module" id="mod-maven">
+    <div class="module-header">
+      <div class="module-icon">🔨</div>
+      <div class="module-meta">
+        <div class="module-tag">Module 06 — Code & Build</div>
+        <h2 class="module-title">Maven — Build Tool</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">What Problem Does Maven Solve?</h3>
+      <p>When you write Java code, your computer can't run it directly. You need to: compile it (translate to machine code), download external libraries (like React for Java), run tests, and package everything into a single deployable file. Doing this manually for every developer on a team is chaotic.</p>
+    </div>
+
+    <div class="callout callout-analogy">
+      <div class="callout-label">🏗️ Analogy — Construction Site Manager</div>
+      <p>Building a house requires ordering materials, scheduling workers, following blueprints. <strong>Maven is the construction manager</strong> for your Java project. You describe what you want to build (in a file called <code>pom.xml</code>), and Maven handles all the steps: fetching materials (dependencies), building (compilation), testing, and packaging.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">The pom.xml — Maven's Blueprint</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">pom.xml — Project Configuration</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body">&lt;<span class="cmd">project</span>&gt;
+  &lt;<span class="cmd">groupId</span>&gt;com.mycompany&lt;/<span class="cmd">groupId</span>&gt;
+  &lt;<span class="cmd">artifactId</span>&gt;my-web-app&lt;/<span class="cmd">artifactId</span>&gt;
+  &lt;<span class="cmd">version</span>&gt;1.0.0&lt;/<span class="cmd">version</span>&gt;
+  &lt;<span class="cmd">packaging</span>&gt;jar&lt;/<span class="cmd">packaging</span>&gt;
+
+  <span class="comment">&lt;!-- External libraries my app needs --&gt;</span>
+  &lt;<span class="cmd">dependencies</span>&gt;
+    &lt;<span class="cmd">dependency</span>&gt;
+      &lt;<span class="cmd">groupId</span>&gt;org.springframework.boot&lt;/<span class="cmd">groupId</span>&gt;
+      &lt;<span class="cmd">artifactId</span>&gt;spring-boot-starter-web&lt;/<span class="cmd">artifactId</span>&gt;
+      &lt;<span class="cmd">version</span>&gt;3.0.0&lt;/<span class="cmd">version</span>&gt;
+    &lt;/<span class="cmd">dependency</span>&gt;
+  &lt;/<span class="cmd">dependencies</span>&gt;
+&lt;/<span class="cmd">project</span>&gt;</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Maven Lifecycle Commands</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — Maven Commands</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># Clean old build files</span>
+<span class="cmd">mvn clean</span>
+
+<span class="comment"># Compile source code</span>
+<span class="cmd">mvn compile</span>
+
+<span class="comment"># Run tests</span>
+<span class="cmd">mvn test</span>
+
+<span class="comment"># Package into JAR/WAR file (most common)</span>
+<span class="cmd">mvn package</span>
+<span class="out">BUILD SUCCESS</span>
+<span class="out">→ Created: target/my-web-app-1.0.0.jar</span>
+
+<span class="comment"># Do all steps in one command</span>
+<span class="cmd">mvn clean install</span></div>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">✅ Module Summary</div>
+      <ul class="checklist">
+        <li>Maven automates Java project building: compile → test → package</li>
+        <li>pom.xml is Maven's configuration file (your project blueprint)</li>
+        <li>Dependencies are automatically downloaded from the internet</li>
+        <li>Output is a JAR/WAR file — ready to deploy on any server</li>
+      </ul>
+    </div>
+
+    <div class="next-card" onclick="showModule('jenkins')">
+      <div class="next-text">
+        <div class="next-label">Next Module →</div>
+        <div class="next-title">🤖 Jenkins — CI/CD</div>
+        <div class="next-why">You can build manually. But what if every Git push automatically triggered a build, test, and deploy? That's CI/CD — and Jenkins does it for you.</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </div>
+  </section>
+
+  <!-- ========== JENKINS ========== -->
+  <section class="module" id="mod-jenkins">
+    <div class="module-header">
+      <div class="module-icon">🤖</div>
+      <div class="module-meta">
+        <div class="module-tag">Module 07 — CI/CD</div>
+        <h2 class="module-title">Jenkins — Continuous Integration & Delivery</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">What is CI/CD?</h3>
+      <p><strong>CI (Continuous Integration)</strong> means: every time a developer pushes code, it's automatically built and tested. No more "it works on my machine!" problems.</p>
+      <p><strong>CD (Continuous Delivery/Deployment)</strong> means: if all tests pass, the code is automatically deployed to production. No manual deployment steps.</p>
+    </div>
+
+    <div class="callout callout-analogy">
+      <div class="callout-label">🏭 Analogy — Factory Assembly Line</div>
+      <p>Imagine a car factory. <strong>Old way:</strong> workers build the whole car, then quality checks it at the end — finding defects when it's too late. <strong>CI/CD way:</strong> at every step of the assembly line, the car part is automatically checked. Problems are caught immediately. <strong>Jenkins is the factory manager</strong> running the assembly line — triggering each step automatically.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Jenkins Pipeline — How It Works</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-box active">Developer Pushes Code</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box">GitHub Webhook</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box">Jenkins Triggered</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box">Build + Test</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box active">Deploy 🚀</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Your First Jenkinsfile</h3>
+      <p>A <strong>Jenkinsfile</strong> is a script that defines what Jenkins should do. It lives in your project's root directory alongside your code.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Jenkinsfile — CI/CD Pipeline</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="kw">pipeline</span> {
+    <span class="kw">agent</span> any    <span class="comment">// run on any available server</span>
+
+    <span class="kw">stages</span> {
+        <span class="kw">stage</span>(<span class="str">'Checkout'</span>) {
+            <span class="kw">steps</span> {
+                git branch: <span class="str">'main'</span>,
+                    url: <span class="str">'https://github.com/arjun/my-app.git'</span>
+            }
+        }
+
+        <span class="kw">stage</span>(<span class="str">'Build'</span>) {
+            <span class="kw">steps</span> {
+                sh <span class="str">'mvn clean package'</span>
+            }
+        }
+
+        <span class="kw">stage</span>(<span class="str">'Test'</span>) {
+            <span class="kw">steps</span> {
+                sh <span class="str">'mvn test'</span>
+            }
+        }
+
+        <span class="kw">stage</span>(<span class="str">'Deploy'</span>) {
+            <span class="kw">steps</span> {
+                sh <span class="str">'scp target/app.jar user@server:/opt/app/'</span>
+                sh <span class="str">'ssh user@server "sudo systemctl restart myapp"'</span>
+            }
+        }
+    }
+
+    <span class="kw">post</span> {
+        <span class="kw">success</span> { echo <span class="str">'✅ Pipeline succeeded!'</span> }
+        <span class="kw">failure</span> { echo <span class="str">'❌ Pipeline failed — check logs!'</span> }
+    }
+}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Why Docker After Jenkins?</h3>
+      <div class="callout callout-warn">
+        <div class="callout-label">⚠️ Problem Jenkins Reveals</div>
+        <p>Jenkins builds and deploys perfectly on the build server. But on the production server: "It works in Jenkins but crashes in prod!" Why? Different Java version, different OS, missing libraries. Jenkins automates deployment — but doesn't guarantee the environment is the same everywhere. That's where Docker comes in.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-project">
+      <div class="callout-label">🚀 Mini Project — CI/CD Pipeline for a Java App</div>
+      <p>Set up Jenkins → Connect to GitHub → Create a pipeline that builds with Maven, runs tests, and deploys to your EC2 server on every push to main branch.</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">✅ Module Summary</div>
+      <ul class="checklist">
+        <li>CI = Automatically build & test on every code push</li>
+        <li>CD = Automatically deploy if tests pass</li>
+        <li>Jenkinsfile defines your pipeline as code</li>
+        <li>Jenkins catches bugs early and eliminates manual deployments</li>
+      </ul>
+    </div>
+
+    <div class="next-card" onclick="showModule('docker')">
+      <div class="next-text">
+        <div class="next-label">Next Module →</div>
+        <div class="next-title">🐳 Docker — Containerization</div>
+        <div class="next-why">Package your entire app + its environment into a single portable container. "Works on my machine" becomes "works everywhere."</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </div>
+  </section>
+
+  <!-- ========== DOCKER ========== -->
+  <section class="module" id="mod-docker">
+    <div class="module-header">
+      <div class="module-icon">🐳</div>
+      <div class="module-meta">
+        <div class="module-tag">Module 08 — Containers</div>
+        <h2 class="module-title">Docker — Containerization</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">The "Works on My Machine" Problem</h3>
+      <p>Developer A writes an app on Windows with Python 3.9. Developer B pulls the code on Mac with Python 3.11. The production server runs Linux with Python 3.7. Everyone is confused when things break at each step. This is one of the most frustrating problems in software engineering.</p>
+    </div>
+
+    <div class="callout callout-analogy">
+      <div class="callout-label">🚢 Analogy — Shipping Containers</div>
+      <p>Before shipping containers, loading cargo onto ships was chaotic. Different sizes, different methods, things breaking. Then someone invented the <strong>standard shipping container</strong> — one size, works on any ship, any truck, any train, any port in the world.</p>
+      <p><strong>Docker containers are the shipping containers of software.</strong> You pack your app, its dependencies, its runtime — everything — into a single container. It runs identically on your laptop, your colleague's laptop, Jenkins, and production. No surprises.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">VM vs Container — What's the Difference?</h3>
+      <div class="arch-diagram">  VIRTUAL MACHINE (Heavy)          CONTAINER (Lightweight)
+  ┌─────────────────────┐          ┌──────┬──────┬──────┐
+  │  Your App           │          │ App1 │ App2 │ App3 │
+  │  + Libraries        │          │+Libs │+Libs │+Libs │
+  │  + Guest OS (4GB)   │          └──────┴──────┴──────┘
+  │  + Hypervisor       │          │   Container Engine  │
+  │  + Host OS          │          │   (Docker)          │
+  └─────────────────────┘          │   Host OS           │
+  Boots in minutes                 └─────────────────────┘
+  Takes GBs of RAM                 Starts in seconds
+  Full OS overhead                 Shares host OS kernel</div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Core Docker Concepts</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="cc-icon">📄</div>
+          <div class="cc-title">Dockerfile</div>
+          <div class="cc-desc">A recipe/blueprint that describes how to build your container image.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">💿</div>
+          <div class="cc-title">Image</div>
+          <div class="cc-desc">A snapshot built from a Dockerfile. Like a frozen template you can deploy anywhere.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">📦</div>
+          <div class="cc-title">Container</div>
+          <div class="cc-desc">A running instance of an image. Like a live restaurant vs a recipe book.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🗄️</div>
+          <div class="cc-title">Registry</div>
+          <div class="cc-desc">Docker Hub — a store of images. Pull official images or push your own.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Dockerize a Node.js App</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Dockerfile</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># Start from an official Node.js base image</span>
+<span class="kw">FROM</span> node:18-alpine
+
+<span class="comment"># Set working directory inside the container</span>
+<span class="kw">WORKDIR</span> /app
+
+<span class="comment"># Copy dependency files first (for caching)</span>
+<span class="kw">COPY</span> package*.json ./
+
+<span class="comment"># Install dependencies</span>
+<span class="kw">RUN</span> npm install
+
+<span class="comment"># Copy the rest of the application code</span>
+<span class="kw">COPY</span> . .
+
+<span class="comment"># Expose port 3000 to the outside world</span>
+<span class="kw">EXPOSE</span> 3000
+
+<span class="comment"># Command to run when container starts</span>
+<span class="kw">CMD</span> [<span class="str">"node"</span>, <span class="str">"app.js"</span>]</div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — Build & Run</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># Build the image</span>
+<span class="cmd">docker build -t my-node-app:1.0 .</span>
+<span class="out">Successfully built a1b2c3d4e5f6</span>
+<span class="out">Successfully tagged my-node-app:1.0</span>
+
+<span class="comment"># Run the container</span>
+<span class="cmd">docker run -d -p 3000:3000 --name my-app my-node-app:1.0</span>
+
+<span class="comment"># Check running containers</span>
+<span class="cmd">docker ps</span>
+<span class="out">CONTAINER ID  IMAGE          STATUS    PORTS</span>
+<span class="out">a1b2c3d4e5f6  my-node-app:1  Up 2min   0.0.0.0:3000->3000</span>
+
+<span class="comment"># View logs</span>
+<span class="cmd">docker logs my-app</span>
+
+<span class="comment"># Stop and remove</span>
+<span class="cmd">docker stop my-app && docker rm my-app</span>
+
+<span class="comment"># Push to Docker Hub</span>
+<span class="cmd">docker tag my-node-app:1.0 arjun/my-node-app:1.0</span>
+<span class="cmd">docker push arjun/my-node-app:1.0</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Docker Compose — Multi-Container Apps</h3>
+      <p>Real apps have multiple pieces: a web server, a database, maybe a cache. Docker Compose lets you define and run them all together.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">docker-compose.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="cmd">version</span>: <span class="str">'3.8'</span>
+<span class="cmd">services</span>:
+  <span class="kw">web</span>:
+    <span class="cmd">build</span>: .
+    <span class="cmd">ports</span>: [<span class="str">"3000:3000"</span>]
+    <span class="cmd">depends_on</span>: [db]
+    <span class="cmd">environment</span>:
+      - DB_HOST=db
+
+  <span class="kw">db</span>:
+    <span class="cmd">image</span>: <span class="str">postgres:15</span>
+    <span class="cmd">environment</span>:
+      - POSTGRES_DB=myapp
+      - POSTGRES_PASSWORD=secret
+    <span class="cmd">volumes</span>:
+      - db-data:/var/lib/postgresql/data
+
+<span class="cmd">volumes</span>:
+  db-data:</div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="cmd">docker compose up -d</span>    <span class="comment"># start everything</span>
+<span class="cmd">docker compose down</span>      <span class="comment"># stop everything</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Why Kubernetes After Docker?</h3>
+      <div class="callout callout-warn">
+        <div class="callout-label">⚠️ Problem Docker Reveals at Scale</div>
+        <p>Docker is great for running containers. But what happens when your app needs <strong>100 containers</strong> running across <strong>10 servers</strong>? Who decides which server runs which container? What if a container crashes — who restarts it? What if traffic spikes — who adds more containers? Docker alone can't answer these questions. You need an <strong>orchestrator</strong>. That's Kubernetes.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-project">
+      <div class="callout-label">🚀 Mini Project — Dockerize a Python Flask App</div>
+      <p>Write a simple Flask web app → Create a Dockerfile → Build the image → Run it locally → Push to Docker Hub → Pull it on your EC2 and run it there. Your app is now portable!</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">✅ Module Summary</div>
+      <ul class="checklist">
+        <li>Docker packages apps into portable containers that run anywhere</li>
+        <li>Dockerfile = recipe, Image = packaged product, Container = running instance</li>
+        <li>Containers are lighter and faster than virtual machines</li>
+        <li>Docker Compose manages multi-container applications</li>
+        <li>Docker Hub is the public registry for sharing images</li>
+      </ul>
+    </div>
+
+    <div class="next-card" onclick="showModule('kubernetes')">
+      <div class="next-text">
+        <div class="next-label">Next Module →</div>
+        <div class="next-title">☸️ Kubernetes — Container Orchestration</div>
+        <div class="next-why">Manage hundreds of Docker containers across dozens of servers automatically — self-healing, scaling, and load balancing included.</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </div>
+  </section>
+
+  <!-- ========== KUBERNETES ========== -->
+  <section class="module" id="mod-kubernetes">
+    <div class="module-header">
+      <div class="module-icon">☸️</div>
+      <div class="module-meta">
+        <div class="module-tag">Module 09 — Orchestration</div>
+        <h2 class="module-title">Kubernetes</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">What is Kubernetes?</h3>
+      <p><strong>Kubernetes</strong> (K8s) is an open-source system that automatically manages containerized applications at scale. It handles starting, stopping, distributing, scaling, and healing containers — so you don't have to do it manually.</p>
+    </div>
+
+    <div class="callout callout-analogy">
+      <div class="callout-label">🍽️ Analogy — Restaurant Manager</div>
+      <p>You have 50 waiters (containers) serving 500 customers across 5 floors (servers). The <strong>restaurant manager (Kubernetes)</strong>: decides which floor each waiter goes to, replaces waiters who go sick automatically, adds more waiters when the restaurant gets busy, ensures every customer gets served. You just tell the manager "I want 50 waiters" — the rest is handled automatically.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Kubernetes Architecture</h3>
+      <div class="arch-diagram">  ┌─────────────────────────── KUBERNETES CLUSTER ──────────────────────┐
+  │                                                                        │
+  │  ┌──────────────────────┐      ┌────────────────────────────────────┐  │
+  │  │    CONTROL PLANE     │      │           WORKER NODES             │  │
+  │  │  (The Brain)         │      │                                    │  │
+  │  │                      │      │  ┌────────────┐  ┌────────────┐   │  │
+  │  │  API Server ←────────┼──────┼→ │   Node 1   │  │   Node 2   │   │  │
+  │  │  Scheduler           │      │  │ [Pod][Pod] │  │ [Pod][Pod] │   │  │
+  │  │  etcd (database)     │      │  └────────────┘  └────────────┘   │  │
+  │  │  Controller Manager  │      │                                    │  │
+  │  └──────────────────────┘      └────────────────────────────────────┘  │
+  └────────────────────────────────────────────────────────────────────────┘
+
+  Pod = smallest unit in K8s = one or more containers running together</div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Key Kubernetes Objects</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="cc-icon">📦</div>
+          <div class="cc-title">Pod</div>
+          <div class="cc-desc">Smallest deployable unit. Wraps one or more containers. Has its own IP address.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🔄</div>
+          <div class="cc-title">Deployment</div>
+          <div class="cc-desc">Manages Pods — ensures X replicas always run. Handles rolling updates.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🌐</div>
+          <div class="cc-title">Service</div>
+          <div class="cc-desc">Stable network endpoint for Pods. Load balances traffic across all replicas.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">⚙️</div>
+          <div class="cc-title">ConfigMap</div>
+          <div class="cc-desc">Store configuration (env variables) separately from your container image.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Deploy an App on Kubernetes</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">deployment.yaml</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="cmd">apiVersion</span>: apps/v1
+<span class="cmd">kind</span>: Deployment
+<span class="cmd">metadata</span>:
+  <span class="cmd">name</span>: my-node-app
+<span class="cmd">spec</span>:
+  <span class="cmd">replicas</span>: 3        <span class="comment"># run 3 copies at all times</span>
+  <span class="cmd">selector</span>:
+    <span class="cmd">matchLabels</span>:
+      <span class="cmd">app</span>: my-node-app
+  <span class="cmd">template</span>:
+    <span class="cmd">metadata</span>:
+      <span class="cmd">labels</span>:
+        <span class="cmd">app</span>: my-node-app
+    <span class="cmd">spec</span>:
+      <span class="cmd">containers</span>:
+      - <span class="cmd">name</span>: my-node-app
+        <span class="cmd">image</span>: <span class="str">arjun/my-node-app:1.0</span>
+        <span class="cmd">ports</span>:
+        - <span class="cmd">containerPort</span>: 3000
+        <span class="cmd">resources</span>:
+          <span class="cmd">limits</span>:
+            <span class="cmd">cpu</span>: <span class="str">"500m"</span>
+            <span class="cmd">memory</span>: <span class="str">"256Mi"</span>
+---
+<span class="cmd">apiVersion</span>: v1
+<span class="cmd">kind</span>: Service
+<span class="cmd">metadata</span>:
+  <span class="cmd">name</span>: my-node-app-svc
+<span class="cmd">spec</span>:
+  <span class="cmd">type</span>: LoadBalancer
+  <span class="cmd">selector</span>:
+    <span class="cmd">app</span>: my-node-app
+  <span class="cmd">ports</span>:
+  - <span class="cmd">port</span>: 80
+    <span class="cmd">targetPort</span>: 3000</div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — kubectl Commands</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># Deploy the app</span>
+<span class="cmd">kubectl apply -f deployment.yaml</span>
+<span class="out">deployment.apps/my-node-app created</span>
+<span class="out">service/my-node-app-svc created</span>
+
+<span class="comment"># Check pods are running</span>
+<span class="cmd">kubectl get pods</span>
+<span class="out">NAME                          READY   STATUS    RESTARTS</span>
+<span class="out">my-node-app-7d6b8c-abc12      1/1     Running   0</span>
+<span class="out">my-node-app-7d6b8c-def34      1/1     Running   0</span>
+<span class="out">my-node-app-7d6b8c-ghi56      1/1     Running   0</span>
+
+<span class="comment"># Scale up to 10 replicas</span>
+<span class="cmd">kubectl scale deployment my-node-app --replicas=10</span>
+
+<span class="comment"># Rolling update (zero downtime)</span>
+<span class="cmd">kubectl set image deployment/my-node-app my-node-app=arjun/my-node-app:2.0</span>
+
+<span class="comment"># If something goes wrong, roll back instantly</span>
+<span class="cmd">kubectl rollout undo deployment/my-node-app</span>
+
+<span class="comment"># View logs from a pod</span>
+<span class="cmd">kubectl logs my-node-app-7d6b8c-abc12</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Self-Healing — Kubernetes' Superpower</h3>
+      <div class="callout callout-tip">
+        <div class="callout-label">🔄 Watch This Happen</div>
+        <p>You told Kubernetes: "I want 3 replicas." If one Pod crashes at 3am, Kubernetes <strong>automatically</strong> starts a new one — within seconds — without anyone waking up. This is called <em>self-healing</em> and it's what makes Kubernetes so powerful for production systems.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-project">
+      <div class="callout-label">🚀 Mini Project — Deploy a Full App on K8s</div>
+      <p>Use Minikube (local K8s) → Deploy your Dockerized Node.js app → Expose it via a Service → Scale it to 5 replicas → Simulate a pod crash and watch K8s heal itself.</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">✅ Module Summary</div>
+      <ul class="checklist">
+        <li>Kubernetes orchestrates containers across multiple servers</li>
+        <li>Pods = containers, Deployments = desired state, Services = networking</li>
+        <li>Self-healing: K8s restarts crashed containers automatically</li>
+        <li>Auto-scaling: handles traffic spikes by adding/removing pods</li>
+        <li>Rolling updates: deploy new versions with zero downtime</li>
+      </ul>
+    </div>
+
+    <div class="next-card" onclick="showModule('terraform')">
+      <div class="next-text">
+        <div class="next-label">Next Module →</div>
+        <div class="next-title">🏗️ Terraform — Infrastructure as Code</div>
+        <div class="next-why">You can manage apps on Kubernetes, but who creates the servers and networks? Terraform lets you define ALL infrastructure in code — no clicking in consoles.</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </div>
+  </section>
+
+  <!-- ========== TERRAFORM ========== -->
+  <section class="module" id="mod-terraform">
+    <div class="module-header">
+      <div class="module-icon">🏗️</div>
+      <div class="module-meta">
+        <div class="module-tag">Module 10 — Infrastructure as Code</div>
+        <h2 class="module-title">Terraform</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">The Problem: ClickOps</h3>
+      <p>Imagine you manually click through the AWS console to create 5 EC2 instances, 3 S3 buckets, 2 VPCs, security groups, and IAM roles. Three months later, you need to recreate this entire setup for a new client. Or worse — something breaks and you have no idea what the original settings were.</p>
+      <p>Manual infrastructure = inconsistent, undocumented, irreproducible. This is called <em>"ClickOps"</em> — and it's a DevOps anti-pattern.</p>
+    </div>
+
+    <div class="callout callout-analogy">
+      <div class="callout-label">🏠 Analogy — Architectural Blueprint</div>
+      <p>When a builder constructs a house, they work from a <strong>blueprint</strong>. The blueprint describes exactly every room, door, pipe, and wire. You can build the same house in Mumbai or Delhi from the same blueprint. <strong>Terraform is the blueprint for your cloud infrastructure</strong> — write it once, deploy anywhere, recreate identically anytime.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">How Terraform Works</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-box active">Write .tf files</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box">terraform init</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box">terraform plan</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box">terraform apply</div>
+          <div class="flow-arrow">→</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-box active">Infrastructure Created ✅</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Create an EC2 Instance with Terraform</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">main.tf — Terraform Configuration</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># Tell Terraform which cloud provider to use</span>
+<span class="kw">provider</span> <span class="str">"aws"</span> {
+  region = <span class="str">"ap-south-1"</span>   <span class="comment"># Mumbai region</span>
+}
+
+<span class="comment"># Create a VPC</span>
+<span class="kw">resource</span> <span class="str">"aws_vpc"</span> <span class="str">"main"</span> {
+  cidr_block = <span class="str">"10.0.0.0/16"</span>
+  tags = { Name = <span class="str">"my-vpc"</span> }
+}
+
+<span class="comment"># Create an EC2 instance</span>
+<span class="kw">resource</span> <span class="str">"aws_instance"</span> <span class="str">"web_server"</span> {
+  ami           = <span class="str">"ami-0c55b159cbfafe1f0"</span>
+  instance_type = <span class="str">"t2.micro"</span>
+  key_name      = <span class="str">"my-key"</span>
+
+  tags = {
+    Name        = <span class="str">"web-server"</span>
+    Environment = <span class="str">"production"</span>
+  }
+}
+
+<span class="comment"># Output the public IP address</span>
+<span class="kw">output</span> <span class="str">"server_ip"</span> {
+  value = aws_instance.web_server.public_ip
+}</div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — Terraform Commands</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># Download the AWS provider plugin</span>
+<span class="cmd">terraform init</span>
+<span class="out">Terraform has been successfully initialized!</span>
+
+<span class="comment"># Preview what will be created (no changes yet)</span>
+<span class="cmd">terraform plan</span>
+<span class="out">Plan: 2 to add, 0 to change, 0 to destroy.</span>
+<span class="out">  + aws_vpc.main</span>
+<span class="out">  + aws_instance.web_server</span>
+
+<span class="comment"># Actually create the infrastructure</span>
+<span class="cmd">terraform apply</span>
+<span class="out">Apply complete! Resources: 2 added.</span>
+<span class="out">server_ip = "13.233.45.67"</span>
+
+<span class="comment"># Destroy everything when no longer needed</span>
+<span class="cmd">terraform destroy</span>
+<span class="out">Destroy complete! Resources: 2 destroyed.</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Key Benefits of Terraform</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="cc-icon">📋</div>
+          <div class="cc-title">Documented</div>
+          <div class="cc-desc">Your infrastructure is described in code. New team members can read exactly what was built.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">♻️</div>
+          <div class="cc-title">Reproducible</div>
+          <div class="cc-desc">Recreate identical environments (dev, staging, prod) from the same code.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🔄</div>
+          <div class="cc-title">Version Controlled</div>
+          <div class="cc-desc">Store Terraform files in Git. See who changed what and when.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🌍</div>
+          <div class="cc-title">Multi-Cloud</div>
+          <div class="cc-desc">Same tool works for AWS, Azure, GCP, and 1000+ other providers.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-project">
+      <div class="callout-label">🚀 Mini Project — Infrastructure Setup with Terraform</div>
+      <p>Write Terraform code to create: 1 VPC, 2 subnets (public + private), 1 EC2 web server in public subnet, 1 RDS database in private subnet, security groups with proper rules. Then destroy it all with one command.</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">✅ Module Summary</div>
+      <ul class="checklist">
+        <li>Terraform manages cloud infrastructure as code — no manual clicking</li>
+        <li>Write .tf files → terraform plan (preview) → terraform apply (create)</li>
+        <li>Infrastructure is version-controlled, documented, and reproducible</li>
+        <li>Works with AWS, Azure, GCP, and 1000+ providers</li>
+        <li>terraform destroy removes everything cleanly</li>
+      </ul>
+    </div>
+
+    <div class="next-card" onclick="showModule('monitoring')">
+      <div class="next-text">
+        <div class="next-label">Final Module →</div>
+        <div class="next-title">📊 Prometheus & Grafana — Monitoring</div>
+        <div class="next-why">Your app is running in production. But how do you know it's healthy? You need monitoring — alerts, dashboards, and insights into your system's performance.</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </div>
+  </section>
+
+  <!-- ========== MONITORING ========== -->
+  <section class="module" id="mod-monitoring">
+    <div class="module-header">
+      <div class="module-icon">📊</div>
+      <div class="module-meta">
+        <div class="module-tag">Module 11 — Monitoring</div>
+        <h2 class="module-title">Prometheus & Grafana</h2>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Why Monitoring? The Final Piece</h3>
+      <p>You've built your app, containerized it, deployed it on Kubernetes, automated your pipeline with Jenkins, and provisioned infrastructure with Terraform. But your work isn't done — you need to <strong>watch</strong> what's happening in production.</p>
+      <p>Without monitoring: servers could be running at 99% CPU right now and you wouldn't know until users complain. Memory could be slowly leaking. A database could be about to run out of space. Monitoring catches these before they become disasters.</p>
+    </div>
+
+    <div class="callout callout-analogy">
+      <div class="callout-label">✈️ Analogy — Airplane Cockpit</div>
+      <p>A pilot doesn't fly blind. The cockpit has hundreds of gauges showing altitude, speed, fuel, engine temperature, wind direction. If anything goes wrong, an alarm sounds immediately. <strong>Prometheus is the system collecting all those gauge readings. Grafana is the cockpit dashboard displaying them beautifully.</strong></p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Prometheus — Metrics Collector</h3>
+      <p><strong>Prometheus</strong> is an open-source monitoring system. It "scrapes" (collects) metrics from your applications and servers every few seconds and stores them in a time-series database.</p>
+      <div class="arch-diagram">  Your App / Kubernetes / Linux
+         ↓ (exposes metrics at /metrics endpoint)
+  ┌──────────────────────────────────┐
+  │         PROMETHEUS               │
+  │  Scrapes metrics every 15 sec    │
+  │  Stores: CPU%, memory, req/sec   │
+  │  Evaluates alert rules           │
+  └──────────────────────────────────┘
+         ↓                    ↓
+  [Grafana Dashboard]    [AlertManager]
+  Beautiful charts        → Slack/Email alerts</div>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">prometheus.yml — Configuration</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="cmd">global</span>:
+  <span class="cmd">scrape_interval</span>: 15s    <span class="comment"># collect metrics every 15 seconds</span>
+
+<span class="cmd">scrape_configs</span>:
+  - <span class="cmd">job_name</span>: <span class="str">'my-node-app'</span>
+    <span class="cmd">static_configs</span>:
+      - <span class="cmd">targets</span>: [<span class="str">'localhost:3000'</span>]
+
+  - <span class="cmd">job_name</span>: <span class="str">'kubernetes-nodes'</span>
+    <span class="cmd">kubernetes_sd_configs</span>:
+      - <span class="cmd">role</span>: node</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">PromQL — Querying Your Metrics</h3>
+      <p>Prometheus has its own query language called <strong>PromQL</strong>. It looks complex but starts simply:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PromQL — Example Queries</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="comment"># CPU usage of all nodes</span>
+<span class="cmd">node_cpu_seconds_total</span>
+
+<span class="comment"># CPU usage % (human-readable)</span>
+<span class="cmd">100 - (avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)</span>
+
+<span class="comment"># Available memory in GB</span>
+<span class="cmd">node_memory_MemAvailable_bytes / 1024 / 1024 / 1024</span>
+
+<span class="comment"># HTTP requests per second</span>
+<span class="cmd">rate(http_requests_total[5m])</span>
+
+<span class="comment"># Alert: disk almost full</span>
+<span class="cmd">(node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes > 0.85</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Grafana — Beautiful Dashboards</h3>
+      <p><strong>Grafana</strong> connects to Prometheus and turns raw metrics into stunning, real-time visual dashboards. You can build dashboards with graphs, gauges, heatmaps, and tables — and share them with your whole team.</p>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="cc-icon">📈</div>
+          <div class="cc-title">Time Series Graphs</div>
+          <div class="cc-desc">See how CPU, memory, and request rates change over time.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🔴</div>
+          <div class="cc-title">Alerts</div>
+          <div class="cc-desc">Get Slack/email notifications when CPU > 80% or error rate spikes.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🗂️</div>
+          <div class="cc-title">Pre-built Dashboards</div>
+          <div class="cc-desc">Import ready-made dashboards for Kubernetes, Node.js, and more from grafana.com.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">👥</div>
+          <div class="cc-title">Team Sharing</div>
+          <div class="cc-desc">Share dashboards with your entire team. Everyone has visibility.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Deploy the Full Stack with Docker Compose</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">docker-compose.monitoring.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="cmd">version</span>: <span class="str">'3.8'</span>
+<span class="cmd">services</span>:
+
+  <span class="kw">prometheus</span>:
+    <span class="cmd">image</span>: <span class="str">prom/prometheus:latest</span>
+    <span class="cmd">ports</span>: [<span class="str">"9090:9090"</span>]
+    <span class="cmd">volumes</span>:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  <span class="kw">grafana</span>:
+    <span class="cmd">image</span>: <span class="str">grafana/grafana:latest</span>
+    <span class="cmd">ports</span>: [<span class="str">"3000:3000"</span>]
+    <span class="cmd">environment</span>:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    <span class="cmd">volumes</span>:
+      - grafana-data:/var/lib/grafana
+    <span class="cmd">depends_on</span>: [prometheus]
+
+  <span class="kw">node-exporter</span>:
+    <span class="cmd">image</span>: <span class="str">prom/node-exporter:latest</span>
+    <span class="cmd">ports</span>: [<span class="str">"9100:9100"</span>]
+    <span class="comment"># Exposes Linux system metrics (CPU, RAM, disk)</span>
+
+<span class="cmd">volumes</span>:
+  grafana-data:</div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <div class="code-body"><span class="cmd">docker compose -f docker-compose.monitoring.yml up -d</span>
+<span class="comment"># Prometheus: http://localhost:9090</span>
+<span class="comment"># Grafana: http://localhost:3000 (admin/admin)</span></div>
+      </div>
+    </div>
+
+    <div class="callout callout-project">
+      <div class="callout-label">🚀 Final Mini Project — Full Monitoring Stack</div>
+      <p>Deploy Prometheus + Grafana + Node Exporter on your EC2 server → Import the "Node Exporter Full" dashboard from Grafana.com → Set up an alert that fires on Slack when CPU usage exceeds 70% for 5 minutes.</p>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">🎓 You've Completed the DevOps Journey!</h3>
+      <div class="callout callout-tip">
+        <div class="callout-label">✅ Complete DevOps Lifecycle — What You've Mastered</div>
+        <ul class="checklist">
+          <li>☁️ <strong>Cloud Computing + AWS</strong> — On-demand infrastructure, EC2, S3, IAM, VPC</li>
+          <li>🐧 <strong>Linux</strong> — Command line, file system, permissions, process management</li>
+          <li>🌿 <strong>Git & GitHub</strong> — Version control, branching, collaboration</li>
+          <li>⚡ <strong>Shell Scripting</strong> — Automation, loops, conditionals</li>
+          <li>🔨 <strong>Maven</strong> — Build, test, and package Java applications</li>
+          <li>🤖 <strong>Jenkins</strong> — CI/CD pipelines, automated testing and deployment</li>
+          <li>🐳 <strong>Docker</strong> — Containerization, Dockerfiles, Docker Compose</li>
+          <li>☸️ <strong>Kubernetes</strong> — Orchestration, scaling, self-healing, rolling updates</li>
+          <li>🏗️ <strong>Terraform</strong> — Infrastructure as Code, reproducible environments</li>
+          <li>📊 <strong>Prometheus & Grafana</strong> — Metrics, dashboards, alerting</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="next-card" onclick="showModule('home')">
+      <div class="next-text">
+        <div class="next-label">← Go Back</div>
+        <div class="next-title">🏠 Return to Home</div>
+        <div class="next-why">Review the roadmap and revisit any module you want to practice more.</div>
+      </div>
+      <div class="next-arrow">←</div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const modules = ['home','cloud','aws','linux','git','shell','maven','jenkins','docker','kubernetes','terraform','monitoring'];
+  let currentIndex = 0;
+
+  function showModule(id) {
+    // hide all
+    document.querySelectorAll('.module').forEach(m => m.classList.remove('visible'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+    // show target
+    const target = document.getElementById('mod-' + id);
+    if (target) {
+      target.classList.add('visible');
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // activate nav
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) {
+        n.classList.add('active');
+      }
+    });
+
+    // update progress
+    currentIndex = modules.indexOf(id);
+    if (currentIndex < 0) currentIndex = 0;
+    const pct = Math.round((currentIndex / (modules.length - 1)) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '%';
+
+    // close sidebar on mobile
+    if (window.innerWidth <= 768) {
+      document.getElementById('sidebar').classList.remove('open');
+    }
+  }
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+
+  // scroll main to top on module change
+  document.getElementById('main').addEventListener('scroll', function() {});
+</script>
+</body>
+</html>
