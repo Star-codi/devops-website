@@ -1,0 +1,82 @@
+<div class="module-header"><div class="module-icon">📝</div><div class="module-meta"><div class="module-tag">Module 0.3 — Before You Begin</div><h2 class="module-title">YAML &amp; Config Files</h2></div></div>
+<div class="section">
+<h3 class="section-title">What is YAML and Why Does It Matter?</h3>
+<p><strong>YAML</strong> (YAML Ain't Markup Language) is a human-readable format for writing configuration files. If JSON is for machines, YAML is for humans — it's clean, readable, and used <em>everywhere</em> in DevOps.</p>
+<p>You'll write YAML for <strong>Docker Compose</strong>, <strong>Kubernetes</strong> manifests, <strong>GitHub Actions</strong> pipelines, <strong>Ansible</strong> playbooks, and more. Getting comfortable with YAML will save you hours of debugging.</p>
+</div>
+<div class="callout callout-analogy"><div class="callout-label">📋 Analogy — Form Filling</div><p>YAML is like filling out a structured form. Instead of checkboxes and dropdown menus, you write key-value pairs with indentation showing which items belong together. The indentation (spaces — <em>never tabs!</em>) is everything in YAML.</p></div>
+<div class="section">
+<h3 class="section-title">YAML Basics — Syntax</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">config.yaml — YAML Syntax Examples</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># --- KEY: VALUE PAIRS ---</span>
+<span class="cmd">name</span>: <span class="str">my-app</span>
+<span class="cmd">version</span>: <span class="str">"1.0"</span>
+<span class="cmd">port</span>: <span class="out">8080</span>
+<span class="cmd">debug</span>: <span class="kw">true</span>
+<span class="comment"># --- LISTS (use - for each item) ---</span>
+<span class="cmd">languages</span>:
+  - Python
+  - Java
+  - Go
+
+<span class="comment"># --- NESTED (indentation = hierarchy) ---</span>
+<span class="cmd">database</span>:
+  <span class="cmd">host</span>: <span class="str">localhost</span>
+<span class="cmd">port</span>: <span class="out">5432</span>
+<span class="cmd">name</span>: <span class="str">mydb</span>
+<span class="cmd">credentials</span>:
+    <span class="cmd">user</span>: <span class="str">admin</span>
+<span class="cmd">password</span>: <span class="str">secret123</span>
+<span class="comment"># --- LIST OF OBJECTS ---</span>
+<span class="cmd">servers</span>:
+  - <span class="cmd">name</span>: <span class="str">web-1</span>
+<span class="cmd">ip</span>: <span class="str">10.0.0.1</span>
+<span class="cmd">role</span>: <span class="str">frontend</span>
+  - <span class="cmd">name</span>: <span class="str">db-1</span>
+<span class="cmd">ip</span>: <span class="str">10.0.0.2</span>
+<span class="cmd">role</span>: <span class="str">database</span>
+<span class="comment"># --- MULTI-LINE STRINGS ---</span>
+<span class="cmd">description</span>: |
+  This is a multi-line
+  string. The pipe | keeps
+  newlines.
+
+<span class="comment"># ⚠️  NEVER use TABS. Always use 2-space indentation.</span></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">YAML in Action — GitHub Actions Pipeline</h3>
+<p>Here's a real GitHub Actions CI/CD pipeline written in YAML. Don't worry about understanding every detail — just notice the structure:</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">.github/workflows/deploy.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">name</span>: <span class="str">Deploy My App</span>
+<span class="comment"># When to run this pipeline</span>
+<span class="cmd">on</span>:
+  <span class="cmd">push</span>:
+    <span class="cmd">branches</span>: [<span class="str">main</span>]
+
+<span class="comment"># What to do</span>
+<span class="cmd">jobs</span>:
+  <span class="cmd">build-and-deploy</span>:
+    <span class="cmd">runs-on</span>: <span class="str">ubuntu-latest</span>
+<span class="cmd">steps</span>:
+      - <span class="cmd">name</span>: <span class="str">Checkout code</span>
+<span class="cmd">uses</span>: <span class="str">actions/checkout@v3</span>
+
+      - <span class="cmd">name</span>: <span class="str">Run tests</span>
+<span class="cmd">run</span>: <span class="str">npm test</span>
+
+      - <span class="cmd">name</span>: <span class="str">Build Docker image</span>
+<span class="cmd">run</span>: <span class="str">docker build -t myapp:latest .</span>
+
+      - <span class="cmd">name</span>: <span class="str">Push to Docker Hub</span>
+<span class="cmd">run</span>: <span class="str">docker push myusername/myapp:latest</span></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Common YAML Mistakes to Avoid</h3>
+<table class="compare-table">
+<tr><th>❌ Wrong</th><th>✅ Right</th><th>Why</th></tr>
+<tr><td><code>name:myapp</code></td><td><code>name: myapp</code></td><td>Space after colon is required</td></tr>
+<tr><td>Tab indentation</td><td>2-space indentation</td><td>YAML doesn't allow tabs</td></tr>
+<tr><td><code>port: "8080"</code> when a number is needed</td><td><code>port: 8080</code></td><td>Numbers shouldn't be quoted</td></tr>
+<tr><td>Inconsistent indentation</td><td>Always consistent 2 spaces</td><td>Inconsistency causes parse errors</td></tr>
+</table>
+</div>
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Write Your First YAML</div><p>Create a file called <code>app-config.yaml</code> describing a fictional app: give it a name, version, a list of 3 features, and a nested database section with host, port, and name. Validate it at <strong>yamllint.com</strong>.</p></div>
+<div class="next-card" onclick="showModule('cloud')"><div class="next-text"><div class="next-label">Next →</div><div class="next-title">☁️ Module 01: Why Cloud Computing</div><div class="next-why">Now that you have the foundations, let's understand the infrastructure that runs modern software.</div></div><div class="next-arrow">→</div></div>

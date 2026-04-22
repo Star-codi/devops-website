@@ -1,0 +1,83 @@
+<div class="module-header"><div class="module-icon">🔐</div><div class="module-meta"><div class="module-tag">Module 12 — Security &amp; Next Steps</div><h2 class="module-title">DevSecOps Basics</h2></div></div>
+<div class="section">
+<h3 class="section-title">What is DevSecOps?</h3>
+<p><strong>DevSecOps</strong> = Development + Security + Operations. It's the practice of baking security into every stage of the DevOps pipeline — not bolting it on at the end as an afterthought.</p>
+<p>The old approach: developers build the app, security team scans it at the end, finds 500 vulnerabilities, everyone panics. The DevSecOps approach: security checks run <strong>automatically</strong> at every commit, every build, every deployment. Problems are caught when they're cheap to fix — not after you're in production.</p>
+</div>
+<div class="callout callout-analogy"><div class="callout-label">🏗️ Analogy — Building Safety</div><p>Imagine building a skyscraper and only checking if it's structurally sound after it's finished. That would be insane — you'd build safety into every floor as you go. DevSecOps does the same for software: safety at every layer, from the start.</p></div>
+<div class="section">
+<h3 class="section-title">Security at Every Stage</h3>
+<div class="svg-diagram">
+<svg font-family="'DM Mono', monospace" viewbox="0 0 800 220" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#111827" height="220" width="800"></rect>
+<defs>
+<marker id="ars" markerheight="6" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#7c3aed"></path></marker>
+</defs>
+<!-- Pipeline -->
+<rect fill="#0d1117" height="80" rx="10" stroke="#1e2d45" stroke-width="1" width="770" x="10" y="70"></rect>
+<!-- Stages -->
+<rect fill="#0a0e1a" height="50" rx="6" stroke="#00d4aa" stroke-width="1.5" width="110" x="30" y="85"></rect>
+<text fill="#00d4aa" font-size="18" text-anchor="middle" x="85" y="107">💻</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="85" y="124">CODE</text>
+<path d="M140,110 L165,110" marker-end="url(#ars)" stroke="#7c3aed" stroke-width="1.5"></path>
+<rect fill="#0a0e1a" height="50" rx="6" stroke="#fbbf24" stroke-width="1.5" width="110" x="165" y="85"></rect>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="220" y="107">🔍</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="220" y="124">SAST SCAN</text>
+<path d="M275,110 L300,110" marker-end="url(#ars)" stroke="#7c3aed" stroke-width="1.5"></path>
+<rect fill="#0a0e1a" height="50" rx="6" stroke="#fbbf24" stroke-width="1.5" width="110" x="300" y="85"></rect>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="355" y="107">📦</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="355" y="124">BUILD + SCAN</text>
+<path d="M410,110 L435,110" marker-end="url(#ars)" stroke="#7c3aed" stroke-width="1.5"></path>
+<rect fill="#0a0e1a" height="50" rx="6" stroke="#ff6b35" stroke-width="1.5" width="110" x="435" y="85"></rect>
+<text fill="#ff6b35" font-size="18" text-anchor="middle" x="490" y="107">🐳</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="490" y="124">IMAGE SCAN</text>
+<path d="M545,110 L570,110" marker-end="url(#ars)" stroke="#7c3aed" stroke-width="1.5"></path>
+<rect fill="#0a0e1a" height="50" rx="6" stroke="#ff6b35" stroke-width="1.5" width="110" x="570" y="85"></rect>
+<text fill="#ff6b35" font-size="18" text-anchor="middle" x="625" y="107">🚀</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="625" y="124">DEPLOY + POLICY</text>
+<path d="M680,110 L705,110" marker-end="url(#ars)" stroke="#7c3aed" stroke-width="1.5"></path>
+<rect fill="#0a0e1a" height="50" rx="6" stroke="#7c3aed" stroke-width="1.5" width="80" x="705" y="85"></rect>
+<text fill="#7c3aed" font-size="18" text-anchor="middle" x="745" y="107">📊</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="745" y="124">MONITOR</text>
+<!-- Security shields below -->
+<text fill="#64748b" font-size="8" text-anchor="middle" x="85" y="165">Secret scanning</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="220" y="165">SonarQube / Semgrep</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="355" y="165">Dependency check</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="490" y="165">Trivy / Snyk</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="625" y="165">OPA / Kyverno</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="745" y="165">Falco / SIEM</text>
+<!-- Title -->
+<text fill="#7c3aed" font-size="13" font-weight="bold" text-anchor="middle" x="400" y="35">Security Integrated at Every Stage (Shift Left)</text>
+</svg>
+<div class="diagram-caption">"Shift Left" — move security checks earlier in the pipeline where they're cheaper to fix</div>
+</div>
+</div>
+<div class="section">
+<h3 class="section-title">Essential Security Practices</h3>
+<div class="concept-grid">
+<div class="concept-card"><div class="cc-icon">🔑</div><div class="cc-title">Never Hardcode Secrets</div><div class="cc-desc">Never put passwords, API keys, or tokens directly in your code or YAML files. Use environment variables or secret managers (AWS Secrets Manager, Vault).</div></div>
+<div class="concept-card"><div class="cc-icon">🏷️</div><div class="cc-title">Least Privilege (IAM)</div><div class="cc-desc">Give every user, service, and app only the permissions they <em>need</em> — nothing more. A compromised app with minimal permissions does minimal damage.</div></div>
+<div class="concept-card"><div class="cc-icon">🔍</div><div class="cc-title">Scan Dependencies</div><div class="cc-desc">Your code uses 100s of open-source libraries. Tools like <strong>Snyk</strong> or <strong>Trivy</strong> check them for known vulnerabilities automatically on every build.</div></div>
+<div class="concept-card"><div class="cc-icon">🔐</div><div class="cc-title">HTTPS Everywhere</div><div class="cc-desc">All traffic to and from your app must be encrypted. Use SSL/TLS certificates. Let's Encrypt provides free certificates. Never serve production over plain HTTP.</div></div>
+<div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">Audit Logs</div><div class="cc-desc">Keep logs of who did what and when. AWS CloudTrail records every API call. You need this for compliance, debugging, and catching attackers.</div></div>
+<div class="concept-card"><div class="cc-icon">🛡️</div><div class="cc-title">Network Segmentation</div><div class="cc-desc">Don't put your database on the public internet. Use private subnets (VPC). Only your app servers should be able to reach the database — nothing else.</div></div>
+</div>
+</div>
+<div class="section">
+<h3 class="section-title">Secrets Management — The Right Way</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">BAD vs GOOD — Secrets Handling</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># ❌ NEVER DO THIS — hardcoded secrets in code</span>
+<span class="cmd">DB_PASSWORD</span>=<span class="str">"mypassword123"</span> <span class="comment"># visible to everyone with repo access!</span>
+<span class="cmd">API_KEY</span>=<span class="str">"sk-abc123xyz"</span> <span class="comment"># gets committed to Git history forever</span>
+<span class="comment"># ✅ Use environment variables</span>
+<span class="cmd">export DB_PASSWORD</span>=<span class="str">"$(cat /run/secrets/db_pass)"</span>
+<span class="comment"># ✅ In Docker Compose — use env files</span>
+<span class="cmd">env_file</span>:
+  - .env                     <span class="comment"># .env is in .gitignore — never committed</span>
+<span class="comment"># ✅ In Kubernetes — use Secrets</span>
+<span class="cmd">kubectl create secret generic db-secret</span> \
+  --from-literal=password=<span class="str">mypassword</span>
+<span class="comment"># ✅ In AWS — use Secrets Manager</span>
+<span class="cmd">aws secretsmanager get-secret-value</span> --secret-id <span class="str">prod/db/password</span></div></div>
+</div>
+<div class="callout callout-warn"><div class="callout-label">⚠️ Real-World Warning</div><p>Every week, developers accidentally commit API keys to public GitHub repos. Attackers have bots that scan GitHub 24/7 for leaked credentials. A leaked AWS key can result in a <strong>₹10 lakh bill</strong> within hours from crypto miners. Always add <code>.env</code> to your <code>.gitignore</code>!</p></div>
+<div class="next-card" onclick="showModule('interview')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🎯 Interview Prep</div><div class="next-why">Practice real interview questions on AWS, Linux, Git, Docker and scenario-based problems to get job-ready.</div></div><div class="next-arrow">→</div></div>

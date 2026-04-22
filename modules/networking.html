@@ -1,0 +1,95 @@
+<div class="module-header"><div class="module-icon">🌐</div><div class="module-meta"><div class="module-tag">Module 0.2 — Before You Begin</div><h2 class="module-title">Networking Basics for DevOps</h2></div></div>
+<div class="section">
+<h3 class="section-title">Why Do DevOps Engineers Need to Know Networking?</h3>
+<p>Every app you deploy runs on servers that communicate over a network. When your app is slow or unreachable, it's often a <strong>network issue</strong>. Understanding how data travels between machines is essential for debugging, securing, and scaling applications.</p>
+</div>
+<div class="callout callout-analogy"><div class="callout-label">📮 Analogy — The Postal System</div><p>Think of the internet like a postal system. Every house (computer) has an address (<strong>IP address</strong>). Letters have a "to" and "from" address. The postal system figures out the best route to deliver it (this is called <strong>routing</strong>). The type of delivery service (standard vs express) is like different <strong>protocols</strong> (HTTP vs HTTPS). And the post office that sorts the mail is like a <strong>router</strong>.</p></div>
+<div class="section">
+<h3 class="section-title">Key Networking Concepts</h3>
+<div class="concept-grid">
+<div class="concept-card"><div class="cc-icon">🏠</div><div class="cc-title">IP Address</div><div class="cc-desc">A unique address for every device on a network. Like your home address but for computers. Example: <code>192.168.1.10</code> (private) or <code>54.210.1.45</code> (public).</div></div>
+<div class="concept-card"><div class="cc-icon">🚪</div><div class="cc-title">Port</div><div class="cc-desc">A "door" on a server for a specific service. Port 80 = HTTP websites. Port 443 = HTTPS. Port 22 = SSH login. Port 3306 = MySQL database.</div></div>
+<div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">DNS</div><div class="cc-desc">Domain Name System — translates human-readable names like <code>google.com</code> into IP addresses. It's the internet's phone book.</div></div>
+<div class="concept-card"><div class="cc-icon">🔒</div><div class="cc-title">HTTP vs HTTPS</div><div class="cc-desc">HTTP sends data in plain text (anyone can read it). HTTPS encrypts it with SSL/TLS — essential for any production site.</div></div>
+<div class="concept-card"><div class="cc-icon">⚖️</div><div class="cc-title">Load Balancer</div><div class="cc-desc">Distributes traffic across multiple servers so no single server gets overwhelmed. Like a receptionist directing customers to available staff.</div></div>
+<div class="concept-card"><div class="cc-icon">🔥</div><div class="cc-title">Firewall</div><div class="cc-desc">Controls which traffic is allowed in and out. AWS calls them "Security Groups". You decide: "allow port 80 from everyone, but port 22 only from my IP."</div></div>
+</div>
+</div>
+<div class="section">
+<h3 class="section-title">How a Web Request Works — Step by Step</h3>
+<div class="svg-diagram">
+<svg font-family="'DM Mono', monospace" viewbox="0 0 780 260" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#111827" height="260" width="780"></rect>
+<defs>
+<marker id="arq" markerheight="6" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#00d4aa"></path></marker>
+<marker id="arb" markerheight="6" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#fbbf24"></path></marker>
+</defs>
+<!-- User -->
+<rect fill="#0a0e1a" height="80" rx="8" stroke="#00d4aa" stroke-width="1.5" width="100" x="20" y="90"></rect>
+<text fill="#00d4aa" font-size="24" text-anchor="middle" x="70" y="122">👤</text>
+<text fill="#e2e8f0" font-size="10" font-weight="bold" text-anchor="middle" x="70" y="143">USER</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="70" y="158">Types URL</text>
+<!-- DNS -->
+<rect fill="#0a0e1a" height="80" rx="8" stroke="#fbbf24" stroke-width="1.5" width="100" x="165" y="90"></rect>
+<text fill="#fbbf24" font-size="24" text-anchor="middle" x="215" y="122">📋</text>
+<text fill="#e2e8f0" font-size="10" font-weight="bold" text-anchor="middle" x="215" y="143">DNS</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="215" y="158">Resolves IP</text>
+<!-- Load Balancer -->
+<rect fill="#0a0e1a" height="80" rx="8" stroke="#fbbf24" stroke-width="1.5" width="120" x="310" y="90"></rect>
+<text fill="#fbbf24" font-size="24" text-anchor="middle" x="370" y="122">⚖️</text>
+<text fill="#e2e8f0" font-size="10" font-weight="bold" text-anchor="middle" x="370" y="143">LOAD BALANCER</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="370" y="158">Picks a server</text>
+<!-- Servers -->
+<rect fill="#0a0e1a" height="60" rx="8" stroke="#7c3aed" stroke-width="1.5" width="100" x="490" y="30"></rect>
+<text fill="#7c3aed" font-size="20" text-anchor="middle" x="540" y="55">🖥️</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="540" y="72">Server 1</text>
+<rect fill="#0a0e1a" height="60" rx="8" stroke="#7c3aed" stroke-width="1.5" width="100" x="490" y="100"></rect>
+<text fill="#7c3aed" font-size="20" text-anchor="middle" x="540" y="125">🖥️</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="540" y="142">Server 2</text>
+<rect fill="#0a0e1a" height="60" rx="8" stroke="#7c3aed" stroke-width="1.5" width="100" x="490" y="170"></rect>
+<text fill="#7c3aed" font-size="20" text-anchor="middle" x="540" y="195">🖥️</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="540" y="212">Server 3</text>
+<!-- DB -->
+<rect fill="#0a0e1a" height="80" rx="8" stroke="#7c3aed" stroke-width="1.5" width="120" x="640" y="90"></rect>
+<text fill="#7c3aed" font-size="24" text-anchor="middle" x="700" y="122">🗄️</text>
+<text fill="#e2e8f0" font-size="10" font-weight="bold" text-anchor="middle" x="700" y="143">DATABASE</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="700" y="158">Returns data</text>
+<!-- Arrows -->
+<path d="M120,130 L163,130" marker-end="url(#arq)" stroke="#00d4aa" stroke-width="1.5"></path>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="141" y="122">①DNS</text>
+<path d="M265,130 L308,130" marker-end="url(#arq)" stroke="#00d4aa" stroke-width="1.5"></path>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="286" y="122">②Route</text>
+<path d="M430,100 L488,60" marker-end="url(#arb)" stroke="#fbbf24" stroke-width="1.5"></path>
+<path d="M430,130 L488,130" marker-end="url(#arb)" stroke="#fbbf24" stroke-width="1.5"></path>
+<path d="M430,160 L488,200" marker-end="url(#arb)" stroke="#fbbf24" stroke-width="1.5"></path>
+<path d="M590,130 L638,130" marker-end="url(#arq)" stroke="#7c3aed" stroke-width="1.5"></path>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="614" y="122">④DB Query</text>
+</svg>
+<div class="diagram-caption">How typing "google.com" leads to a response — DNS lookup → Load Balancer → Server → Database</div>
+</div>
+</div>
+<div class="section">
+<h3 class="section-title">Useful Networking Commands</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Networking</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Check your IP address</span>
+<span class="cmd">ip addr show</span> <span class="comment"># Linux</span>
+<span class="cmd">ifconfig</span> <span class="comment"># older Linux / macOS</span>
+<span class="comment"># Test if a host is reachable</span>
+<span class="cmd">ping google.com</span>
+<span class="cmd">ping 192.168.1.1</span>
+<span class="comment"># DNS lookup — what IP does this domain map to?</span>
+<span class="cmd">nslookup github.com</span>
+<span class="cmd">dig github.com</span>
+<span class="comment"># Check if a port is open on a server</span>
+<span class="cmd">telnet 192.168.1.10 80</span>
+<span class="cmd">nc -zv 192.168.1.10 443</span>
+<span class="comment"># Trace the route packets take</span>
+<span class="cmd">traceroute google.com</span>
+<span class="comment"># See what's listening on which ports</span>
+<span class="cmd">netstat -tulpn</span>
+<span class="cmd">ss -tulpn</span> <span class="comment"># modern alternative</span>
+<span class="comment"># Download a file / test an HTTP endpoint</span>
+<span class="cmd">curl http://localhost:8080/health</span>
+<span class="cmd">wget https://example.com/file.zip</span></div></div>
+</div>
+<div class="callout callout-tip"><div class="callout-label">✅ Remember These Port Numbers</div><p><strong>22</strong> = SSH (terminal access to servers) · <strong>80</strong> = HTTP · <strong>443</strong> = HTTPS · <strong>3306</strong> = MySQL · <strong>5432</strong> = PostgreSQL · <strong>6379</strong> = Redis · <strong>8080</strong> = common dev server port · <strong>9090</strong> = Prometheus · <strong>3000</strong> = Grafana</p></div>
+<div class="next-card" onclick="showModule('yaml')"><div class="next-text"><div class="next-label">Next →</div><div class="next-title">📝 YAML &amp; Config Files</div><div class="next-why">Almost every DevOps tool — Docker, Kubernetes, Ansible, GitHub Actions — uses YAML for configuration. You need to be fluent in it.</div></div><div class="next-arrow">→</div></div>

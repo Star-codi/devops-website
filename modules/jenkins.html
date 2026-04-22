@@ -1,0 +1,56 @@
+<div class="module-header"><div class="module-icon">🤖</div><div class="module-meta"><div class="module-tag">Module 07 — CI/CD</div><h2 class="module-title">Jenkins — Continuous Integration &amp; Delivery</h2></div></div>
+<div class="section"><h3 class="section-title">What is CI/CD?</h3><p><strong>CI (Continuous Integration)</strong> means: every time a developer pushes code, it's automatically built and tested. No more "it works on my machine!" problems.</p><p><strong>CD (Continuous Delivery/Deployment)</strong> means: if all tests pass, the code is automatically deployed to production. No manual deployment steps.</p></div>
+<div class="callout callout-analogy"><div class="callout-label">🏭 Analogy — Factory Assembly Line</div><p>Imagine a car factory. <strong>Old way:</strong> workers build the whole car, then quality checks it at the end — finding defects when it's too late. <strong>CI/CD way:</strong> at every step of the assembly line, the car part is automatically checked. Problems are caught immediately. <strong>Jenkins is the factory manager</strong> running the assembly line — triggering each step automatically.</p></div>
+<div class="section">
+<h3 class="section-title">Jenkins Pipeline — How It Works</h3>
+<div class="flow"><div class="flow-step"><div class="flow-box active">Developer Pushes Code</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">GitHub Webhook</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">Jenkins Triggered</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">Build + Test</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box active">Deploy 🚀</div></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Your First Jenkinsfile</h3>
+<p>A <strong>Jenkinsfile</strong> is a script that defines what Jenkins should do. It lives in your project's root directory alongside your code.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">Jenkinsfile — CI/CD Pipeline</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">pipeline</span> {
+    <span class="kw">agent</span> any    <span class="comment">// run on any available server</span>
+<span class="kw">stages</span> {
+        <span class="kw">stage</span>(<span class="str">'Checkout'</span>) {
+            <span class="kw">steps</span> {
+                git branch: <span class="str">'main'</span>,
+                    url: <span class="str">'https://github.com/arjun/my-app.git'</span>
+            }
+        }
+
+        <span class="kw">stage</span>(<span class="str">'Build'</span>) {
+            <span class="kw">steps</span> {
+                sh <span class="str">'mvn clean package'</span>
+            }
+        }
+
+        <span class="kw">stage</span>(<span class="str">'Test'</span>) {
+            <span class="kw">steps</span> {
+                sh <span class="str">'mvn test'</span>
+            }
+        }
+
+        <span class="kw">stage</span>(<span class="str">'Docker Build &amp; Push'</span>) {
+            <span class="kw">steps</span> {
+                sh <span class="str">'docker build -t arjun/my-app:${BUILD_NUMBER} .'</span>
+                sh <span class="str">'docker push arjun/my-app:${BUILD_NUMBER}'</span>
+            }
+        }
+
+        <span class="kw">stage</span>(<span class="str">'Deploy'</span>) {
+            <span class="kw">steps</span> {
+                sh <span class="str">'kubectl set image deployment/my-app my-app=arjun/my-app:${BUILD_NUMBER}'</span>
+            }
+        }
+    }
+
+    <span class="kw">post</span> {
+        <span class="kw">success</span> { echo <span class="str">'✅ Pipeline succeeded!'</span> }
+        <span class="kw">failure</span> { echo <span class="str">'❌ Pipeline failed — check logs!'</span> }
+    }
+}</div></div>
+</div>
+<div class="section"><h3 class="section-title">Why Docker After Jenkins?</h3><div class="callout callout-warn"><div class="callout-label">⚠️ Problem Jenkins Reveals</div><p>Jenkins builds and deploys perfectly on the build server. But on the production server: "It works in Jenkins but crashes in prod!" Why? Different Java version, different OS, missing libraries. Jenkins automates deployment — but doesn't guarantee the environment is the same everywhere. That's where Docker comes in.</p></div></div>
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — CI/CD Pipeline for a Java App</div><p>Set up Jenkins → Connect to GitHub → Create a pipeline that builds with Maven, runs tests, builds a Docker image, and deploys to Kubernetes on every push to main branch.</p></div>
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist"><li>CI = Automatically build &amp; test on every code push</li><li>CD = Automatically deploy if tests pass</li><li>Jenkinsfile defines your pipeline as code — stored in Git</li><li>Jenkins catches bugs early and eliminates manual deployments</li></ul></div>
+<div class="next-card" onclick="showModule('docker')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🐳 Docker — Containerization</div><div class="next-why">Package your entire app + its environment into a single portable container. "Works on my machine" becomes "works everywhere."</div></div><div class="next-arrow">→</div></div>

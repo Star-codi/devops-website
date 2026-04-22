@@ -1,0 +1,84 @@
+<div class="module-header"><div class="module-icon">📊</div><div class="module-meta"><div class="module-tag">Module 11 — Monitoring</div><h2 class="module-title">Prometheus &amp; Grafana</h2></div></div>
+<div class="section"><h3 class="section-title">Why Monitoring? The Final Piece</h3><p>You've built your app, containerized it, deployed it on Kubernetes, automated your pipeline with Jenkins, and provisioned infrastructure with Terraform. But your work isn't done — you need to <strong>watch</strong> what's happening in production.</p><p>Without monitoring: servers could be running at 99% CPU right now and you wouldn't know until users complain. Memory could be slowly leaking. A database could be about to run out of space. Monitoring catches these before they become disasters.</p></div>
+<div class="callout callout-analogy"><div class="callout-label">✈️ Analogy — Airplane Cockpit</div><p>A pilot doesn't fly blind. The cockpit has hundreds of gauges showing altitude, speed, fuel, engine temperature, wind direction. If anything goes wrong, an alarm sounds immediately. <strong>Prometheus is the system collecting all those gauge readings. Grafana is the cockpit dashboard displaying them beautifully.</strong></p></div>
+<div class="section">
+<h3 class="section-title">Prometheus — Metrics Collector</h3>
+<p><strong>Prometheus</strong> is an open-source monitoring system. It "scrapes" (collects) metrics from your applications and servers every few seconds and stores them in a time-series database.</p>
+<div class="arch-diagram">  Your App / Kubernetes / Linux
+         ↓ (exposes metrics at /metrics endpoint)
+  ┌──────────────────────────────────┐
+  │         PROMETHEUS               │
+  │  Scrapes metrics every 15 sec    │
+  │  Stores: CPU%, memory, req/sec   │
+  │  Evaluates alert rules           │
+  └──────────────────────────────────┘
+         ↓                    ↓
+  [Grafana Dashboard]    [AlertManager]
+  Beautiful charts        → Slack/Email alerts</div>
+<div class="code-block"><div class="code-header"><span class="code-lang">prometheus.yml — Configuration</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">global</span>:
+  <span class="cmd">scrape_interval</span>: 15s    <span class="comment"># collect metrics every 15 seconds</span>
+<span class="cmd">scrape_configs</span>:
+  - <span class="cmd">job_name</span>: <span class="str">'my-node-app'</span>
+<span class="cmd">static_configs</span>:
+      - <span class="cmd">targets</span>: [<span class="str">'localhost:3000'</span>]
+
+  - <span class="cmd">job_name</span>: <span class="str">'kubernetes-nodes'</span>
+<span class="cmd">kubernetes_sd_configs</span>:
+      - <span class="cmd">role</span>: node</div></div>
+</div>
+<div class="section">
+<h3 class="section-title">PromQL — Querying Your Metrics</h3>
+<p>Prometheus has its own query language called <strong>PromQL</strong>. It looks complex but starts simply:</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">PromQL — Example Queries</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># CPU usage % (human-readable)</span>
+<span class="cmd">100 - (avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)</span>
+<span class="comment"># Available memory in GB</span>
+<span class="cmd">node_memory_MemAvailable_bytes / 1024 / 1024 / 1024</span>
+<span class="comment"># HTTP requests per second</span>
+<span class="cmd">rate(http_requests_total[5m])</span>
+<span class="comment"># Alert: disk almost full</span>
+<span class="cmd">(node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes &gt; 0.85</span>
+<span class="comment"># p99 response time</span>
+<span class="cmd">histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))</span></div></div>
+</div>
+<div class="section"><h3 class="section-title">Grafana — Beautiful Dashboards</h3><p><strong>Grafana</strong> connects to Prometheus and turns raw metrics into stunning, real-time visual dashboards. You can build dashboards with graphs, gauges, heatmaps, and tables — and share them with your whole team.</p><div class="concept-grid"><div class="concept-card"><div class="cc-icon">📈</div><div class="cc-title">Time Series Graphs</div><div class="cc-desc">See how CPU, memory, and request rates change over time.</div></div><div class="concept-card"><div class="cc-icon">🔴</div><div class="cc-title">Alerts</div><div class="cc-desc">Get Slack/email notifications when CPU &gt; 80% or error rate spikes.</div></div><div class="concept-card"><div class="cc-icon">🗂️</div><div class="cc-title">Pre-built Dashboards</div><div class="cc-desc">Import ready-made dashboards for Kubernetes, Node.js, and more from grafana.com.</div></div><div class="concept-card"><div class="cc-icon">👥</div><div class="cc-title">Team Sharing</div><div class="cc-desc">Share dashboards with your entire team. Everyone has visibility.</div></div></div></div>
+<div class="section">
+<h3 class="section-title">Deploy the Full Stack with Docker Compose</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">docker-compose.monitoring.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">version</span>: <span class="str">'3.8'</span>
+<span class="cmd">services</span>:
+
+  <span class="kw">prometheus</span>:
+    <span class="cmd">image</span>: <span class="str">prom/prometheus:latest</span>
+<span class="cmd">ports</span>: [<span class="str">"9090:9090"</span>]
+    <span class="cmd">volumes</span>:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  <span class="kw">grafana</span>:
+    <span class="cmd">image</span>: <span class="str">grafana/grafana:latest</span>
+<span class="cmd">ports</span>: [<span class="str">"3000:3000"</span>]
+    <span class="cmd">environment</span>:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    <span class="cmd">volumes</span>:
+      - grafana-data:/var/lib/grafana
+    <span class="cmd">depends_on</span>: [prometheus]
+
+  <span class="kw">node-exporter</span>:
+    <span class="cmd">image</span>: <span class="str">prom/node-exporter:latest</span>
+<span class="cmd">ports</span>: [<span class="str">"9100:9100"</span>]
+
+  <span class="kw">alertmanager</span>:
+    <span class="cmd">image</span>: <span class="str">prom/alertmanager:latest</span>
+<span class="cmd">ports</span>: [<span class="str">"9093:9093"</span>]
+
+<span class="cmd">volumes</span>:
+  grafana-data:</div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">docker compose -f docker-compose.monitoring.yml up -d</span>
+<span class="comment"># Prometheus: http://localhost:9090</span>
+<span class="comment"># Grafana: http://localhost:3000 (admin/admin)</span>
+<span class="comment"># Import dashboard ID 1860 from grafana.com for Node Exporter Full 🎉</span></div></div>
+</div>
+<div class="callout callout-project"><div class="callout-label">🚀 Final Mini Project — Full Monitoring Stack</div><p>Deploy Prometheus + Grafana + Node Exporter on your EC2 server → Import the "Node Exporter Full" dashboard from Grafana.com → Set up an alert that fires on Slack when CPU usage exceeds 70% for 5 minutes.</p></div>
+<div class="section">
+<h3 class="section-title">🎓 You've Completed the DevOps Journey!</h3>
+<div class="callout callout-tip"><div class="callout-label">✅ Core DevOps Stack — Modules 01–11 Complete!</div><ul class="checklist"><li>☁️ <strong>Cloud Computing + AWS</strong> — On-demand infrastructure, EC2, S3, IAM, VPC</li><li>🐧 <strong>Linux</strong> — Architecture, command line, permissions, user management</li><li>🌿 <strong>Git &amp; GitHub</strong> — DVCS, branching strategy, collaboration</li><li>⚡ <strong>Shell Scripting</strong> — Automation, functions, I/O redirection</li><li>🔨 <strong>Maven</strong> — Build, test, and package Java applications</li><li>🤖 <strong>Jenkins</strong> — CI/CD pipelines, automated testing and deployment</li><li>🐳 <strong>Docker</strong> — Containerization, Dockerfiles, Docker Compose</li><li>☸️ <strong>Kubernetes</strong> — Orchestration, scaling, self-healing, rolling updates</li><li>🏗️ <strong>Terraform</strong> — Infrastructure as Code, reproducible environments</li><li>📊 <strong>Prometheus &amp; Grafana</strong> — Metrics, dashboards, alerting</li></ul><p style="margin-top:12px;font-size:.9rem;">Continue to <strong>Module 5 — AWS Deep Dive</strong> to master VPC, S3 storage classes, AWS CLI, Lambda, RDS &amp; DynamoDB →</p></div>
+</div>
+<div class="next-card" onclick="showModule('vpc')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🔒 VPC &amp; Networking Deep Dive</div><div class="next-why">Now let's go deeper into AWS — understand subnets, security groups, NAT gateways, and how to architect a secure network.</div></div><div class="next-arrow">→</div></div>

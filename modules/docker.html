@@ -1,0 +1,87 @@
+<div class="module-header"><div class="module-icon">🐳</div><div class="module-meta"><div class="module-tag">Module 08 — Containers</div><h2 class="module-title">Docker — Containerization</h2></div></div>
+<div class="section"><h3 class="section-title">The "Works on My Machine" Problem</h3><p>Developer A writes an app on Windows with Python 3.9. Developer B pulls the code on Mac with Python 3.11. The production server runs Linux with Python 3.7. Everyone is confused when things break at each step. This is one of the most frustrating problems in software engineering.</p></div>
+<div class="callout callout-analogy"><div class="callout-label">🚢 Analogy — Shipping Containers</div><p>Before shipping containers, loading cargo onto ships was chaotic. Different sizes, different methods, things breaking. Then someone invented the <strong>standard shipping container</strong> — one size, works on any ship, any truck, any train, any port in the world.</p><p><strong>Docker containers are the shipping containers of software.</strong> You pack your app, its dependencies, its runtime — everything — into a single container. It runs identically on your laptop, your colleague's laptop, Jenkins, and production. No surprises.</p></div>
+<div class="section">
+<h3 class="section-title">VM vs Container — What's the Difference?</h3>
+<div class="arch-diagram">  VIRTUAL MACHINE (Heavy)          CONTAINER (Lightweight)
+  ┌─────────────────────┐          ┌──────┬──────┬──────┐
+  │  Your App           │          │ App1 │ App2 │ App3 │
+  │  + Libraries        │          │+Libs │+Libs │+Libs │
+  │  + Guest OS (4GB)   │          └──────┴──────┴──────┘
+  │  + Hypervisor       │          │   Container Engine  │
+  │  + Host OS          │          │   (Docker)          │
+  └─────────────────────┘          │   Host OS           │
+  Boots in minutes                 └─────────────────────┘
+  Takes GBs of RAM                 Starts in seconds
+  Full OS overhead                 Shares host OS kernel</div>
+</div>
+<div class="section"><h3 class="section-title">Core Docker Concepts</h3><div class="concept-grid"><div class="concept-card"><div class="cc-icon">📄</div><div class="cc-title">Dockerfile</div><div class="cc-desc">A recipe/blueprint that describes how to build your container image.</div></div><div class="concept-card"><div class="cc-icon">💿</div><div class="cc-title">Image</div><div class="cc-desc">A snapshot built from a Dockerfile. Like a frozen template you can deploy anywhere.</div></div><div class="concept-card"><div class="cc-icon">📦</div><div class="cc-title">Container</div><div class="cc-desc">A running instance of an image. Like a live restaurant vs a recipe book.</div></div><div class="concept-card"><div class="cc-icon">🗄️</div><div class="cc-title">Registry</div><div class="cc-desc">Docker Hub — a store of images. Pull official images or push your own.</div></div></div></div>
+<div class="section">
+<h3 class="section-title">Dockerize a Node.js App</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Dockerfile</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Start from an official Node.js base image</span>
+<span class="kw">FROM</span> node:18-alpine
+
+<span class="comment"># Set working directory inside the container</span>
+<span class="kw">WORKDIR</span> /app
+
+<span class="comment"># Copy dependency files first (for caching)</span>
+<span class="kw">COPY</span> package*.json ./
+
+<span class="comment"># Install dependencies</span>
+<span class="kw">RUN</span> npm install
+
+<span class="comment"># Copy the rest of the application code</span>
+<span class="kw">COPY</span> . .
+
+<span class="comment"># Expose port 3000 to the outside world</span>
+<span class="kw">EXPOSE</span> 3000
+
+<span class="comment"># Command to run when container starts</span>
+<span class="kw">CMD</span> [<span class="str">"node"</span>, <span class="str">"app.js"</span>]</div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Build &amp; Run</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Build the image</span>
+<span class="cmd">docker build -t my-node-app:1.0 .</span>
+<span class="out">Successfully built a1b2c3d4e5f6</span>
+<span class="out">Successfully tagged my-node-app:1.0</span>
+<span class="comment"># Run the container</span>
+<span class="cmd">docker run -d -p 3000:3000 --name my-app my-node-app:1.0</span>
+<span class="comment"># Check running containers</span>
+<span class="cmd">docker ps</span>
+<span class="out">CONTAINER ID  IMAGE          STATUS    PORTS</span>
+<span class="out">a1b2c3d4e5f6  my-node-app:1  Up 2min   0.0.0.0:3000-&gt;3000</span>
+<span class="comment"># View logs</span>
+<span class="cmd">docker logs my-app</span>
+<span class="comment"># Stop and remove</span>
+<span class="cmd">docker stop my-app &amp;&amp; docker rm my-app</span>
+<span class="comment"># Push to Docker Hub</span>
+<span class="cmd">docker tag my-node-app:1.0 arjun/my-node-app:1.0</span>
+<span class="cmd">docker push arjun/my-node-app:1.0</span></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Docker Compose — Multi-Container Apps</h3>
+<p>Real apps have multiple pieces: a web server, a database, maybe a cache. Docker Compose lets you define and run them all together.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">docker-compose.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">version</span>: <span class="str">'3.8'</span>
+<span class="cmd">services</span>:
+  <span class="kw">web</span>:
+    <span class="cmd">build</span>: .
+    <span class="cmd">ports</span>: [<span class="str">"3000:3000"</span>]
+    <span class="cmd">depends_on</span>: [db]
+    <span class="cmd">environment</span>:
+      - DB_HOST=db
+
+  <span class="kw">db</span>:
+    <span class="cmd">image</span>: <span class="str">postgres:15</span>
+<span class="cmd">environment</span>:
+      - POSTGRES_DB=myapp
+      - POSTGRES_PASSWORD=secret
+    <span class="cmd">volumes</span>:
+      - db-data:/var/lib/postgresql/data
+
+<span class="cmd">volumes</span>:
+  db-data:</div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">docker compose up -d</span> <span class="comment"># start everything</span>
+<span class="cmd">docker compose down</span> <span class="comment"># stop everything</span></div></div>
+</div>
+<div class="section"><h3 class="section-title">Why Kubernetes After Docker?</h3><div class="callout callout-warn"><div class="callout-label">⚠️ Problem Docker Reveals at Scale</div><p>Docker is great for running containers. But what happens when your app needs <strong>100 containers</strong> running across <strong>10 servers</strong>? Who decides which server runs which container? What if a container crashes — who restarts it? What if traffic spikes — who adds more containers? Docker alone can't answer these questions. You need an <strong>orchestrator</strong>. That's Kubernetes.</p></div></div>
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Dockerize a Python Flask App</div><p>Write a simple Flask web app → Create a Dockerfile → Build the image → Run it locally → Push to Docker Hub → Pull it on your EC2 and run it there. Your app is now portable!</p></div>
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist"><li>Docker packages apps into portable containers that run anywhere</li><li>Dockerfile = recipe, Image = packaged product, Container = running instance</li><li>Containers are lighter and faster than virtual machines</li><li>Docker Compose manages multi-container applications</li><li>Docker Hub is the public registry for sharing images</li></ul></div>
+<div class="next-card" onclick="showModule('kubernetes')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">☸️ Kubernetes — Container Orchestration</div><div class="next-why">Manage hundreds of Docker containers across dozens of servers automatically — self-healing, scaling, and load balancing included.</div></div><div class="next-arrow">→</div></div>

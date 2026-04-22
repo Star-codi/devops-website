@@ -1,0 +1,177 @@
+<div class="module-header"><div class="module-icon">🐧</div><div class="module-meta"><div class="module-tag">Module 03 — Foundation</div><h2 class="module-title">Linux Basics</h2></div></div>
+<div class="section"><h3 class="section-title">What is an Operating System?</h3><p>Before diving into Linux, let's understand what an OS actually does. An <strong>Operating System</strong> is the software that manages all hardware and software resources on your computer. Without it, your applications have no way to talk to the CPU, memory, or disk.</p>
+<div class="concept-grid">
+<div class="concept-card"><div class="cc-icon">⚙️</div><div class="cc-title">Process Management</div><div class="cc-desc">Decides which processes run, for how long, and allocates CPU time. Without this, every program would fight for the processor.</div></div>
+<div class="concept-card"><div class="cc-icon">💾</div><div class="cc-title">Memory Management</div><div class="cc-desc">Tracks how much RAM each process uses, decides how much to allocate, and keeps record of free memory.</div></div>
+<div class="concept-card"><div class="cc-icon">📁</div><div class="cc-title">File Management</div><div class="cc-desc">Organises files and directories, tracks file information (size, permissions, location), and manages reads/writes.</div></div>
+<div class="concept-card"><div class="cc-icon">🔒</div><div class="cc-title">Security &amp; User Management</div><div class="cc-desc">Manages authorised users, restricts access to unauthorised users, and prevents harmful activities on the system.</div></div>
+</div></div>
+<div class="section"><h3 class="section-title">Linux Architecture</h3>
+<div class="svg-diagram">
+<svg font-family="'DM Mono', monospace" viewbox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#111827" height="220" width="700"></rect>
+<!-- Layer 1: Hardware -->
+<rect fill="rgba(255,107,53,0.12)" height="38" rx="6" stroke="#ff6b35" stroke-width="1.5" width="640" x="30" y="170"></rect>
+<text fill="#ff6b35" font-size="11" font-weight="bold" text-anchor="middle" x="350" y="185">⚡ HARDWARE</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="350" y="200">CPU · RAM · Disk · Network Card · Keyboard · Mouse</text>
+<!-- Layer 2: Kernel -->
+<rect fill="rgba(124,58,237,0.12)" height="42" rx="6" stroke="#7c3aed" stroke-width="1.5" width="540" x="80" y="118"></rect>
+<text fill="#7c3aed" font-size="11" font-weight="bold" text-anchor="middle" x="350" y="134">🧠 KERNEL — Core of Linux</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="350" y="150">Process Mgmt · Memory Mgmt · Device Control · System Security</text>
+<!-- Layer 3: Shell -->
+<rect fill="rgba(251,191,36,0.10)" height="42" rx="6" stroke="#fbbf24" stroke-width="1.5" width="420" x="140" y="66"></rect>
+<text fill="#fbbf24" font-size="11" font-weight="bold" text-anchor="middle" x="350" y="82">🐚 SHELL — CLI Interface</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="350" y="98">bash · zsh · sh · fish · Users type commands here</text>
+<!-- Layer 4: Applications -->
+<rect fill="rgba(0,212,170,0.10)" height="42" rx="6" stroke="#00d4aa" stroke-width="1.5" width="300" x="200" y="14"></rect>
+<text fill="#00d4aa" font-size="11" font-weight="bold" text-anchor="middle" x="350" y="30">📦 APPLICATION SOFTWARE</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="350" y="46">nginx · docker · python · your code</text>
+<!-- Arrows -->
+<path d="M350,57 L350,65" marker-end="url(#arq)" stroke="#00d4aa" stroke-width="1.5"></path>
+<path d="M350,109 L350,117" marker-end="url(#arq)" stroke="#fbbf24" stroke-width="1.5"></path>
+<path d="M350,161 L350,169" marker-end="url(#arq)" stroke="#7c3aed" stroke-width="1.5"></path>
+<!-- Left label -->
+<text fill="#64748b" font-size="9" text-anchor="middle" transform="rotate(-90,18,110)" x="18" y="110">Higher Level ↑</text>
+</svg>
+<div class="diagram-caption">Linux architecture — user commands flow down through Shell → Kernel → Hardware</div>
+</div></div>
+<div class="section"><h3 class="section-title">What is Linux &amp; Why Does It Matter?</h3><p><strong>Linux</strong> is a free, open-source operating system founded by <strong>Linus Torvalds</strong> in 1991. About <strong>96% of the world's servers run Linux</strong> — including all major cloud providers (AWS, GCP, Azure). If you're doing DevOps, you're doing Linux.</p>
+<div class="concept-grid">
+<div class="concept-card"><div class="cc-icon">🐧</div><div class="cc-title">Popular Linux Flavours</div><div class="cc-desc"><strong>Ubuntu / Debian</strong> — beginner-friendly, great for servers<br/><strong>Red Hat (RHEL)</strong> — enterprise standard<br/><strong>CentOS / Fedora</strong> — RHEL-based, free<br/><strong>Kali Linux</strong> — security &amp; penetration testing<br/><strong>Amazon Linux</strong> — AWS-optimised</div></div>
+<div class="concept-card"><div class="cc-icon">🪟</div><div class="cc-title">Linux vs Windows</div><div class="cc-desc"><strong>Free &amp; open source</strong> vs paid closed source<br/><strong>More secure</strong>, no antivirus needed<br/><strong>CLI-first</strong> vs GUI-first<br/><strong>No reboot</strong> needed for most updates<br/><strong>Enterprise-designed</strong> — multi-user, better multitasking</div></div>
+</div></div>
+<div class="callout callout-analogy"><div class="callout-label">🎮 Analogy — Cheat Codes</div><p>Using a GUI (graphical interface) is like playing a game normally. Using the Linux terminal is like knowing the cheat codes — you can do in 1 second what takes 5 minutes with a mouse.</p></div>
+<div class="section">
+<h3 class="section-title">Essential Commands — Navigation</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — File Navigation</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Print current directory (where am I?)</span>
+<span class="cmd">pwd</span>
+<span class="out">/home/arjun</span>
+<span class="comment"># List files in current directory</span>
+<span class="cmd">ls</span>
+<span class="out">Documents  Downloads  projects  script.sh</span>
+<span class="comment"># List with details (permissions, size, date)</span>
+<span class="cmd">ls -la</span>
+<span class="comment"># Change directory</span>
+<span class="cmd">cd projects</span>
+<span class="cmd">cd ..</span> <span class="comment"># go one level up</span>
+<span class="cmd">cd ~</span> <span class="comment"># go to home directory</span>
+<span class="comment"># Create a new directory</span>
+<span class="cmd">mkdir my-app</span>
+<span class="comment"># Create a file</span>
+<span class="cmd">touch hello.txt</span></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Essential Commands — Files</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — File Operations</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># View file contents</span>
+<span class="cmd">cat hello.txt</span>
+<span class="cmd">less hello.txt</span> <span class="comment"># scrollable view</span>
+<span class="comment"># Write to a file</span>
+<span class="cmd">echo "Hello World" &gt; hello.txt</span>
+<span class="cmd">echo "Line 2" &gt;&gt; hello.txt</span> <span class="comment"># append (don't overwrite)</span>
+<span class="comment"># Copy, Move, Delete</span>
+<span class="cmd">cp hello.txt backup.txt</span>
+<span class="cmd">mv hello.txt greetings.txt</span> <span class="comment"># also used for renaming</span>
+<span class="cmd">rm greetings.txt</span>
+<span class="cmd">rm -rf old-folder/</span> <span class="comment"># delete folder (careful!)</span>
+<span class="comment"># Search inside files</span>
+<span class="cmd">grep "error" app.log</span>
+<span class="cmd">grep -r "TODO" ./src</span> <span class="comment"># search in all files</span></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Permissions (chmod)</h3>
+<p>Linux controls who can read, write, or execute a file. Think of it as setting access rules.</p>
+<div class="arch-diagram">  File permissions look like: -rwxr-xr--
+
+  - = regular file (d = directory)
+  rwx = owner can Read, Write, Execute
+  r-x = group can Read, Execute (not write)
+  r-- = others can only Read
+
+  chmod 755 script.sh   →  owner=rwx, group=rx, others=rx
+  chmod 644 config.txt  →  owner=rw, group=r, others=r
+  chmod +x deploy.sh    →  make executable for everyone</div>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Permissions</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Make a script executable</span>
+<span class="cmd">chmod +x deploy.sh</span>
+<span class="cmd">./deploy.sh</span> <span class="comment"># now you can run it</span>
+<span class="comment"># Change file owner</span>
+<span class="cmd">chown arjun:developers myfile.txt</span>
+<span class="comment"># Run as superuser (admin)</span>
+<span class="cmd">sudo apt update</span> <span class="comment"># sudo = "do as super user"</span></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Process &amp; System Commands</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — System Management</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># See running processes</span>
+<span class="cmd">ps aux</span>
+<span class="cmd">top</span> <span class="comment"># live view (like task manager)</span>
+<span class="comment"># Kill a process</span>
+<span class="cmd">kill 1234</span> <span class="comment"># 1234 = process ID</span>
+<span class="cmd">kill -9 1234</span> <span class="comment"># force kill</span>
+<span class="comment"># Disk and memory</span>
+<span class="cmd">df -h</span> <span class="comment"># disk usage</span>
+<span class="cmd">free -h</span> <span class="comment"># memory usage</span>
+<span class="comment"># Install software (Ubuntu/Debian)</span>
+<span class="cmd">sudo apt update &amp;&amp; sudo apt install nginx -y</span>
+<span class="comment"># Manage services</span>
+<span class="cmd">sudo systemctl start nginx</span>
+<span class="cmd">sudo systemctl enable nginx</span>
+<span class="cmd">sudo systemctl status nginx</span></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">User Management</h3>
+<p>Linux allows multiple users on one machine. Every user has a type, a UID, and specific permissions.</p>
+<table class="compare-table">
+<tr><th>User Type</th><th>UID</th><th>Description</th></tr>
+<tr><td>🔴 Root User</td><td>0</td><td>Superuser — full control over everything. Access via <code>sudo</code>. Direct login disabled by default.</td></tr>
+<tr><td>⚙️ System Users</td><td>1–999</td><td>Created by OS for background services (daemons). No password, no login. E.g. <code>www-data</code> for nginx.</td></tr>
+<tr><td>👤 Normal Users</td><td>1000+</td><td>Created by admins for real people. Limited permissions — can only affect their own files.</td></tr>
+</table>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — User Management</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Create a new user</span>
+<span class="cmd">sudo useradd -m arjun</span> <span class="comment"># -m creates home directory</span>
+<span class="cmd">sudo passwd arjun</span> <span class="comment"># set password</span>
+<span class="comment"># Modify a user (add to sudo group)</span>
+<span class="cmd">sudo usermod -aG sudo arjun</span>
+<span class="comment"># Delete a user</span>
+<span class="cmd">sudo userdel -r arjun</span> <span class="comment"># -r removes home dir too</span>
+<span class="comment"># Switch to another user</span>
+<span class="cmd">su - arjun</span>
+<span class="comment"># See current user</span>
+<span class="cmd">whoami</span>
+<span class="comment"># See all users on the system</span>
+<span class="cmd">cat /etc/passwd</span>
+<span class="comment"># See which groups a user belongs to</span>
+<span class="cmd">groups arjun</span></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">File Test Operators — Check Before You Act</h3>
+<p>In shell scripts, you often need to check if a file or directory exists before doing something with it. These are called <strong>file test operators</strong>:</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">Shell — File Test Operators</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Check if a file exists</span>
+<span class="kw">if</span> [ -e config.yaml ]; <span class="kw">then</span>
+    echo "Config file exists"
+<span class="kw">fi</span>
+<span class="comment"># Common file test operators:</span>
+<span class="comment"># -e  → path exists (file or directory)</span>
+<span class="comment"># -f  → is a regular file</span>
+<span class="comment"># -d  → is a directory</span>
+<span class="comment"># -r  → file is readable</span>
+<span class="comment"># -w  → file is writable</span>
+<span class="comment"># -x  → file is executable</span>
+<span class="comment"># -s  → file is NOT empty (has content)</span>
+<span class="comment"># Practical example in a deploy script</span>
+<span class="kw">if</span> [ ! -d "/var/log/myapp" ]; <span class="kw">then</span>
+    mkdir -p /var/log/myapp
+    echo "Created log directory"
+<span class="kw">fi</span>
+<span class="kw">if</span> [ -x "./deploy.sh" ]; <span class="kw">then</span>
+    ./deploy.sh
+<span class="kw">else</span>
+    echo "Error: deploy.sh is not executable"
+    chmod +x deploy.sh
+<span class="kw">fi</span></div></div>
+</div>
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Set Up a Web Server</div><div class="code-block" style="margin-top:8px"><div class="code-header"><span class="code-lang">Commands</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">sudo apt update</span>
+<span class="cmd">sudo apt install nginx -y</span>
+<span class="cmd">sudo systemctl start nginx &amp;&amp; sudo systemctl enable nginx</span>
+<span class="cmd">echo "&lt;h1&gt;Hello from my EC2 server!&lt;/h1&gt;" | sudo tee /var/www/html/index.html</span>
+<span class="comment"># Visit http://your-ec2-ip in a browser 🎉</span></div></div></div>
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist"><li>Linux OS manages processes, memory, files, network, and security</li><li>Architecture: Applications → Shell → Kernel → Hardware</li><li>96% of servers run Linux — Ubuntu, RHEL, Amazon Linux are most common</li><li>Navigation: pwd, ls, cd, mkdir, touch</li><li>Files: cat, cp, mv, rm, grep</li><li>Permissions: chmod (755 = rwxr-xr-x), chown, sudo</li><li>Users: root (UID 0), system (1-999), normal (1000+)</li><li>File tests: -e -f -d -r -w -x -s in shell scripts</li></ul></div>
+<div class="next-card" onclick="showModule('git')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🌿 Git &amp; GitHub</div><div class="next-why">Now that you can navigate servers, you need to track your code changes and collaborate with teams — that's where Git comes in.</div></div><div class="next-arrow">→</div></div>

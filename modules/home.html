@@ -1,0 +1,107 @@
+<div class="module-header"><div class="module-icon">🗺️</div><div class="module-meta"><div class="module-tag">Start Here</div><h2 class="module-title">Your DevOps Learning Roadmap</h2></div></div>
+<div class="section">
+<h3 class="section-title">What is DevOps?</h3>
+<p><strong>DevOps</strong> is the combination of two words: <em>Development</em> (writing software) and <em>Operations</em> (running and managing that software). In simple terms, DevOps is a way of working where the people who build software and the people who run it work together smoothly, automatically, and continuously.</p>
+<p>Before DevOps, developers would write code and "throw it over the wall" to operations teams who would then struggle to deploy it. Bugs were found late, deployments were scary, and things broke in production all the time.</p>
+</div>
+<div class="callout callout-analogy"><div class="callout-label">🍕 Real-World Analogy</div><p>Think of a pizza restaurant. The <strong>chef</strong> (developer) makes the pizza, and the <strong>delivery team</strong> (operations) delivers it. In old-school IT, the chef makes the pizza and just hands it to delivery — but delivery doesn't know the right address, it's not packed properly, and it arrives cold. DevOps is like giving the chef and delivery team a shared system, clear communication, and automated processes — so every pizza is delivered hot, on time, every time.</p></div>
+<div class="section">
+<h3 class="section-title">Your Learning Path</h3>
+<p>Each module below builds on the previous one. Don't skip ahead — every concept is connected. Click any card to start learning!</p>
+<div id="landing-grid">
+<div class="landing-card" onclick="showModule('devopslife')"><div class="lc-num">00</div><div class="lc-icon">🔄</div><div class="lc-title">DevOps Lifecycle</div></div>
+<div class="landing-card" onclick="showModule('networking')"><div class="lc-num">00b</div><div class="lc-icon">🌐</div><div class="lc-title">Networking Basics</div></div>
+<div class="landing-card" onclick="showModule('yaml')"><div class="lc-num">00c</div><div class="lc-icon">📝</div><div class="lc-title">YAML &amp; Config Files</div></div>
+<div class="landing-card" onclick="showModule('cloud')"><div class="lc-num">01</div><div class="lc-icon">☁️</div><div class="lc-title">Why Cloud Computing</div></div>
+<div class="landing-card" onclick="showModule('aws')"><div class="lc-num">02</div><div class="lc-icon">🔶</div><div class="lc-title">AWS Core Services</div></div>
+<div class="landing-card" onclick="showModule('linux')"><div class="lc-num">03</div><div class="lc-icon">🐧</div><div class="lc-title">Linux Basics</div></div>
+<div class="landing-card" onclick="showModule('git')"><div class="lc-num">04</div><div class="lc-icon">🌿</div><div class="lc-title">Git &amp; GitHub</div></div>
+<div class="landing-card" onclick="showModule('shell')"><div class="lc-num">05</div><div class="lc-icon">⚡</div><div class="lc-title">Shell Scripting</div></div>
+<div class="landing-card" onclick="showModule('maven')"><div class="lc-num">06</div><div class="lc-icon">🔨</div><div class="lc-title">Maven</div></div>
+<div class="landing-card" onclick="showModule('jenkins')"><div class="lc-num">07</div><div class="lc-icon">🤖</div><div class="lc-title">Jenkins CI/CD</div></div>
+<div class="landing-card" onclick="showModule('docker')"><div class="lc-num">08</div><div class="lc-icon">🐳</div><div class="lc-title">Docker</div></div>
+<div class="landing-card" onclick="showModule('kubernetes')"><div class="lc-num">09</div><div class="lc-icon">☸️</div><div class="lc-title">Kubernetes</div></div>
+<div class="landing-card" onclick="showModule('terraform')"><div class="lc-num">10</div><div class="lc-icon">🏗️</div><div class="lc-title">Terraform</div></div>
+<div class="landing-card" onclick="showModule('monitoring')"><div class="lc-num">11</div><div class="lc-icon">📊</div><div class="lc-title">Monitoring</div></div>
+<div class="landing-card" onclick="showModule('vpc')"><div class="lc-num">12</div><div class="lc-icon">🔒</div><div class="lc-title">VPC Deep Dive</div></div>
+<div class="landing-card" onclick="showModule('s3deep')"><div class="lc-num">13</div><div class="lc-icon">🪣</div><div class="lc-title">S3 Storage Classes</div></div>
+<div class="landing-card" onclick="showModule('awscli')"><div class="lc-num">14</div><div class="lc-icon">⌨️</div><div class="lc-title">AWS CLI</div></div>
+<div class="landing-card" onclick="showModule('services')"><div class="lc-num">15</div><div class="lc-icon">⚡</div><div class="lc-title">Lambda, RDS &amp; More</div></div>
+<div class="landing-card" onclick="showModule('security')"><div class="lc-num">16</div><div class="lc-icon">🔐</div><div class="lc-title">DevSecOps Basics</div></div>
+<div class="landing-card" onclick="showModule('interview')"><div class="lc-num">17</div><div class="lc-icon">🎯</div><div class="lc-title">Interview Prep</div></div>
+<div class="landing-card" onclick="showModule('nextsteps')"><div class="lc-num">18</div><div class="lc-icon">🚀</div><div class="lc-title">What's Next</div></div>
+</div>
+</div>
+<div class="section">
+<h3 class="section-title">The DevOps Infinity Loop</h3>
+<p>DevOps is often shown as an <strong>infinity loop (∞)</strong> — because the process never stops. You plan, build, test, deploy, monitor, and then use what you learn to plan again. This is called the <strong>DevOps Lifecycle</strong>.</p>
+<div class="svg-diagram">
+<svg font-family="'DM Mono', monospace" viewbox="0 0 800 340" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arr" markerheight="8" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#00d4aa"></path></marker>
+</defs>
+<!-- background -->
+<rect fill="#111827" height="340" width="800"></rect>
+<!-- Left loop (Dev side) -->
+<ellipse cx="290" cy="170" fill="none" rx="180" ry="110" stroke="#1e2d45" stroke-width="2"></ellipse>
+<!-- Right loop (Ops side) -->
+<ellipse cx="510" cy="170" fill="none" rx="180" ry="110" stroke="#1e2d45" stroke-width="2"></ellipse>
+<!-- Left flow arrows - top arc -->
+<path d="M 200,100 Q 290,55 380,100" fill="none" marker-end="url(#arr)" stroke="#00d4aa" stroke-width="2"></path>
+<!-- Left flow arrows - bottom arc -->
+<path d="M 380,240 Q 290,285 200,240" fill="none" marker-end="url(#arr)" stroke="#00d4aa" stroke-width="2"></path>
+<!-- Right flow arrows - top arc -->
+<path d="M 420,100 Q 510,55 600,100" fill="none" marker-end="url(#arr)" stroke="#7c3aed" stroke-width="2"></path>
+<!-- Right flow arrows - bottom arc -->
+<path d="M 600,240 Q 510,285 420,240" fill="none" marker-end="url(#arr)" stroke="#7c3aed" stroke-width="2"></path>
+<!-- DEV label -->
+<text fill="#00d4aa" font-size="13" font-weight="bold" text-anchor="middle" x="290" y="28">DEV</text>
+<!-- OPS label -->
+<text fill="#7c3aed" font-size="13" font-weight="bold" text-anchor="middle" x="510" y="28">OPS</text>
+<!-- Nodes - Dev side -->
+<circle cx="200" cy="100" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
+<text fill="#00d4aa" font-size="16" text-anchor="middle" x="200" y="96">📋</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="200" y="110">PLAN</text>
+<circle cx="290" cy="62" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
+<text fill="#00d4aa" font-size="16" text-anchor="middle" x="290" y="58">💻</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="290" y="72">CODE</text>
+<circle cx="380" cy="100" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
+<text fill="#00d4aa" font-size="16" text-anchor="middle" x="380" y="96">🔨</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="380" y="110">BUILD</text>
+<circle cx="380" cy="240" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
+<text fill="#00d4aa" font-size="16" text-anchor="middle" x="380" y="236">🧪</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="380" y="250">TEST</text>
+<circle cx="290" cy="278" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
+<text fill="#00d4aa" font-size="16" text-anchor="middle" x="290" y="274">🔀</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="290" y="288">MERGE</text>
+<circle cx="200" cy="240" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
+<text fill="#00d4aa" font-size="16" text-anchor="middle" x="200" y="236">🔗</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="200" y="250">INTEGRATE</text>
+<!-- Nodes - Ops side -->
+<circle cx="420" cy="100" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
+<text fill="#7c3aed" font-size="16" text-anchor="middle" x="420" y="96">🚀</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="420" y="110">RELEASE</text>
+<circle cx="510" cy="62" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
+<text fill="#7c3aed" font-size="16" text-anchor="middle" x="510" y="58">📦</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="510" y="72">DEPLOY</text>
+<circle cx="600" cy="100" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
+<text fill="#7c3aed" font-size="16" text-anchor="middle" x="600" y="96">⚙️</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="600" y="110">OPERATE</text>
+<circle cx="600" cy="240" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
+<text fill="#7c3aed" font-size="16" text-anchor="middle" x="600" y="236">📊</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="600" y="250">MONITOR</text>
+<circle cx="510" cy="278" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
+<text fill="#7c3aed" font-size="16" text-anchor="middle" x="510" y="274">💬</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="510" y="288">FEEDBACK</text>
+<circle cx="420" cy="240" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
+<text fill="#7c3aed" font-size="16" text-anchor="middle" x="420" y="236">🔧</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="420" y="250">CONFIG</text>
+<!-- center -->
+<circle cx="400" cy="170" fill="#0a0e1a" r="22" stroke="#fbbf24" stroke-width="2"></circle>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="400" y="166">∞</text>
+<text fill="#fbbf24" font-size="7" text-anchor="middle" x="400" y="178">DEVOPS</text>
+</svg>
+<div class="diagram-caption">The DevOps Infinity Loop — a continuous cycle of building, deploying, and improving</div>
+</div>
+</div>
+<div class="next-card" onclick="showModule('devopslife')"><div class="next-text"><div class="next-label">Start Your Journey →</div><div class="next-title">🔄 Module 00: DevOps Lifecycle</div><div class="next-why">Understand the big picture — what happens from when a developer writes code to when users see it live.</div></div><div class="next-arrow">→</div></div>

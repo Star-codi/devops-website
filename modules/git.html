@@ -1,0 +1,115 @@
+<div class="module-header"><div class="module-icon">🌿</div><div class="module-meta"><div class="module-tag">Module 04 — Code &amp; Build</div><h2 class="module-title">Git &amp; GitHub</h2></div></div>
+<div class="section"><h3 class="section-title">The Problem Without Version Control</h3><p>Imagine you and your friend are both editing the same Word document. You each make changes and email it back and forth. After 5 rounds, nobody knows which version is the latest. Someone accidentally overwrites the other's changes. The file is now a mess called <code>final_final_v3_ACTUAL_FINAL.docx</code>.</p><p>In software, this is catastrophic. A team of 10 developers could be working on the same codebase. Without coordination, everything breaks. This is why we use a <strong>Version Control System (VCS)</strong>.</p></div>
+<div class="section">
+<h3 class="section-title">Types of Version Control Systems</h3>
+<table class="compare-table">
+<tr><th>Type</th><th>How it works</th><th>Tools</th><th>Problem</th></tr>
+<tr><td>📂 Local VCS (LVCS)</td><td>Saves versions only on your local machine</td><td>RCS, SCCS</td><td>No backup, no collaboration</td></tr>
+<tr><td>🌐 Centralized VCS (CVCS)</td><td>One central server stores all code; everyone connects to it</td><td>SVN, Perforce</td><td>No internet = can't save; server failure = all lost</td></tr>
+<tr><td><span class="badge-good">✅ Distributed VCS (DVCS)</span></td><td>Every developer has a <strong>full copy</strong> of the entire repo</td><td><strong>Git</strong>, Mercurial</td><td>None — best of both worlds</td></tr>
+</table>
+<p><strong>Git</strong> is a DVCS — it combines Local VCS (work offline, full local history) with Central VCS (push to shared remote, full collaboration). This is why Git is the industry standard.</p>
+</div>
+<div class="callout callout-analogy"><div class="callout-label">⏰ Analogy — Google Docs + Time Machine</div><p><strong>Git</strong> is like Google Docs for code — everyone can work on it, every change is tracked, and you can go back to any previous version instantly. GIT stands for <em>Global Information Tracker</em>. Created in 2005 by <strong>Linus Torvalds</strong> (same person who created Linux!) to manage the Linux kernel source code.</p></div>
+<div class="section"><h3 class="section-title">Git vs GitHub — They're Different!</h3><table class="compare-table"><thead><tr><th></th><th>Git</th><th>GitHub</th></tr></thead><tbody><tr><td>What it is</td><td>Version control tool (software on your computer)</td><td>Website that hosts Git repositories in the cloud</td></tr><tr><td>Where it runs</td><td>On your local machine</td><td>In the cloud (github.com)</td></tr><tr><td>Analogy</td><td>The camera taking photos</td><td>The photo album stored online</td></tr><tr><td>Can work offline?</td><td><span class="badge-good">Yes</span></td><td><span class="badge-bad">No</span></td></tr><tr><td>Alternatives</td><td>—</td><td>GitLab, Bitbucket, Azure DevOps</td></tr></tbody></table></div>
+<div class="section">
+<h3 class="section-title">Git's Three Working Areas</h3>
+<div class="svg-diagram">
+<svg font-family="'DM Mono', monospace" viewbox="0 0 720 160" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#111827" height="160" width="720"></rect>
+<defs><marker id="garr" markerheight="6" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#00d4aa"></path></marker></defs>
+<!-- Box 1 -->
+<rect fill="#0a0e1a" height="100" rx="8" stroke="#ff6b35" stroke-width="1.5" width="180" x="20" y="30"></rect>
+<text fill="#ff6b35" font-size="22" text-anchor="middle" x="110" y="60">💻</text>
+<text fill="#e2e8f0" font-size="11" font-weight="bold" text-anchor="middle" x="110" y="82">Working Directory</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="110" y="98">Where you create,</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="110" y="112">edit, delete files</text>
+<!-- Arrow 1 -->
+<path d="M200,80 L269,80" marker-end="url(#garr)" stroke="#00d4aa" stroke-width="1.5"></path>
+<text fill="#00d4aa" font-size="9" text-anchor="middle" x="234" y="72">git add</text>
+<!-- Box 2 -->
+<rect fill="#0a0e1a" height="100" rx="8" stroke="#fbbf24" stroke-width="1.5" width="180" x="270" y="30"></rect>
+<text fill="#fbbf24" font-size="22" text-anchor="middle" x="360" y="60">📋</text>
+<text fill="#e2e8f0" font-size="11" font-weight="bold" text-anchor="middle" x="360" y="82">Staging Area</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="360" y="98">Temporary hold —</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="360" y="112">files ready to commit</text>
+<!-- Arrow 2 -->
+<path d="M450,80 L519,80" marker-end="url(#garr)" stroke="#00d4aa" stroke-width="1.5"></path>
+<text fill="#00d4aa" font-size="9" text-anchor="middle" x="484" y="72">git commit</text>
+<!-- Box 3 -->
+<rect fill="#0a0e1a" height="100" rx="8" stroke="#7c3aed" stroke-width="1.5" width="180" x="520" y="30"></rect>
+<text fill="#7c3aed" font-size="22" text-anchor="middle" x="610" y="60">🗂️</text>
+<text fill="#e2e8f0" font-size="11" font-weight="bold" text-anchor="middle" x="610" y="82">Local Repository</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="610" y="98">Permanent snapshots</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="610" y="112">(.git folder)</text>
+<!-- git push label -->
+<text fill="#64748b" font-size="9" text-anchor="middle" x="360" y="148">Then: git push → uploads to GitHub (remote repository)</text>
+</svg>
+<div class="diagram-caption">Git's three areas — every file goes through these stages before reaching GitHub</div>
+</div>
+</div>
+<div class="section">
+<h3 class="section-title">The Core Git Workflow</h3>
+<div class="flow"><div class="flow-step"><div class="flow-box active">Edit Code</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">git add</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">git commit</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">git push</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box active">GitHub</div></div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Complete Git Workflow</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># 1. Configure Git (one time only)</span>
+<span class="cmd">git config user.name "Arjun"</span>
+<span class="cmd">git config user.email "arjun@email.com"</span>
+<span class="cmd">git config --edit</span> <span class="comment"># open config to edit manually</span>
+<span class="comment"># 2. Initialize project</span>
+<span class="cmd">git init</span>
+<span class="comment"># 3. Check status and add files</span>
+<span class="cmd">git status</span>
+<span class="cmd">git add app.py</span> <span class="comment"># add single file</span>
+<span class="cmd">git add .</span> <span class="comment"># add ALL files</span>
+<span class="cmd">git add *.js</span> <span class="comment"># add all .js files</span>
+<span class="comment"># 4. Commit with a message</span>
+<span class="cmd">git commit -m "feat: add login page"</span>
+<span class="comment"># 5. Connect to GitHub remote</span>
+<span class="cmd">git remote add origin https://github.com/user/repo.git</span>
+<span class="cmd">git remote -v</span> <span class="comment"># verify connection</span>
+<span class="comment"># 6. Push to GitHub</span>
+<span class="cmd">git push origin main</span>
+<span class="comment"># 7. Pull latest changes from team</span>
+<span class="cmd">git pull origin main</span>
+<span class="comment"># Useful extras</span>
+<span class="cmd">git log</span> <span class="comment"># see commit history</span>
+<span class="cmd">git ls-files</span> <span class="comment"># list tracked files</span>
+<span class="cmd">git remote remove origin</span> <span class="comment"># remove connection</span></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Branching — Types &amp; Commands</h3>
+<p>A <strong>branch</strong> is a separate line of development — a safe sandbox to work in without touching the main codebase.</p>
+<div class="info-box">
+<div class="info-box-item"><h4>🌿 Main / Master Branch</h4><p>The default branch created when you init a repo. This is your <strong>production code</strong> — always stable and working. Never push broken code directly here.</p></div>
+<div class="info-box-item"><h4>✨ Feature Branch</h4><p>Created to develop a <strong>new feature</strong>. Isolated from main — you experiment freely. Once done, raise a Pull Request to merge back into main.</p></div>
+<div class="info-box-item"><h4>🚀 Release Branch</h4><p>Created when <strong>preparing a release</strong>. Only bug fixes go here — no new features. When ready, merged into main and tagged with a version number.</p></div>
+<div class="info-box-item"><h4>🔥 Hotfix Branch</h4><p>Created for <strong>critical production bugs</strong> that need immediate fixing. Branched directly from main, fixed fast, merged back to main and also back to any in-progress release branch.</p></div>
+</div>
+<div class="arch-diagram">  main:    A---B---C-----------H  (production)
+                       \         /
+  feature:              D---E---F  (your new feature, merged via PR)
+                  \
+  hotfix:          G  (urgent fix, merged directly to main)</div>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Branching Commands</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># List all branches</span>
+<span class="cmd">git branch</span> <span class="comment"># local branches</span>
+<span class="cmd">git branch -a</span> <span class="comment"># local + remote branches</span>
+<span class="cmd">git branch -r</span> <span class="comment"># remote branches only</span>
+<span class="comment"># Create and switch to new branch</span>
+<span class="cmd">git checkout -b feature/login-page</span>
+<span class="comment"># Or using newer syntax:</span>
+<span class="cmd">git switch -c feature/login-page</span>
+<span class="comment"># Switch between branches</span>
+<span class="cmd">git checkout main</span>
+<span class="cmd">git switch main</span>
+<span class="comment"># Push branch to GitHub</span>
+<span class="cmd">git push origin feature/login-page</span>
+<span class="comment"># Merge feature into main</span>
+<span class="cmd">git checkout main</span>
+<span class="cmd">git merge feature/login-page</span>
+<span class="comment"># Delete branch after merge</span>
+<span class="cmd">git branch -d feature/login-page</span> <span class="comment"># safe delete (merged)</span>
+<span class="cmd">git branch -D feature/login-page</span> <span class="comment"># force delete</span>
+<span class="cmd">git push origin --delete feature/login-page</span> <span class="comment"># delete remote</span></div></div>
+</div>
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist"><li>VCS types: Local (LVCS) → Centralized (CVCS) → Distributed (DVCS — Git)</li><li>Git was created by Linus Torvalds in 2005 for the Linux kernel</li><li>Three areas: Working Directory → Staging Area → Local Repository → GitHub</li><li>Core workflow: git init → add → commit → remote add → push</li><li>Branch types: main, feature, release, hotfix — each has a purpose</li><li>git fetch downloads but doesn't merge; git pull = fetch + merge</li></ul></div>
+<div class="next-card" onclick="showModule('shell')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">⚡ Shell Scripting</div><div class="next-why">You know Linux commands. Now learn to chain them into automated scripts that run on their own.</div></div><div class="next-arrow">→</div></div>

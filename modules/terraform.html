@@ -1,0 +1,56 @@
+<div class="module-header"><div class="module-icon">🏗️</div><div class="module-meta"><div class="module-tag">Module 10 — Infrastructure as Code</div><h2 class="module-title">Terraform</h2></div></div>
+<div class="section"><h3 class="section-title">The Problem: ClickOps</h3><p>Imagine you manually click through the AWS console to create 5 EC2 instances, 3 S3 buckets, 2 VPCs, security groups, and IAM roles. Three months later, you need to recreate this entire setup for a new client. Or worse — something breaks and you have no idea what the original settings were.</p><p>Manual infrastructure = inconsistent, undocumented, irreproducible. This is called <em>"ClickOps"</em> — and it's a DevOps anti-pattern.</p></div>
+<div class="callout callout-analogy"><div class="callout-label">🏠 Analogy — Architectural Blueprint</div><p>When a builder constructs a house, they work from a <strong>blueprint</strong>. The blueprint describes exactly every room, door, pipe, and wire. You can build the same house in Mumbai or Delhi from the same blueprint. <strong>Terraform is the blueprint for your cloud infrastructure</strong> — write it once, deploy anywhere, recreate identically anytime.</p></div>
+<div class="section">
+<h3 class="section-title">How Terraform Works</h3>
+<div class="flow"><div class="flow-step"><div class="flow-box active">Write .tf files</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">terraform init</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">terraform plan</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">terraform apply</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box active">Infrastructure Created ✅</div></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Create an EC2 Instance with Terraform</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">main.tf — Terraform Configuration</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Tell Terraform which cloud provider to use</span>
+<span class="kw">provider</span> <span class="str">"aws"</span> {
+  region = <span class="str">"ap-south-1"</span> <span class="comment"># Mumbai region</span>
+}
+
+<span class="comment"># Create a VPC</span>
+<span class="kw">resource</span> <span class="str">"aws_vpc"</span> <span class="str">"main"</span> {
+  cidr_block = <span class="str">"10.0.0.0/16"</span>
+  tags = { Name = <span class="str">"my-vpc"</span> }
+}
+
+<span class="comment"># Create an EC2 instance</span>
+<span class="kw">resource</span> <span class="str">"aws_instance"</span> <span class="str">"web_server"</span> {
+  ami           = <span class="str">"ami-0c55b159cbfafe1f0"</span>
+  instance_type = <span class="str">"t2.micro"</span>
+  key_name      = <span class="str">"my-key"</span>
+
+  tags = {
+    Name        = <span class="str">"web-server"</span>
+    Environment = <span class="str">"production"</span>
+  }
+}
+
+<span class="comment"># Output the public IP address</span>
+<span class="kw">output</span> <span class="str">"server_ip"</span> {
+  value = aws_instance.web_server.public_ip
+}</div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Terraform Commands</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Download the AWS provider plugin</span>
+<span class="cmd">terraform init</span>
+<span class="out">Terraform has been successfully initialized!</span>
+<span class="comment"># Preview what will be created (no changes yet)</span>
+<span class="cmd">terraform plan</span>
+<span class="out">Plan: 2 to add, 0 to change, 0 to destroy.</span>
+<span class="out">  + aws_vpc.main</span>
+<span class="out">  + aws_instance.web_server</span>
+<span class="comment"># Actually create the infrastructure</span>
+<span class="cmd">terraform apply</span>
+<span class="out">Apply complete! Resources: 2 added.</span>
+<span class="out">server_ip = "13.233.45.67"</span>
+<span class="comment"># Destroy everything when no longer needed</span>
+<span class="cmd">terraform destroy</span>
+<span class="out">Destroy complete! Resources: 2 destroyed.</span></div></div>
+</div>
+<div class="section"><h3 class="section-title">Key Benefits of Terraform</h3><div class="concept-grid"><div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">Documented</div><div class="cc-desc">Your infrastructure is described in code. New team members can read exactly what was built.</div></div><div class="concept-card"><div class="cc-icon">♻️</div><div class="cc-title">Reproducible</div><div class="cc-desc">Recreate identical environments (dev, staging, prod) from the same code.</div></div><div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">Version Controlled</div><div class="cc-desc">Store Terraform files in Git. See who changed what and when.</div></div><div class="concept-card"><div class="cc-icon">🌍</div><div class="cc-title">Multi-Cloud</div><div class="cc-desc">Same tool works for AWS, Azure, GCP, and 1000+ other providers.</div></div></div></div>
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Infrastructure Setup with Terraform</div><p>Write Terraform code to create: 1 VPC, 2 subnets (public + private), 1 EC2 web server in public subnet, 1 RDS database in private subnet, security groups with proper rules. Then destroy it all with one command.</p></div>
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist"><li>Terraform manages cloud infrastructure as code — no manual clicking</li><li>Write .tf files → terraform plan (preview) → terraform apply (create)</li><li>Infrastructure is version-controlled, documented, and reproducible</li><li>Works with AWS, Azure, GCP, and 1000+ providers</li><li>terraform destroy removes everything cleanly</li></ul></div>
+<div class="next-card" onclick="showModule('monitoring')"><div class="next-text"><div class="next-label">Final Module →</div><div class="next-title">📊 Prometheus &amp; Grafana — Monitoring</div><div class="next-why">Your app is running in production. But how do you know it's healthy? You need monitoring — alerts, dashboards, and insights into your system's performance.</div></div><div class="next-arrow">→</div></div>

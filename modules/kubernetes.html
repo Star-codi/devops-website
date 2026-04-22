@@ -1,0 +1,75 @@
+<div class="module-header"><div class="module-icon">☸️</div><div class="module-meta"><div class="module-tag">Module 09 — Orchestration</div><h2 class="module-title">Kubernetes</h2></div></div>
+<div class="section"><h3 class="section-title">What is Kubernetes?</h3><p><strong>Kubernetes</strong> (K8s) is an open-source system that automatically manages containerized applications at scale. It handles starting, stopping, distributing, scaling, and healing containers — so you don't have to do it manually.</p></div>
+<div class="callout callout-analogy"><div class="callout-label">🍽️ Analogy — Restaurant Manager</div><p>You have 50 waiters (containers) serving 500 customers across 5 floors (servers). The <strong>restaurant manager (Kubernetes)</strong>: decides which floor each waiter goes to, replaces waiters who go sick automatically, adds more waiters when the restaurant gets busy, ensures every customer gets served. You just tell the manager "I want 50 waiters" — the rest is handled automatically.</p></div>
+<div class="section">
+<h3 class="section-title">Kubernetes Architecture</h3>
+<div class="arch-diagram">  ┌─────────────────────────── KUBERNETES CLUSTER ──────────────────────┐
+  │                                                                        │
+  │  ┌──────────────────────┐      ┌────────────────────────────────────┐  │
+  │  │    CONTROL PLANE     │      │           WORKER NODES             │  │
+  │  │  (The Brain)         │      │                                    │  │
+  │  │                      │      │  ┌────────────┐  ┌────────────┐   │  │
+  │  │  API Server ←────────┼──────┼→ │   Node 1   │  │   Node 2   │   │  │
+  │  │  Scheduler           │      │  │ [Pod][Pod] │  │ [Pod][Pod] │   │  │
+  │  │  etcd (database)     │      │  └────────────┘  └────────────┘   │  │
+  │  │  Controller Manager  │      │                                    │  │
+  │  └──────────────────────┘      └────────────────────────────────────┘  │
+  └────────────────────────────────────────────────────────────────────────┘
+
+  Pod = smallest unit in K8s = one or more containers running together</div>
+</div>
+<div class="section"><h3 class="section-title">Key Kubernetes Objects</h3><div class="concept-grid"><div class="concept-card"><div class="cc-icon">📦</div><div class="cc-title">Pod</div><div class="cc-desc">Smallest deployable unit. Wraps one or more containers. Has its own IP address.</div></div><div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">Deployment</div><div class="cc-desc">Manages Pods — ensures X replicas always run. Handles rolling updates.</div></div><div class="concept-card"><div class="cc-icon">🌐</div><div class="cc-title">Service</div><div class="cc-desc">Stable network endpoint for Pods. Load balances traffic across all replicas.</div></div><div class="concept-card"><div class="cc-icon">⚙️</div><div class="cc-title">ConfigMap</div><div class="cc-desc">Store configuration (env variables) separately from your container image.</div></div></div></div>
+<div class="section">
+<h3 class="section-title">Deploy an App on Kubernetes</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">deployment.yaml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">apiVersion</span>: apps/v1
+<span class="cmd">kind</span>: Deployment
+<span class="cmd">metadata</span>:
+  <span class="cmd">name</span>: my-node-app
+<span class="cmd">spec</span>:
+  <span class="cmd">replicas</span>: 3        <span class="comment"># run 3 copies at all times</span>
+<span class="cmd">selector</span>:
+    <span class="cmd">matchLabels</span>:
+      <span class="cmd">app</span>: my-node-app
+  <span class="cmd">template</span>:
+    <span class="cmd">metadata</span>:
+      <span class="cmd">labels</span>:
+        <span class="cmd">app</span>: my-node-app
+    <span class="cmd">spec</span>:
+      <span class="cmd">containers</span>:
+      - <span class="cmd">name</span>: my-node-app
+        <span class="cmd">image</span>: <span class="str">arjun/my-node-app:1.0</span>
+<span class="cmd">ports</span>:
+        - <span class="cmd">containerPort</span>: 3000
+---
+<span class="cmd">apiVersion</span>: v1
+<span class="cmd">kind</span>: Service
+<span class="cmd">metadata</span>:
+  <span class="cmd">name</span>: my-node-app-svc
+<span class="cmd">spec</span>:
+  <span class="cmd">type</span>: LoadBalancer
+  <span class="cmd">selector</span>:
+    <span class="cmd">app</span>: my-node-app
+  <span class="cmd">ports</span>:
+  - <span class="cmd">port</span>: 80
+    <span class="cmd">targetPort</span>: 3000</div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — kubectl Commands</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Deploy the app</span>
+<span class="cmd">kubectl apply -f deployment.yaml</span>
+<span class="out">deployment.apps/my-node-app created</span>
+<span class="out">service/my-node-app-svc created</span>
+<span class="comment"># Check pods are running</span>
+<span class="cmd">kubectl get pods</span>
+<span class="out">NAME                          READY   STATUS    RESTARTS</span>
+<span class="out">my-node-app-7d6b8c-abc12      1/1     Running   0</span>
+<span class="out">my-node-app-7d6b8c-def34      1/1     Running   0</span>
+<span class="out">my-node-app-7d6b8c-ghi56      1/1     Running   0</span>
+<span class="comment"># Scale up to 10 replicas</span>
+<span class="cmd">kubectl scale deployment my-node-app --replicas=10</span>
+<span class="comment"># Rolling update (zero downtime)</span>
+<span class="cmd">kubectl set image deployment/my-node-app my-node-app=arjun/my-node-app:2.0</span>
+<span class="comment"># If something goes wrong, roll back instantly</span>
+<span class="cmd">kubectl rollout undo deployment/my-node-app</span></div></div>
+</div>
+<div class="section"><h3 class="section-title">Self-Healing — Kubernetes' Superpower</h3><div class="callout callout-tip"><div class="callout-label">🔄 Watch This Happen</div><p>You told Kubernetes: "I want 3 replicas." If one Pod crashes at 3am, Kubernetes <strong>automatically</strong> starts a new one — within seconds — without anyone waking up. This is called <em>self-healing</em> and it's what makes Kubernetes so powerful for production systems.</p></div></div>
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Deploy a Full App on K8s</div><p>Use Minikube (local K8s) → Deploy your Dockerized Node.js app → Expose it via a Service → Scale it to 5 replicas → Simulate a pod crash and watch K8s heal itself.</p></div>
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist"><li>Kubernetes orchestrates containers across multiple servers</li><li>Pods = containers, Deployments = desired state, Services = networking</li><li>Self-healing: K8s restarts crashed containers automatically</li><li>Auto-scaling: handles traffic spikes by adding/removing pods</li><li>Rolling updates: deploy new versions with zero downtime</li></ul></div>
+<div class="next-card" onclick="showModule('terraform')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🏗️ Terraform — Infrastructure as Code</div><div class="next-why">You can manage apps on Kubernetes, but who creates the servers and networks? Terraform lets you define ALL infrastructure in code — no clicking in consoles.</div></div><div class="next-arrow">→</div></div>

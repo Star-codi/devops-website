@@ -1,0 +1,39 @@
+<div class="module-header"><div class="module-icon">🔨</div><div class="module-meta"><div class="module-tag">Module 06 — Code &amp; Build</div><h2 class="module-title">Maven — Build Tool</h2></div></div>
+<div class="section"><h3 class="section-title">What Problem Does Maven Solve?</h3><p>When you write Java code, your computer can't run it directly. You need to: compile it (translate to machine code), download external libraries, run tests, and package everything into a single deployable file. Doing this manually for every developer on a team is chaotic.</p></div>
+<div class="callout callout-analogy"><div class="callout-label">🏗️ Analogy — Construction Site Manager</div><p>Building a house requires ordering materials, scheduling workers, following blueprints. <strong>Maven is the construction manager</strong> for your Java project. You describe what you want to build (in a file called <code>pom.xml</code>), and Maven handles all the steps: fetching materials (dependencies), building (compilation), testing, and packaging.</p></div>
+<div class="section">
+<h3 class="section-title">The Maven Build Lifecycle</h3>
+<div class="flow"><div class="flow-step"><div class="flow-box">clean</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">compile</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">test</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box active">package</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box active">JAR/WAR ✅</div></div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">pom.xml — Project Configuration</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">&lt;<span class="cmd">project</span>&gt;
+  &lt;<span class="cmd">groupId</span>&gt;com.mycompany&lt;/<span class="cmd">groupId</span>&gt;
+  &lt;<span class="cmd">artifactId</span>&gt;my-web-app&lt;/<span class="cmd">artifactId</span>&gt;
+  &lt;<span class="cmd">version</span>&gt;1.0.0&lt;/<span class="cmd">version</span>&gt;
+  &lt;<span class="cmd">packaging</span>&gt;jar&lt;/<span class="cmd">packaging</span>&gt;
+
+  <span class="comment">&lt;!-- External libraries my app needs --&gt;</span>
+  &lt;<span class="cmd">dependencies</span>&gt;
+    &lt;<span class="cmd">dependency</span>&gt;
+      &lt;<span class="cmd">groupId</span>&gt;org.springframework.boot&lt;/<span class="cmd">groupId</span>&gt;
+      &lt;<span class="cmd">artifactId</span>&gt;spring-boot-starter-web&lt;/<span class="cmd">artifactId</span>&gt;
+      &lt;<span class="cmd">version</span>&gt;3.0.0&lt;/<span class="cmd">version</span>&gt;
+    &lt;/<span class="cmd">dependency</span>&gt;
+  &lt;/<span class="cmd">dependencies</span>&gt;
+&lt;/<span class="cmd">project</span>&gt;</div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Maven Lifecycle Commands</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Maven Commands</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Clean old build files</span>
+<span class="cmd">mvn clean</span>
+<span class="comment"># Compile source code</span>
+<span class="cmd">mvn compile</span>
+<span class="comment"># Run tests</span>
+<span class="cmd">mvn test</span>
+<span class="comment"># Package into JAR/WAR file (most common)</span>
+<span class="cmd">mvn package</span>
+<span class="out">BUILD SUCCESS</span>
+<span class="out">→ Created: target/my-web-app-1.0.0.jar</span>
+<span class="comment"># Do all steps in one command</span>
+<span class="cmd">mvn clean install</span></div></div>
+</div>
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist"><li>Maven automates Java project building: compile → test → package</li><li>pom.xml is Maven's configuration file (your project blueprint)</li><li>Dependencies are automatically downloaded from Maven Central</li><li>Output is a JAR/WAR file — ready to deploy on any server</li></ul></div>
+<div class="next-card" onclick="showModule('jenkins')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🤖 Jenkins — CI/CD</div><div class="next-why">You can build manually. But what if every Git push automatically triggered a build, test, and deploy? That's CI/CD — and Jenkins does it for you.</div></div><div class="next-arrow">→</div></div>

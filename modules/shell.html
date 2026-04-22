@@ -1,0 +1,120 @@
+<div class="module-header"><div class="module-icon">⚡</div><div class="module-meta"><div class="module-tag">Module 05 — Code &amp; Build</div><h2 class="module-title">Shell Scripting</h2></div></div>
+<div class="section">
+<h3 class="section-title">What is a Shell?</h3>
+<p>A <strong>shell</strong> is a user interface that provides access to operating system services. It acts as a translator between the user and the kernel — you type a command, the shell interprets it, and the kernel executes it.</p>
+<div class="info-box">
+<div class="info-box-item"><h4>🖼️ GUI Shell</h4><p>Graphical interface — icons, windows, menus. Examples: Windows Explorer, Linux GNOME, KDE. Easy to learn but slow and not scriptable.</p></div>
+<div class="info-box-item"><h4>⌨️ CLI Shell</h4><p>Text-based — you type commands. Examples: Windows CMD, PowerShell, Linux Terminal. Faster, automatable, used in all DevOps work.</p></div>
+</div>
+<p><strong>Types of CLI shells in Linux:</strong> <code>sh</code> (original Bourne Shell), <code>bash</code> (Bourne Again Shell — default on most Linux), <code>zsh</code> (Z Shell — macOS default, advanced features), <code>fish</code> (user-friendly, auto-suggestions), <code>ksh</code> (Korn Shell — enterprise), <code>csh</code> (C Shell — C-like syntax).</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Discover Your Shell</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Which shell are you using right now?</span>
+<span class="cmd">echo $0</span>
+<span class="out">-bash</span>
+<span class="comment"># List all available shells on the system</span>
+<span class="cmd">cat /etc/shells</span>
+<span class="out">/bin/sh</span>
+<span class="out">/bin/bash</span>
+<span class="out">/usr/bin/zsh</span>
+<span class="out">/usr/bin/fish</span></div></div>
+</div>
+<div class="section"><h3 class="section-title">What is Shell Scripting?</h3><p>A <strong>shell script</strong> is an executable file containing multiple shell commands that run sequentially — like a recipe. Instead of typing 20 commands every morning, you write them once in a script and run them with a single command.</p></div>
+<div class="callout callout-analogy"><div class="callout-label">🤖 Analogy — Teaching a Robot</div><p>Imagine training a robot to clean your house. Instead of telling it what to do step by step every day, you write instructions once and hand it the list. Shell scripting is exactly that — you write instructions for your computer to follow automatically, every time.</p></div>
+<div class="section">
+<h3 class="section-title">Variables, Input &amp; Operators</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Shell Script — Variables &amp; Operators</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment">#!/bin/bash</span>
+<span class="comment"># Declare a variable (no spaces around =)</span>
+<span class="cmd">APP_NAME</span>=<span class="str">"myapp"</span>
+<span class="cmd">PORT</span>=<span class="out">8080</span>
+<span class="comment"># Access variable value with $</span>
+<span class="cmd">echo</span> <span class="str">"Starting $APP_NAME on port $PORT"</span>
+<span class="comment"># Take input from user</span>
+<span class="cmd">read</span> <span class="cmd">USERNAME</span>
+<span class="cmd">echo</span> <span class="str">"Hello, $USERNAME!"</span>
+<span class="comment"># Arithmetic operators (use $(( )) for math)</span>
+<span class="cmd">TOTAL</span>=$(( 10 + 5 ))        <span class="comment"># addition</span>
+<span class="cmd">DIFF</span>=$(( 10 - 3 ))         <span class="comment"># subtraction</span>
+<span class="cmd">PROD</span>=$(( 4 * 5 ))          <span class="comment"># multiplication</span>
+<span class="cmd">MOD</span>=$(( 10 % 3 ))          <span class="comment"># modulus (remainder)</span>
+<span class="comment"># Relational operators (for comparisons)</span>
+<span class="comment"># -eq  equal          -ne  not equal</span>
+<span class="comment"># -gt  greater than   -lt  less than</span>
+<span class="comment"># -ge  &gt;= (or equal)  -le  &lt;= (or equal)</span>
+<span class="comment"># Logical operators</span>
+<span class="comment"># &amp;&amp;  AND    ||  OR    !  NOT</span></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Conditions &amp; Loops</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Shell Script — If / For / While / Until</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment">#!/bin/bash</span>
+<span class="comment"># IF / ELIF / ELSE</span>
+<span class="kw">if</span> [ -f "package.json" ]; <span class="kw">then</span>
+    echo "Node project" &amp;&amp; npm install
+<span class="kw">elif</span> [ -f "pom.xml" ]; <span class="kw">then</span>
+    echo "Java project" &amp;&amp; mvn package
+<span class="kw">else</span>
+    echo "Unknown project" &amp;&amp; exit 1
+<span class="kw">fi</span>
+<span class="comment"># FOR LOOP — iterate over a list</span>
+<span class="kw">for</span> server <span class="kw">in</span> web1 web2 web3; <span class="kw">do</span>
+    echo "Deploying to $server"
+    ssh $server "sudo systemctl restart app"
+<span class="kw">done</span>
+<span class="comment"># WHILE LOOP — runs while condition is true</span>
+COUNT=1
+<span class="kw">while</span> [ $COUNT -le 5 ]; <span class="kw">do</span>
+    echo "Attempt $COUNT"
+    COUNT=$(( COUNT + 1 ))
+<span class="kw">done</span>
+<span class="comment"># UNTIL LOOP — runs UNTIL condition becomes true</span>
+<span class="kw">until</span> [ $COUNT -gt 10 ]; <span class="kw">do</span>
+    echo "Waiting... $COUNT"
+    COUNT=$(( COUNT + 1 ))
+<span class="kw">done</span></div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Functions &amp; I/O Redirection</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Shell Script — Functions</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment">#!/bin/bash</span>
+<span class="comment"># Define a function</span>
+<span class="kw">deploy_app</span>() {
+    local APP=$1               <span class="comment"># $1 = first argument</span>
+    local ENV=$2               <span class="comment"># $2 = second argument</span>
+    echo "Deploying $APP to $ENV..."
+    docker pull $APP:latest
+    docker run -d --name $APP $APP:latest
+    echo "✅ $APP deployed to $ENV"
+}
+
+<span class="comment"># Call the function</span>
+<span class="cmd">deploy_app</span> <span class="str">"myapp"</span> <span class="str">"production"</span>
+<span class="cmd">deploy_app</span> <span class="str">"api"</span> <span class="str">"staging"</span></div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">Shell Script — I/O Redirection</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Linux has 3 standard streams:</span>
+<span class="comment"># 0 = stdin  (Standard Input)</span>
+<span class="comment"># 1 = stdout (Standard Output)</span>
+<span class="comment"># 2 = stderr (Standard Error)</span>
+<span class="comment"># Output redirection</span>
+<span class="cmd">echo "Hello" &gt; output.txt</span> <span class="comment"># OVERWRITE (careful!)</span>
+<span class="cmd">echo "World" &gt;&gt; output.txt</span> <span class="comment"># APPEND (safe)</span>
+<span class="comment"># Input redirection</span>
+<span class="cmd">mysql -u root -p mydb &lt; backup.sql</span> <span class="comment"># feed SQL file as input</span>
+<span class="comment"># Error redirection</span>
+<span class="cmd">./deploy.sh 2&gt; errors.log</span> <span class="comment"># send errors to file</span>
+<span class="cmd">./deploy.sh &amp;&gt; all.log</span> <span class="comment"># send BOTH stdout and stderr</span>
+<span class="comment"># Discard output entirely (send to /dev/null)</span>
+<span class="cmd">./noisy-script.sh &gt; /dev/null 2&gt;&amp;1</span>
+<span class="comment"># Pipe — send output of one command as input to another</span>
+<span class="cmd">cat app.log | grep "ERROR" | tail -20</span>
+<span class="cmd">ps aux | grep nginx</span></div></div>
+</div>
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Automated Backup Script</div><div class="code-block" style="margin-top:8px"><div class="code-header"><span class="code-lang">backup.sh</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment">#!/bin/bash</span>
+DATE=$(date +%Y-%m-%d)
+BACKUP_DIR=<span class="str">"/backups/$DATE"</span>
+SOURCE_DIR=<span class="str">"/var/www/html"</span>
+
+mkdir -p $BACKUP_DIR
+cp -r $SOURCE_DIR $BACKUP_DIR
+echo "Backup completed: $BACKUP_DIR"
+
+<span class="comment"># Upload to S3</span>
+aws s3 cp $BACKUP_DIR s3://my-backups/$DATE --recursive
+echo "✅ Backup uploaded to S3"</div></div></div>
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist"><li>A shell translates your commands to the kernel — bash is the most common</li><li>Shell scripts automate repetitive Linux commands — start with <code>#!/bin/bash</code></li><li>Variables: <code>NAME=value</code>, access with <code>$NAME</code>, read input with <code>read</code></li><li>Conditions: if/elif/else; Loops: for, while, until</li><li>Functions: group reusable commands, pass arguments with $1, $2...</li><li>Redirection: <code>&gt;</code> overwrites, <code>&gt;&gt;</code> appends, <code>2&gt;</code> errors, <code>&amp;&gt;</code> both</li><li>Pipe <code>|</code> chains commands — the backbone of all DevOps automation</li></ul></div>
+<div class="next-card" onclick="showModule('maven')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🔨 Maven — Build Tool</div><div class="next-why">Software needs to be "built" before deployment. Maven automates this for Java projects.</div></div><div class="next-arrow">→</div></div>

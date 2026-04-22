@@ -1,0 +1,96 @@
+<div class="module-header"><div class="module-icon">🪣</div><div class="module-meta"><div class="module-tag">Module 13 — AWS Deep Dive</div><h2 class="module-title">S3 Storage Classes &amp; Features</h2></div></div>
+<div class="section">
+<h3 class="section-title">S3 Recap + Key Features</h3>
+<p>Amazon S3 (Simple Storage Service) is object storage — think of it as an infinite hard drive in the cloud. It stores <strong>buckets</strong> (containers) and <strong>objects</strong> (files). Bucket names must be globally unique, and a single object can be up to <strong>5 TB</strong>.</p>
+<div class="concept-grid">
+<div class="concept-card"><div class="cc-icon">💎</div><div class="cc-title">11 Nines Durability</div><div class="cc-desc">99.999999999% durability — all S3 classes offer this. AWS replicates your data across multiple devices and facilities automatically.</div></div>
+<div class="concept-card"><div class="cc-icon">📈</div><div class="cc-title">Unlimited Scalability</div><div class="cc-desc">S3 automatically scales with your usage. No capacity planning needed — store 1 file or 1 billion files with no changes to your setup.</div></div>
+<div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">Lifecycle Policies</div><div class="cc-desc">Automatically transition data between storage classes (e.g. Standard → IA → Glacier) after N days. Saves money without manual effort.</div></div>
+<div class="concept-card"><div class="cc-icon">🔒</div><div class="cc-title">Encryption &amp; ACLs</div><div class="cc-desc">Encrypt data at rest (SSE-S3, SSE-KMS) and in transit (HTTPS). ACLs control who can access your bucket — disable to keep ownership to bucket owner only.</div></div>
+</div>
+</div>
+<div class="section">
+<h3 class="section-title">S3 Storage Classes — Visual Guide</h3>
+<div class="svg-diagram">
+<svg font-family="'DM Mono', monospace" viewbox="0 0 780 320" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#111827" height="320" width="780"></rect>
+<!-- Cost axis -->
+<line stroke="#1e2d45" stroke-width="1.5" x1="50" x2="50" y1="20" y2="280"></line>
+<text fill="#64748b" font-size="9" text-anchor="middle" transform="rotate(-90,30,150)" x="30" y="150">← COST</text>
+<!-- Frequency axis -->
+<line stroke="#1e2d45" stroke-width="1.5" x1="50" x2="760" y1="280" y2="280"></line>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="405" y="300">ACCESS FREQUENCY: Frequent ←→ Rare →</text>
+<!-- Bars -->
+<!-- Standard -->
+<rect fill="rgba(0,212,170,0.15)" height="235" rx="4" stroke="#00d4aa" stroke-width="1.5" width="90" x="70" y="40"></rect>
+<text fill="#00d4aa" font-size="9" font-weight="bold" text-anchor="middle" x="115" y="60">STANDARD</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="115" y="76">Highest cost</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="115" y="90">No retrieval fee</text>
+<text fill="#e2e8f0" font-size="8" text-anchor="middle" x="115" y="110">99.99% avail</text>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="115" y="125">🌐</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="115" y="148">Websites</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="115" y="160">Apps</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="115" y="172">Analytics</text>
+<!-- Standard-IA -->
+<rect fill="rgba(0,212,170,0.10)" height="195" rx="4" stroke="#00d4aa" stroke-dasharray="4,3" stroke-width="1" width="90" x="180" y="80"></rect>
+<text fill="#00d4aa" font-size="9" font-weight="bold" text-anchor="middle" x="225" y="100">STANDARD-IA</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="225" y="116">Lower storage</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="225" y="130">Retrieval fee ⚠️</text>
+<text fill="#e2e8f0" font-size="8" text-anchor="middle" x="225" y="148">99.9% avail</text>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="225" y="165">💾</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="225" y="188">Backups</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="225" y="200">DR files</text>
+<!-- One Zone-IA -->
+<rect fill="rgba(251,191,36,0.08)" height="175" rx="4" stroke="#fbbf24" stroke-dasharray="4,3" stroke-width="1" width="90" x="290" y="100"></rect>
+<text fill="#fbbf24" font-size="9" font-weight="bold" text-anchor="middle" x="335" y="118">ONE ZONE-IA</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="335" y="134">20% cheaper</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="335" y="148">than Std-IA</text>
+<text fill="#ff6b35" font-size="8" text-anchor="middle" x="335" y="162">⚠️ 1 AZ only!</text>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="335" y="180">📁</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="335" y="204">Re-creatable data</text>
+<!-- Intelligent-Tiering -->
+<rect fill="rgba(124,58,237,0.10)" height="215" rx="4" stroke="#7c3aed" stroke-width="1.5" width="90" x="400" y="60"></rect>
+<text fill="#7c3aed" font-size="9" font-weight="bold" text-anchor="middle" x="445" y="78">INTELLIGENT</text>
+<text fill="#7c3aed" font-size="9" font-weight="bold" text-anchor="middle" x="445" y="90">TIERING</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="445" y="108">Auto-moves data</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="445" y="122">Small monitor fee</text>
+<text fill="#7c3aed" font-size="20" text-anchor="middle" x="445" y="145">🤖</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="445" y="170">Unknown patterns</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="445" y="182">Data Lakes, ML</text>
+<!-- Glacier Instant -->
+<rect fill="rgba(255,107,53,0.08)" height="135" rx="4" stroke="#ff6b35" stroke-dasharray="4,3" stroke-width="1" width="90" x="510" y="140"></rect>
+<text fill="#ff6b35" font-size="9" font-weight="bold" text-anchor="middle" x="555" y="158">GLACIER</text>
+<text fill="#ff6b35" font-size="9" font-weight="bold" text-anchor="middle" x="555" y="170">INSTANT</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="555" y="188">ms retrieval</text>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="555" y="205">🏔️</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="555" y="228">Medical archives</text>
+<!-- Glacier Flexible -->
+<rect fill="rgba(255,107,53,0.05)" height="100" rx="4" stroke="#ff6b35" stroke-dasharray="4,3" stroke-width="1" width="90" x="620" y="175"></rect>
+<text fill="#ff6b35" font-size="9" font-weight="bold" text-anchor="middle" x="665" y="193">GLACIER</text>
+<text fill="#ff6b35" font-size="9" font-weight="bold" text-anchor="middle" x="665" y="205">FLEXIBLE</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="665" y="222">1–5min to 12hr</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="665" y="245">Long archives</text>
+<!-- Deep Archive (barely any bar) -->
+<rect fill="rgba(100,116,139,0.15)" height="35" rx="4" stroke="#64748b" stroke-dasharray="4,3" stroke-width="1" width="55" x="700" y="240"></rect>
+<text fill="#64748b" font-size="7" font-weight="bold" text-anchor="middle" x="727" y="254">DEEP</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="727" y="265">ARCHIVE</text>
+<text fill="#64748b" font-size="6" text-anchor="middle" x="727" y="272">12–48hr</text>
+</svg>
+<div class="diagram-caption">S3 storage classes by cost vs access frequency — choose based on how often you need your data</div>
+</div>
+</div>
+<div class="section">
+<h3 class="section-title">S3 Storage Classes — Quick Reference</h3>
+<table class="compare-table">
+<tr><th>Class</th><th>Access</th><th>Retrieval</th><th>Cost</th><th>Best For</th></tr>
+<tr><td><span class="badge-good">Standard</span></td><td>Frequent</td><td>Instant, no fee</td><td>Highest</td><td>Websites, active data</td></tr>
+<tr><td>Standard-IA</td><td>Infrequent</td><td>Instant, fee applies</td><td>Lower storage</td><td>Backups, DR</td></tr>
+<tr><td>One Zone-IA</td><td>Infrequent</td><td>Instant, fee applies</td><td>20% &lt; Std-IA</td><td>Re-creatable data</td></tr>
+<tr><td><span class="badge-good">Intelligent-Tiering</span></td><td>Unknown</td><td>Instant</td><td>Auto-optimized</td><td>Data lakes, ML</td></tr>
+<tr><td>Glacier Instant</td><td>Rare</td><td>Milliseconds</td><td>Low</td><td>Medical archives</td></tr>
+<tr><td>Glacier Flexible</td><td>Rare</td><td>1 min – 12 hrs</td><td>Lower</td><td>Long-term backups</td></tr>
+<tr><td><span class="badge-bad">Deep Archive</span></td><td>Very rare</td><td>12 – 48 hrs</td><td>Lowest</td><td>Legal/financial 7+ yrs</td></tr>
+</table>
+</div>
+<div class="callout callout-tip"><div class="callout-label">✅ Cost-Saving Tip</div><p>Use <strong>S3 Lifecycle Policies</strong> to automatically move data: keep new files in Standard for 30 days → move to Standard-IA for 60 days → archive to Glacier Flexible after 90 days. This can cut storage costs by 60–90% for older data!</p></div>
+<div class="next-card" onclick="showModule('awscli')"><div class="next-text"><div class="next-label">Next →</div><div class="next-title">⌨️ AWS CLI</div><div class="next-why">Stop clicking through the console — learn to manage all your AWS resources from the command line.</div></div><div class="next-arrow">→</div></div>

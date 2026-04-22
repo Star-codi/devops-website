@@ -1,0 +1,88 @@
+<div class="module-header"><div class="module-icon">🔄</div><div class="module-meta"><div class="module-tag">Module 0.1 — Before You Begin</div><h2 class="module-title">The DevOps Lifecycle</h2></div></div>
+<div class="section">
+<h3 class="section-title">How Does Software Actually Get to Users?</h3>
+<p>Before diving into tools, you need to understand the <strong>big picture</strong>. How does an idea in a developer's head end up as a feature on your phone? That journey is the <strong>Software Delivery Lifecycle</strong> — and DevOps is about making that journey <em>fast, safe, and automatic</em>.</p>
+<p>Without DevOps: a feature might take <strong>weeks or months</strong> to reach users, with manual steps, broken deployments, and late-night emergencies. With DevOps: the same feature can go live in <strong>minutes</strong>, automatically, with tests and checks built in.</p>
+</div>
+<div class="callout callout-analogy"><div class="callout-label">🏭 Analogy — Factory Assembly Line</div><p>Think of a car factory. In the old days, each car was hand-built by one team — slow, inconsistent, error-prone. Modern factories use an <strong>automated assembly line</strong>: each station does one job perfectly, parts move automatically, quality is checked at every step, and hundreds of cars roll out daily. DevOps is that assembly line — but for software.</p></div>
+<div class="section">
+<h3 class="section-title">The Journey: Code to Production</h3>
+<div class="svg-diagram">
+<svg font-family="'DM Mono', monospace" viewbox="0 0 820 200" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#111827" height="200" width="820"></rect>
+<!-- Steps -->
+<g>
+<!-- Step 1 -->
+<rect fill="#0a0e1a" height="80" rx="8" stroke="#00d4aa" stroke-width="1.5" width="110" x="20" y="60"></rect>
+<text fill="#00d4aa" font-size="22" text-anchor="middle" x="75" y="92">💡</text>
+<text fill="#e2e8f0" font-size="10" font-weight="bold" text-anchor="middle" x="75" y="112">PLAN</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="75" y="126">Jira / Notion</text>
+<!-- Arrow -->
+<path d="M130,100 L150,100" marker-end="url(#arw)" stroke="#00d4aa" stroke-width="1.5"></path>
+<!-- Step 2 -->
+<rect fill="#0a0e1a" height="80" rx="8" stroke="#00d4aa" stroke-width="1.5" width="110" x="150" y="60"></rect>
+<text fill="#00d4aa" font-size="22" text-anchor="middle" x="205" y="92">💻</text>
+<text fill="#e2e8f0" font-size="10" font-weight="bold" text-anchor="middle" x="205" y="112">CODE</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="205" y="126">Git / GitHub</text>
+<!-- Arrow -->
+<path d="M260,100 L280,100" marker-end="url(#arw)" stroke="#00d4aa" stroke-width="1.5"></path>
+<!-- Step 3 -->
+<rect fill="#0a0e1a" height="80" rx="8" stroke="#fbbf24" stroke-width="1.5" width="110" x="280" y="60"></rect>
+<text fill="#fbbf24" font-size="22" text-anchor="middle" x="335" y="92">⚙️</text>
+<text fill="#e2e8f0" font-size="10" font-weight="bold" text-anchor="middle" x="335" y="112">BUILD &amp; TEST</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="335" y="126">Jenkins / Maven</text>
+<!-- Arrow -->
+<path d="M390,100 L410,100" marker-end="url(#arw2)" stroke="#fbbf24" stroke-width="1.5"></path>
+<!-- Step 4 -->
+<rect fill="#0a0e1a" height="80" rx="8" stroke="#fbbf24" stroke-width="1.5" width="110" x="410" y="60"></rect>
+<text fill="#fbbf24" font-size="22" text-anchor="middle" x="465" y="92">🐳</text>
+<text fill="#e2e8f0" font-size="10" font-weight="bold" text-anchor="middle" x="465" y="112">PACKAGE</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="465" y="126">Docker Image</text>
+<!-- Arrow -->
+<path d="M520,100 L540,100" marker-end="url(#arw3)" stroke="#7c3aed" stroke-width="1.5"></path>
+<!-- Step 5 -->
+<rect fill="#0a0e1a" height="80" rx="8" stroke="#7c3aed" stroke-width="1.5" width="110" x="540" y="60"></rect>
+<text fill="#7c3aed" font-size="22" text-anchor="middle" x="595" y="92">🚀</text>
+<text fill="#e2e8f0" font-size="10" font-weight="bold" text-anchor="middle" x="595" y="112">DEPLOY</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="595" y="126">Kubernetes / EC2</text>
+<!-- Arrow -->
+<path d="M650,100 L670,100" marker-end="url(#arw3)" stroke="#7c3aed" stroke-width="1.5"></path>
+<!-- Step 6 -->
+<rect fill="#0a0e1a" height="80" rx="8" stroke="#7c3aed" stroke-width="1.5" width="130" x="670" y="60"></rect>
+<text fill="#7c3aed" font-size="22" text-anchor="middle" x="735" y="92">📊</text>
+<text fill="#e2e8f0" font-size="10" font-weight="bold" text-anchor="middle" x="735" y="112">MONITOR</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="735" y="126">Prometheus / Grafana</text>
+</g>
+<!-- Defs -->
+<defs>
+<marker id="arw" markerheight="6" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#00d4aa"></path></marker>
+<marker id="arw2" markerheight="6" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#fbbf24"></path></marker>
+<marker id="arw3" markerheight="6" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#7c3aed"></path></marker>
+</defs>
+<!-- Labels at top -->
+<text fill="#64748b" font-size="9" text-anchor="middle" x="75" y="45">① Dev</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="205" y="45">② Dev</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="335" y="45">③ CI</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="465" y="45">④ CI</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="595" y="45">⑤ CD</text>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="735" y="45">⑥ Ops</text>
+<!-- Feedback arrow at bottom -->
+<path d="M800,155 Q400,190 20,155" fill="none" marker-end="url(#arw)" stroke="#1e2d45" stroke-dasharray="4,4" stroke-width="1.5"></path>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="400" y="185">← Continuous Feedback Loop</text>
+</svg>
+<div class="diagram-caption">From idea to production — every box in this pipeline is a module you'll learn in this course</div>
+</div>
+</div>
+<div class="section">
+<h3 class="section-title">Old Way vs DevOps Way</h3>
+<table class="compare-table">
+<tr><th>Topic</th><th>❌ Old Way (Manual)</th><th>✅ DevOps Way (Automated)</th></tr>
+<tr><td>Deployments</td><td>Manual, risky, every few months</td><td>Automated, safe, multiple times per day</td></tr>
+<tr><td>Testing</td><td>QA team tests manually at end</td><td>Tests run automatically on every code push</td></tr>
+<tr><td>Servers</td><td>Physical machines, takes weeks to set up</td><td>Cloud VMs created in seconds with code</td></tr>
+<tr><td>Failures</td><td>Discovered by angry users</td><td>Caught by monitoring before users notice</td></tr>
+<tr><td>Team silos</td><td>Dev and Ops barely talk</td><td>Shared responsibility, shared tools</td></tr>
+</table>
+</div>
+<div class="callout callout-tip"><div class="callout-label">✅ Key Takeaway</div><p>DevOps is NOT just tools. It's a <strong>culture of collaboration + automation</strong>. The tools (Docker, Jenkins, Kubernetes etc.) are the <em>how</em>. The culture — fast feedback, shared ownership, continuous improvement — is the <em>why</em>.</p></div>
+<div class="next-card" onclick="showModule('networking')"><div class="next-text"><div class="next-label">Next →</div><div class="next-title">🌐 Networking Basics</div><div class="next-why">Before cloud and servers make sense, you need to understand how computers talk to each other over a network.</div></div><div class="next-arrow">→</div></div>
