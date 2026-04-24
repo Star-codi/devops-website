@@ -1,6 +1,17 @@
 <div class="module-header"><div class="module-icon">🐳</div><div class="module-meta"><div class="module-tag">Module 08 — Containers</div><h2 class="module-title">Docker — Containerization</h2></div></div>
+
 <div class="section"><h3 class="section-title">The "Works on My Machine" Problem</h3><p>Developer A writes an app on Windows with Python 3.9. Developer B pulls the code on Mac with Python 3.11. The production server runs Linux with Python 3.7. Everyone is confused when things break at each step. This is one of the most frustrating problems in software engineering.</p></div>
+
 <div class="callout callout-analogy"><div class="callout-label">🚢 Analogy — Shipping Containers</div><p>Before shipping containers, loading cargo onto ships was chaotic. Different sizes, different methods, things breaking. Then someone invented the <strong>standard shipping container</strong> — one size, works on any ship, any truck, any train, any port in the world.</p><p><strong>Docker containers are the shipping containers of software.</strong> You pack your app, its dependencies, its runtime — everything — into a single container. It runs identically on your laptop, your colleague's laptop, Jenkins, and production. No surprises.</p></div>
+
+<div class="section"><h3 class="section-title">How Docker Actually Works Under the Hood</h3><p>Docker isn't magic. It uses two Linux kernel features to isolate containers from each other and from the host:</p>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🔒</div><div class="cc-title">Namespaces</div><div class="cc-desc">Each container gets its own view of the system — its own process list, network, filesystem, and hostname. Containers can't see each other's processes.</div></div>
+  <div class="concept-card"><div class="cc-icon">📊</div><div class="cc-title">cgroups</div><div class="cc-desc">Control Groups limit how much CPU, RAM, and disk a container can use. Prevents one container from starving the rest.</div></div>
+  <div class="concept-card"><div class="cc-icon">📁</div><div class="cc-title">Union File System</div><div class="cc-desc">Docker images are built in layers. Each Dockerfile instruction adds a layer. Layers are shared and cached — making builds fast and storage efficient.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">Container Runtime</div><div class="cc-desc">Docker uses containerd under the hood to actually run containers. The Docker CLI is just a friendly interface on top.</div></div>
+</div></div>
+
 <div class="section">
 <h3 class="section-title">VM vs Container — What's the Difference?</h3>
 <div class="arch-diagram">  VIRTUAL MACHINE (Heavy)          CONTAINER (Lightweight)
@@ -15,16 +26,18 @@
   Takes GBs of RAM                 Starts in seconds
   Full OS overhead                 Shares host OS kernel</div>
 </div>
-<div class="section"><h3 class="section-title">Core Docker Concepts</h3><div class="concept-grid"><div class="concept-card"><div class="cc-icon">📄</div><div class="cc-title">Dockerfile</div><div class="cc-desc">A recipe/blueprint that describes how to build your container image.</div></div><div class="concept-card"><div class="cc-icon">💿</div><div class="cc-title">Image</div><div class="cc-desc">A snapshot built from a Dockerfile. Like a frozen template you can deploy anywhere.</div></div><div class="concept-card"><div class="cc-icon">📦</div><div class="cc-title">Container</div><div class="cc-desc">A running instance of an image. Like a live restaurant vs a recipe book.</div></div><div class="concept-card"><div class="cc-icon">🗄️</div><div class="cc-title">Registry</div><div class="cc-desc">Docker Hub — a store of images. Pull official images or push your own.</div></div></div></div>
+
+<div class="section"><h3 class="section-title">Core Docker Concepts</h3><div class="concept-grid"><div class="concept-card"><div class="cc-icon">📄</div><div class="cc-title">Dockerfile</div><div class="cc-desc">A recipe/blueprint that describes how to build your container image step by step.</div></div><div class="concept-card"><div class="cc-icon">💿</div><div class="cc-title">Image</div><div class="cc-desc">A snapshot built from a Dockerfile. Read-only, layered, and shareable. Like a frozen template.</div></div><div class="concept-card"><div class="cc-icon">📦</div><div class="cc-title">Container</div><div class="cc-desc">A running instance of an image. Isolated, lightweight, and disposable.</div></div><div class="concept-card"><div class="cc-icon">🗄️</div><div class="cc-title">Registry</div><div class="cc-desc">Docker Hub — a store of images. Pull official images or push your own.</div></div></div></div>
+
 <div class="section">
-<h3 class="section-title">Dockerize a Node.js App</h3>
+<h3 class="section-title">Writing a Dockerfile — Node.js App</h3>
 <div class="code-block"><div class="code-header"><span class="code-lang">Dockerfile</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Start from an official Node.js base image</span>
 <span class="kw">FROM</span> node:18-alpine
 
 <span class="comment"># Set working directory inside the container</span>
 <span class="kw">WORKDIR</span> /app
 
-<span class="comment"># Copy dependency files first (for caching)</span>
+<span class="comment"># Copy dependency files FIRST (layer cache trick)</span>
 <span class="kw">COPY</span> package*.json ./
 
 <span class="comment"># Install dependencies</span>
@@ -33,55 +46,262 @@
 <span class="comment"># Copy the rest of the application code</span>
 <span class="kw">COPY</span> . .
 
-<span class="comment"># Expose port 3000 to the outside world</span>
+<span class="comment"># Expose port 3000</span>
 <span class="kw">EXPOSE</span> 3000
 
 <span class="comment"># Command to run when container starts</span>
 <span class="kw">CMD</span> [<span class="str">"node"</span>, <span class="str">"app.js"</span>]</div></div>
-<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Build &amp; Run</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Build the image</span>
+
+<div class="callout callout-tip"><div class="callout-label">💡 Why COPY package.json before COPY . ?</div><p>Docker caches each layer. If you copy package.json first and run npm install, Docker only re-runs npm install when package.json changes — not every time your code changes. Always order Dockerfile instructions from <em>least changing</em> to <em>most changing</em> for fast rebuilds.</p></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Build & Run</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Build the image</span>
 <span class="cmd">docker build -t my-node-app:1.0 .</span>
 <span class="out">Successfully built a1b2c3d4e5f6</span>
 <span class="out">Successfully tagged my-node-app:1.0</span>
-<span class="comment"># Run the container</span>
+
+<span class="comment"># Run (-d = detached background, -p = host:container port)</span>
 <span class="cmd">docker run -d -p 3000:3000 --name my-app my-node-app:1.0</span>
+
 <span class="comment"># Check running containers</span>
 <span class="cmd">docker ps</span>
 <span class="out">CONTAINER ID  IMAGE          STATUS    PORTS</span>
-<span class="out">a1b2c3d4e5f6  my-node-app:1  Up 2min   0.0.0.0:3000-&gt;3000</span>
+<span class="out">a1b2c3d4e5f6  my-node-app:1  Up 2min   0.0.0.0:3000->3000</span>
+
 <span class="comment"># View logs</span>
 <span class="cmd">docker logs my-app</span>
+
+<span class="comment"># Get a shell inside a running container</span>
+<span class="cmd">docker exec -it my-app sh</span>
+
 <span class="comment"># Stop and remove</span>
-<span class="cmd">docker stop my-app &amp;&amp; docker rm my-app</span>
+<span class="cmd">docker stop my-app && docker rm my-app</span>
+
 <span class="comment"># Push to Docker Hub</span>
-<span class="cmd">docker tag my-node-app:1.0 arjun/my-node-app:1.0</span>
-<span class="cmd">docker push arjun/my-node-app:1.0</span></div></div>
+<span class="cmd">docker tag my-node-app:1.0 yourusername/my-node-app:1.0</span>
+<span class="cmd">docker push yourusername/my-node-app:1.0</span></div></div>
 </div>
+
 <div class="section">
-<h3 class="section-title">Docker Compose — Multi-Container Apps</h3>
-<p>Real apps have multiple pieces: a web server, a database, maybe a cache. Docker Compose lets you define and run them all together.</p>
-<div class="code-block"><div class="code-header"><span class="code-lang">docker-compose.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">version</span>: <span class="str">'3.8'</span>
+<h3 class="section-title">Multi-Stage Builds — Smaller, Safer Images</h3>
+<p>By default, your production image contains everything used to <em>build</em> the app — compilers, dev tools, test frameworks. You don't need any of that in production. It makes the image bigger and adds security risk.</p>
+
+<div class="callout callout-analogy"><div class="callout-label">🏭 Analogy — Factory vs Delivery Truck</div><p>A factory needs heavy machinery and raw materials to build a product. But the <strong>delivery truck only carries the finished product</strong> — not the factory. Multi-stage builds work the same way: use a full build environment in Stage 1, copy only the compiled output into a minimal final image in Stage 2.</p></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Dockerfile — Multi-Stage (Java App)</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># ── Stage 1: BUILD ──────────────────────────────</span>
+<span class="comment"># Full JDK + Maven to compile the app</span>
+<span class="kw">FROM</span> maven:3.9-eclipse-temurin-17 <span class="kw">AS</span> builder
+
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> pom.xml .
+<span class="kw">RUN</span> mvn dependency:go-offline
+<span class="kw">COPY</span> src ./src
+<span class="kw">RUN</span> mvn package -DskipTests
+
+<span class="comment"># ── Stage 2: PRODUCTION ─────────────────────────</span>
+<span class="comment"># Tiny JRE-only image — no compiler, no Maven, no source code</span>
+<span class="kw">FROM</span> eclipse-temurin:17-jre-alpine
+
+<span class="kw">WORKDIR</span> /app
+
+<span class="comment"># Copy ONLY the compiled JAR from the builder stage</span>
+<span class="kw">COPY</span> --from=builder /app/target/myapp.jar app.jar
+
+<span class="kw">EXPOSE</span> 8080
+<span class="kw">CMD</span> [<span class="str">"java"</span>, <span class="str">"-jar"</span>, <span class="str">"app.jar"</span>]</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Size Comparison</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">docker images</span>
+<span class="out">REPOSITORY   TAG           SIZE</span>
+<span class="out">myapp        single-stage  612MB   ← JDK + Maven + source code</span>
+<span class="out">myapp        multi-stage    98MB   ← just JRE + compiled JAR</span></div></div>
+
+<div class="callout callout-tip"><div class="callout-label">✅ When to use Multi-Stage Builds</div><p>Compiled languages — Java, Go, Rust, C++ — benefit most. Node.js apps also benefit if you have a TypeScript or webpack build step. If your app has no build step, a single stage is fine.</p></div>
+</div>
+
+<div class="section">
+<h3 class="section-title">Docker Networking</h3>
+<p>Containers are isolated by default — they can't talk to each other unless you connect them to the same network.</p>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🌉</div><div class="cc-title">Bridge (default)</div><div class="cc-desc">Containers on the same bridge network communicate by container name. Isolated from the host. Docker Compose uses this automatically.</div></div>
+  <div class="concept-card"><div class="cc-icon">🖥️</div><div class="cc-title">Host</div><div class="cc-desc">Container shares the host's network stack directly. No port mapping needed. Use for performance-critical apps.</div></div>
+  <div class="concept-card"><div class="cc-icon">🚫</div><div class="cc-title">None</div><div class="cc-desc">No network at all. Completely isolated. Used for batch jobs that don't need internet access.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔗</div><div class="cc-title">Custom Bridge</div><div class="cc-desc">Your own named network with automatic DNS. Containers resolve each other by service name. Best practice for multi-container apps.</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Docker Networking</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Create a custom network</span>
+<span class="cmd">docker network create my-network</span>
+
+<span class="comment"># Run containers on the same network</span>
+<span class="cmd">docker run -d --name app --network my-network my-node-app:1.0</span>
+<span class="cmd">docker run -d --name db  --network my-network postgres:15</span>
+
+<span class="comment"># 'app' can now reach 'db' by name — Docker handles DNS</span>
+<span class="comment"># Connection string: postgresql://db:5432/myapp</span>
+
+<span class="comment"># List all networks</span>
+<span class="cmd">docker network ls</span>
+<span class="out">NETWORK ID     NAME         DRIVER</span>
+<span class="out">a1b2c3d4e5f6   bridge       bridge</span>
+<span class="out">b2c3d4e5f6a1   my-network   bridge</span>
+<span class="out">c3d4e5f6a1b2   host         host</span></div></div>
+</div>
+
+<div class="section">
+<h3 class="section-title">Docker Volumes — Persistent Data</h3>
+<p>Containers are ephemeral — when removed, all data inside is gone. If your database container is deleted, all data disappears with it. Volumes solve this by storing data <strong>outside</strong> the container lifecycle.</p>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">📂</div><div class="cc-title">Named Volumes</div><div class="cc-desc">Docker manages the location on disk. Best for databases and persistent app data. Survives container removal.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔗</div><div class="cc-title">Bind Mounts</div><div class="cc-desc">Map a specific folder from your host machine into the container. Perfect for local development — code changes reflect instantly.</div></div>
+  <div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-title">tmpfs Mounts</div><div class="cc-desc">Stored in memory only. Fast but not persistent. Use for sensitive temporary data you don't want written to disk.</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Volumes</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Named volume — data persists after container is removed</span>
+<span class="cmd">docker run -d \</span>
+  <span class="cmd">--name postgres-db \</span>
+  <span class="cmd">-v db-data:/var/lib/postgresql/data \</span>
+  <span class="cmd">-e POSTGRES_PASSWORD=secret \</span>
+  <span class="cmd">postgres:15</span>
+
+<span class="comment"># Bind mount — code changes reflect live (dev mode)</span>
+<span class="cmd">docker run -d \</span>
+  <span class="cmd">--name dev-app \</span>
+  <span class="cmd">-v $(pwd)/src:/app/src \</span>
+  <span class="cmd">-p 3000:3000 \</span>
+  <span class="cmd">my-node-app:1.0</span>
+
+<span class="comment"># List all volumes</span>
+<span class="cmd">docker volume ls</span>
+<span class="out">DRIVER    VOLUME NAME</span>
+<span class="out">local     db-data</span>
+
+<span class="comment"># See where Docker stored it on disk</span>
+<span class="cmd">docker volume inspect db-data</span></div></div>
+</div>
+
+<div class="section">
+<h3 class="section-title">Docker Compose — Deep Dive</h3>
+<p>Docker Compose defines your entire stack — app, database, cache — in one YAML file. One command starts everything. One command stops it.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">docker-compose.yml — Production-Style</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">version</span>: <span class="str">'3.8'</span>
+
 <span class="cmd">services</span>:
+
+  <span class="comment"># ── Web Application ─────────────────────────</span>
   <span class="kw">web</span>:
     <span class="cmd">build</span>: .
-    <span class="cmd">ports</span>: [<span class="str">"3000:3000"</span>]
-    <span class="cmd">depends_on</span>: [db]
+    <span class="cmd">ports</span>:
+      - <span class="str">"3000:3000"</span>
     <span class="cmd">environment</span>:
+      - NODE_ENV=production
       - DB_HOST=db
+      - REDIS_HOST=cache
+    <span class="cmd">env_file</span>:
+      - .env                      <span class="comment"># load secrets from file</span>
+    <span class="cmd">depends_on</span>:
+      db:
+        <span class="cmd">condition</span>: service_healthy  <span class="comment"># wait for DB ready signal</span>
+    <span class="cmd">restart</span>: unless-stopped
+    <span class="cmd">networks</span>: [app-network]
 
+  <span class="comment"># ── PostgreSQL Database ──────────────────────</span>
   <span class="kw">db</span>:
-    <span class="cmd">image</span>: <span class="str">postgres:15</span>
-<span class="cmd">environment</span>:
-      - POSTGRES_DB=myapp
-      - POSTGRES_PASSWORD=secret
+    <span class="cmd">image</span>: postgres:15-alpine
+    <span class="cmd">env_file</span>: .env
     <span class="cmd">volumes</span>:
       - db-data:/var/lib/postgresql/data
+    <span class="cmd">healthcheck</span>:
+      <span class="cmd">test</span>: [<span class="str">"CMD-SHELL"</span>, <span class="str">"pg_isready -U postgres"</span>]
+      <span class="cmd">interval</span>: 10s
+      <span class="cmd">timeout</span>: 5s
+      <span class="cmd">retries</span>: 5
+    <span class="cmd">networks</span>: [app-network]
+
+  <span class="comment"># ── Redis Cache ──────────────────────────────</span>
+  <span class="kw">cache</span>:
+    <span class="cmd">image</span>: redis:7-alpine
+    <span class="cmd">volumes</span>:
+      - redis-data:/data
+    <span class="cmd">networks</span>: [app-network]
 
 <span class="cmd">volumes</span>:
-  db-data:</div></div>
-<div class="code-block"><div class="code-header"><span class="code-lang">Terminal</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">docker compose up -d</span> <span class="comment"># start everything</span>
-<span class="cmd">docker compose down</span> <span class="comment"># stop everything</span></div></div>
+  db-data:
+  redis-data:
+
+<span class="cmd">networks</span>:
+  app-network:
+    <span class="cmd">driver</span>: bridge</div></div>
+
+<div class="callout callout-tip"><div class="callout-label">💡 depends_on vs healthcheck</div><p><code>depends_on</code> alone only waits for a container to <em>start</em> — not the service inside to be <em>ready</em>. Postgres can be "started" while the database is still initialising. Add a <code>healthcheck</code> with <code>condition: service_healthy</code> to wait until it actually accepts connections.</p></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Compose Commands</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">docker compose up -d</span>              <span class="comment"># start everything in background</span>
+<span class="cmd">docker compose logs -f</span>             <span class="comment"># tail logs from all services</span>
+<span class="cmd">docker compose logs -f web</span>         <span class="comment"># logs from one service</span>
+<span class="cmd">docker compose up -d --build web</span>   <span class="comment"># rebuild and restart one service</span>
+<span class="cmd">docker compose exec db psql -U postgres</span>  <span class="comment"># shell into db</span>
+<span class="cmd">docker compose down</span>                <span class="comment"># stop, keep volumes</span>
+<span class="cmd">docker compose down -v</span>             <span class="comment"># stop AND wipe volumes</span></div></div>
 </div>
-<div class="section"><h3 class="section-title">Why Kubernetes After Docker?</h3><div class="callout callout-warn"><div class="callout-label">⚠️ Problem Docker Reveals at Scale</div><p>Docker is great for running containers. But what happens when your app needs <strong>100 containers</strong> running across <strong>10 servers</strong>? Who decides which server runs which container? What if a container crashes — who restarts it? What if traffic spikes — who adds more containers? Docker alone can't answer these questions. You need an <strong>orchestrator</strong>. That's Kubernetes.</p></div></div>
-<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Dockerize a Python Flask App</div><p>Write a simple Flask web app → Create a Dockerfile → Build the image → Run it locally → Push to Docker Hub → Pull it on your EC2 and run it there. Your app is now portable!</p></div>
-<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist"><li>Docker packages apps into portable containers that run anywhere</li><li>Dockerfile = recipe, Image = packaged product, Container = running instance</li><li>Containers are lighter and faster than virtual machines</li><li>Docker Compose manages multi-container applications</li><li>Docker Hub is the public registry for sharing images</li></ul></div>
-<div class="next-card" onclick="showModule('kubernetes')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">☸️ Kubernetes — Container Orchestration</div><div class="next-why">Manage hundreds of Docker containers across dozens of servers automatically — self-healing, scaling, and load balancing included.</div></div><div class="next-arrow">→</div></div>
+
+<div class="section">
+<h3 class="section-title">Image Best Practices & Security</h3>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Dockerfile — Best Practices</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># ✅ Use specific slim base images</span>
+<span class="kw">FROM</span> node:18-alpine    <span class="comment"># ~5MB vs ~900MB for full debian</span>
+
+<span class="comment"># ✅ Combine RUN commands to reduce layers</span>
+<span class="kw">RUN</span> apt-get update && \
+    apt-get install -y curl && \
+    rm -rf /var/lib/apt/lists/*  <span class="comment"># clean cache in SAME layer</span>
+
+<span class="comment"># ✅ Run as non-root user — never run as root in prod</span>
+<span class="kw">RUN</span> addgroup -S appgroup && adduser -S appuser -G appgroup
+<span class="kw">USER</span> appuser</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">.dockerignore</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">node_modules
+.git
+.env
+*.log
+README.md
+tests/
+docs/</div></div>
+
+<div class="callout callout-warn"><div class="callout-label">⚠️ Never put secrets in a Dockerfile</div><p>Don't write <code>ENV DB_PASSWORD=mysecret</code> in a Dockerfile — it bakes the secret into every image layer permanently. Anyone with the image can read it with <code>docker history</code>. Use <code>--env-file</code> at runtime, Docker secrets, or AWS Secrets Manager instead.</p></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Scan with Trivy</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Install Trivy (free, open source vulnerability scanner)</span>
+<span class="cmd">apt install trivy</span>
+
+<span class="comment"># Scan your image for known CVEs</span>
+<span class="cmd">trivy image my-node-app:1.0</span>
+<span class="out">Total: 3 (HIGH: 1, MEDIUM: 2)</span>
+<span class="out">┌────────────┬──────────────────┬──────────┐</span>
+<span class="out">│  Library   │  Vulnerability   │ Severity │</span>
+<span class="out">├────────────┼──────────────────┼──────────┤</span>
+<span class="out">│ openssl    │ CVE-2023-0286    │ HIGH     │</span>
+<span class="out">└────────────┴──────────────────┴──────────┘</span>
+
+<span class="comment"># Fail CI pipeline if HIGH/CRITICAL found</span>
+<span class="cmd">trivy image --exit-code 1 --severity HIGH,CRITICAL my-node-app:1.0</span></div></div>
+</div>
+
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Full Stack App with Docker Compose</div>
+<p>Build a complete 3-tier app:</p>
+<ol class="steps">
+  <li>Write a Node.js/Express API that reads and writes to PostgreSQL</li>
+  <li>Write a multi-stage Dockerfile for the app</li>
+  <li>Write a <code>docker-compose.yml</code> with: web, db (with healthcheck), and redis cache</li>
+  <li>Use a <code>.env</code> file for secrets, load via <code>env_file</code></li>
+  <li>Add a named volume for Postgres data</li>
+  <li>Scan the final image with Trivy</li>
+  <li>Run <code>docker compose down && docker compose up -d</code> — verify DB data persists</li>
+</ol></div>
+
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist">
+  <li>Docker uses namespaces + cgroups for isolation — not full VMs</li>
+  <li>Order Dockerfile from least to most changing for fast layer caching</li>
+  <li>Multi-stage builds strip build tools from production images — huge size savings</li>
+  <li>Use custom bridge networks so containers talk by name</li>
+  <li>Named volumes keep database data alive after containers are removed</li>
+  <li>Docker Compose manages multi-container stacks — always use healthchecks</li>
+  <li>Use alpine images, .dockerignore, non-root users, and Trivy scanning in prod</li>
+</ul></div>
+
+<div class="next-card" onclick="showModule('kubernetes')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">☸️ Kubernetes — Container Orchestration</div><div class="next-why">Docker runs containers on one machine. Kubernetes runs them across hundreds — with self-healing, auto-scaling, and zero-downtime deployments built in.</div></div><div class="next-arrow">→</div></div>
