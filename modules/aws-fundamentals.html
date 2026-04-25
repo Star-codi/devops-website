@@ -1,0 +1,238 @@
+<div class="module-header"><div class="module-icon">🔶</div><div class="module-meta"><div class="module-tag">Module 04 — Cloud Foundation</div><h2 class="module-title">AWS Fundamentals</h2></div></div>
+
+<!-- ── WHAT IS AWS ────────────────────────────────── -->
+<div class="section"><h3 class="section-title">What is AWS?</h3><p><strong>Amazon Web Services (AWS)</strong> is the world's most popular cloud platform — used by Netflix, Airbnb, NASA, and millions of startups and enterprises. Instead of buying and maintaining your own physical servers, you rent computing power, storage, and networking from Amazon and pay only for what you use.</p><p>AWS has 200+ services. As a DevOps engineer you don't need to know all of them. This module covers the 6 core services every DevOps engineer works with daily.</p></div>
+
+<div class="callout callout-analogy"><div class="callout-label">🏙️ Analogy — Renting vs Building</div><p>Building your own data centre is like buying land, constructing a building, installing generators, cooling systems, security guards, and network cables — before a single line of code runs. AWS is like moving into a serviced office — power, cooling, security, and networking are already handled. You just bring your laptop and start working.</p></div>
+
+<!-- ── GLOBAL INFRASTRUCTURE ──────────────────────── -->
+<div class="section">
+<h3 class="section-title">AWS Global Infrastructure</h3>
+<p>Understanding how AWS is structured geographically is important for building highly available systems.</p>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🌍</div><div class="cc-title">Regions</div><div class="cc-desc">Physical locations around the world (e.g. ap-south-1 = Mumbai, us-east-1 = Virginia). Each region is completely independent. Choose a region close to your users for lower latency.</div></div>
+  <div class="concept-card"><div class="cc-icon">🏢</div><div class="cc-title">Availability Zones (AZs)</div><div class="cc-desc">Each region has 2–6 AZs. An AZ is one or more data centres with independent power, cooling, and networking. Deploy across multiple AZs for high availability.</div></div>
+  <div class="concept-card"><div class="cc-icon">🌐</div><div class="cc-title">Edge Locations</div><div class="cc-desc">Hundreds of smaller locations used by CloudFront (CDN) to cache and deliver content close to end users. Reduces latency globally.</div></div>
+  <div class="concept-card"><div class="cc-icon">🆓</div><div class="cc-title">Free Tier</div><div class="cc-desc">AWS gives new accounts 12 months of free usage on many services — t2.micro EC2, 5GB S3, 750hrs RDS. Perfect for learning and practice.</div></div>
+</div>
+
+<div class="arch-diagram">  AWS Region: ap-south-1 (Mumbai)
+  ┌─────────────────────────────────────────────────┐
+  │  AZ: ap-south-1a    AZ: ap-south-1b             │
+  │  ┌──────────────┐   ┌──────────────┐            │
+  │  │ Data Centre  │   │ Data Centre  │            │
+  │  │  EC2, RDS    │   │  EC2, RDS    │            │
+  │  └──────────────┘   └──────────────┘            │
+  │  Deploy across both AZs = High Availability     │
+  └─────────────────────────────────────────────────┘</div>
+</div>
+
+<!-- ── IAM ────────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Service 1 — IAM (Identity & Access Management)</h3>
+<p>IAM is the first thing you set up in any AWS account. It controls <strong>who</strong> can do <strong>what</strong> on <strong>which resources</strong>. Never use the root account for day-to-day work.</p>
+
+<div class="callout callout-analogy"><div class="callout-label">🔑 Analogy — Office ID Cards</div><p>An office has different access cards: the security guard can enter the lobby, the developer can access the server room, the manager can access everything. IAM works the same way — each person or service gets exactly the permissions they need, nothing more.</p></div>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">👤</div><div class="cc-title">Users</div><div class="cc-desc">A person or application. Has credentials (password or access keys). Always give users only the permissions they need — principle of least privilege.</div></div>
+  <div class="concept-card"><div class="cc-icon">👥</div><div class="cc-title">Groups</div><div class="cc-desc">Collection of users. Attach policies to groups, not individual users — much easier to manage. e.g. Developers group, DevOps group, ReadOnly group.</div></div>
+  <div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">Policies</div><div class="cc-desc">JSON documents defining what actions are allowed or denied on which resources. AWS provides managed policies. You can also write custom policies.</div></div>
+  <div class="concept-card"><div class="cc-icon">🎭</div><div class="cc-title">Roles</div><div class="cc-desc">Like a user but for AWS services — e.g. an EC2 instance that needs to access S3 assumes an IAM Role. No permanent credentials needed.</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">IAM Policy — Allow S3 Read Only</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">{
+  <span class="str">"Version"</span>: <span class="str">"2012-10-17"</span>,
+  <span class="str">"Statement"</span>: [
+    {
+      <span class="str">"Effect"</span>: <span class="str">"Allow"</span>,
+      <span class="str">"Action"</span>: [
+        <span class="str">"s3:GetObject"</span>,
+        <span class="str">"s3:ListBucket"</span>
+      ],
+      <span class="str">"Resource"</span>: [
+        <span class="str">"arn:aws:s3:::my-bucket"</span>,
+        <span class="str">"arn:aws:s3:::my-bucket/*"</span>
+      ]
+    }
+  ]
+}</div></div>
+
+<div class="callout callout-warn"><div class="callout-label">⚠️ IAM Best Practices</div><p>Never use root account credentials in code or CLI. Never share access keys. Always enable MFA on root and admin accounts. Use IAM Roles for EC2/Lambda instead of embedding access keys in your code.</p></div>
+</div>
+
+<!-- ── EC2 ─────────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Service 2 — EC2 (Elastic Compute Cloud)</h3>
+<p>EC2 is simply a virtual server in the cloud. You choose the OS, CPU, RAM, storage, and networking. You can launch one in under a minute and connect to it over SSH.</p>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">📦</div><div class="cc-title">Instance Types</div><div class="cc-desc">t2.micro (free tier, 1vCPU, 1GB RAM) → t3.medium → c5.xlarge (compute optimised) → r5.2xlarge (memory optimised). Choose based on your workload.</div></div>
+  <div class="concept-card"><div class="cc-icon">💿</div><div class="cc-title">AMI</div><div class="cc-desc">Amazon Machine Image — a snapshot/template of an OS. Use official AWS AMIs (Amazon Linux, Ubuntu) or create your own with pre-installed software.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔑</div><div class="cc-title">Key Pairs</div><div class="cc-desc">SSH key pair for secure access. AWS stores the public key, you keep the private key (.pem file). Never lose it — you can't regenerate it.</div></div>
+  <div class="concept-card"><div class="cc-icon">💾</div><div class="cc-title">EBS Volumes</div><div class="cc-desc">Elastic Block Storage — persistent disk for EC2. Like a hard drive attached to your server. Data survives instance stop/restart but not termination (unless set to retain).</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Launch & Connect to EC2</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Launch a free-tier EC2 (Ubuntu)</span>
+<span class="cmd">aws ec2 run-instances \</span>
+  <span class="cmd">--image-id ami-0c55b159cbfafe1f0 \</span>
+  <span class="cmd">--instance-type t2.micro \</span>
+  <span class="cmd">--key-name my-keypair \</span>
+  <span class="cmd">--security-group-ids sg-12345678 \</span>
+  <span class="cmd">--subnet-id subnet-12345678</span>
+
+<span class="comment"># Get the public IP</span>
+<span class="cmd">aws ec2 describe-instances \</span>
+  <span class="cmd">--query 'Reservations[*].Instances[*].PublicIpAddress' \</span>
+  <span class="cmd">--output text</span>
+
+<span class="comment"># SSH into the server</span>
+<span class="cmd">ssh -i "my-keypair.pem" ubuntu@YOUR-PUBLIC-IP</span>
+<span class="out"># You're now inside a cloud server!</span>
+
+<span class="comment"># Stop / Start / Terminate</span>
+<span class="cmd">aws ec2 stop-instances --instance-ids i-1234567890abcdef0</span>
+<span class="cmd">aws ec2 start-instances --instance-ids i-1234567890abcdef0</span>
+<span class="cmd">aws ec2 terminate-instances --instance-ids i-1234567890abcdef0</span></div></div>
+</div>
+
+<!-- ── VPC ────────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Service 3 — VPC (Virtual Private Cloud)</h3>
+<p>A VPC is your own isolated private network inside AWS. Every EC2 instance, RDS database, and Lambda function lives inside a VPC. You control the IP ranges, subnets, routing, and security.</p>
+
+<div class="callout callout-analogy"><div class="callout-label">🏘️ Analogy — Gated Community</div><p>A VPC is like a gated community. You define the roads (subnets), the gate rules (security groups), and who can enter or leave (route tables, internet gateway). Your database lives in the private area (no internet access), your web server lives in the public area (accessible to users).</p></div>
+
+<div class="arch-diagram">  YOUR VPC (10.0.0.0/16)
+  ┌────────────────────────────────────────────────────┐
+  │                                                     │
+  │  PUBLIC SUBNET (10.0.1.0/24)                       │
+  │  ┌─────────────────────────────┐                   │
+  │  │  Web Server (EC2)           │ ← Internet Access │
+  │  │  Load Balancer              │                   │
+  │  └─────────────────────────────┘                   │
+  │                ↕  (internal only)                  │
+  │  PRIVATE SUBNET (10.0.2.0/24)                      │
+  │  ┌─────────────────────────────┐                   │
+  │  │  Database (RDS)             │ ← No Internet     │
+  │  │  App Servers                │                   │
+  │  └─────────────────────────────┘                   │
+  │                                                     │
+  └──────────────────── [Internet Gateway] ────────────┘
+                                ↕
+                           INTERNET</div>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🌐</div><div class="cc-title">Internet Gateway</div><div class="cc-desc">Connects your VPC to the internet. Attach to a VPC and add a route in your route table to enable public subnet internet access.</div></div>
+  <div class="concept-card"><div class="cc-icon">🗺️</div><div class="cc-title">Route Tables</div><div class="cc-desc">Control where network traffic goes. Public subnet route table has a route to the Internet Gateway. Private subnet route table has no internet route.</div></div>
+  <div class="concept-card"><div class="cc-icon">🛡️</div><div class="cc-title">Security Groups</div><div class="cc-desc">Virtual firewall for EC2 instances. Stateful — allow inbound rules and outbound is automatically allowed. Define which ports/protocols are permitted.</div></div>
+  <div class="concept-card"><div class="cc-icon">🚧</div><div class="cc-title">NACLs</div><div class="cc-desc">Network Access Control Lists — firewall at the subnet level. Stateless — you must define both inbound AND outbound rules. Adds a second layer of security.</div></div>
+</div>
+</div>
+
+<!-- ── S3 ─────────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Service 4 — S3 (Simple Storage Service)</h3>
+<p>S3 is object storage — an infinite hard drive in the cloud. Store files, images, videos, backups, logs, static websites — anything. Files live in <strong>buckets</strong> and are accessed via URLs. Bucket names must be globally unique.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — S3 Operations</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Create a bucket</span>
+<span class="cmd">aws s3 mb s3://my-devops-bucket --region ap-south-1</span>
+
+<span class="comment"># Upload a file</span>
+<span class="cmd">aws s3 cp index.html s3://my-devops-bucket/</span>
+
+<span class="comment"># Sync entire folder (like rsync)</span>
+<span class="cmd">aws s3 sync ./website s3://my-devops-bucket/</span>
+
+<span class="comment"># Download a file</span>
+<span class="cmd">aws s3 cp s3://my-devops-bucket/index.html ./</span>
+
+<span class="comment"># List bucket contents</span>
+<span class="cmd">aws s3 ls s3://my-devops-bucket</span>
+
+<span class="comment"># Enable static website hosting</span>
+<span class="cmd">aws s3 website s3://my-devops-bucket \</span>
+  <span class="cmd">--index-document index.html \</span>
+  <span class="cmd">--error-document error.html</span>
+
+<span class="comment"># Delete an object</span>
+<span class="cmd">aws s3 rm s3://my-devops-bucket/old-file.txt</span></div></div>
+</div>
+
+<!-- ── CLOUDWATCH ─────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Service 5 — CloudWatch (Monitoring & Alerting)</h3>
+<p>CloudWatch is AWS's built-in monitoring service. Every AWS service automatically publishes metrics to CloudWatch. You can set alarms, create dashboards, and trigger automated actions based on thresholds.</p>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">📊</div><div class="cc-title">Metrics</div><div class="cc-desc">EC2 publishes CPU, network, disk metrics every minute. RDS publishes connections, storage, query time. You can also push custom metrics from your application.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔔</div><div class="cc-title">Alarms</div><div class="cc-desc">Set thresholds and get notified. States: OK, ALARM, INSUFFICIENT_DATA. Actions: send SNS notification, trigger Auto Scaling, stop/reboot an instance.</div></div>
+  <div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">Logs</div><div class="cc-desc">Centralise all your application and system logs. Lambda, EC2, RDS, and most AWS services can stream logs directly to CloudWatch Logs.</div></div>
+  <div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-title">EventBridge</div><div class="cc-desc">React to events in your AWS environment automatically. E.g. EC2 instance state changes → trigger Lambda → send Slack notification.</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Create a CloudWatch Alarm</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Alert when EC2 CPU > 80% for 2 consecutive 5-minute periods</span>
+<span class="cmd">aws cloudwatch put-metric-alarm \</span>
+  <span class="cmd">--alarm-name "high-cpu" \</span>
+  <span class="cmd">--alarm-description "Alert when CPU exceeds 80%" \</span>
+  <span class="cmd">--metric-name CPUUtilization \</span>
+  <span class="cmd">--namespace AWS/EC2 \</span>
+  <span class="cmd">--statistic Average \</span>
+  <span class="cmd">--period 300 \</span>
+  <span class="cmd">--evaluation-periods 2 \</span>
+  <span class="cmd">--threshold 80 \</span>
+  <span class="cmd">--comparison-operator GreaterThanThreshold \</span>
+  <span class="cmd">--dimensions Name=InstanceId,Value=i-1234567890abcdef0 \</span>
+  <span class="cmd">--alarm-actions arn:aws:sns:ap-south-1:123456:my-alerts</span></div></div>
+</div>
+
+<!-- ── CLI SETUP ──────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Service 6 — AWS CLI (Command the Cloud)</h3>
+<p>The AWS CLI lets you interact with every AWS service from the terminal — no browser needed. Essential for automation, scripting, and CI/CD pipelines.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — AWS CLI Setup</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Install on Ubuntu</span>
+<span class="cmd">curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"</span>
+<span class="cmd">unzip awscliv2.zip && sudo ./aws/install</span>
+
+<span class="comment"># Configure with IAM credentials</span>
+<span class="cmd">aws configure</span>
+<span class="out">AWS Access Key ID: AKIAIOSFODNN7EXAMPLE</span>
+<span class="out">AWS Secret Access Key: wJalrXUtnFEMI/K7MDENG...</span>
+<span class="out">Default region name: ap-south-1</span>
+<span class="out">Default output format: json</span>
+
+<span class="comment"># Verify — shows which account you're connected to</span>
+<span class="cmd">aws sts get-caller-identity</span>
+<span class="out">{ "Account": "123456789012", "UserId": "AIDAIOSFODNN7EXAMPLE" }</span>
+
+<span class="comment"># Use profiles for multiple AWS accounts</span>
+<span class="cmd">aws configure --profile production</span>
+<span class="cmd">aws s3 ls --profile production</span></div></div>
+
+<div class="callout callout-tip"><div class="callout-label">💡 Useful CLI Tricks</div><p>Use <code>--output table</code> for readable output, <code>--query</code> to filter JSON results, and <code>--dry-run</code> to test commands without executing them. For scripts, <code>--output text</code> is easiest to parse.</p></div>
+</div>
+
+<!-- ── MINI PROJECT ───────────────────────────────── -->
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Static Website on S3 with Monitoring</div>
+<ol class="steps">
+  <li>Create an IAM user with S3 and CloudWatch permissions — configure AWS CLI with those credentials</li>
+  <li>Create an S3 bucket and enable static website hosting</li>
+  <li>Upload your portfolio HTML/CSS files with <code>aws s3 sync</code></li>
+  <li>Set a bucket policy to allow public read access</li>
+  <li>Create a CloudWatch alarm on S3 bucket size (BucketSizeBytes) that alerts when over 50MB</li>
+  <li>Launch a t2.micro EC2, SSH in, install Nginx, and set up a CloudWatch CPU alarm at 80%</li>
+</ol></div>
+
+<!-- ── SUMMARY ───────────────────────────────────── -->
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist">
+  <li>AWS regions = physical locations; AZs = isolated data centres within a region</li>
+  <li>IAM — always use least privilege; use Roles for services, never embed access keys in code</li>
+  <li>EC2 — virtual servers; choose instance type based on workload; access via SSH + key pair</li>
+  <li>VPC — your private network; public subnets for web servers, private subnets for databases</li>
+  <li>S3 — unlimited object storage; use for static websites, backups, logs, and artefacts</li>
+  <li>CloudWatch — metrics, alarms, logs for all AWS resources; always set CPU and cost alarms</li>
+  <li>AWS CLI — essential for automation; configure profiles for multiple accounts</li>
+</ul></div>
+
+<div class="next-card" onclick="showModule('linux')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🐧 Linux Basics</div><div class="next-why">All cloud servers run Linux. Master the command line to configure, deploy, and troubleshoot them effectively.</div></div><div class="next-arrow">→</div></div>

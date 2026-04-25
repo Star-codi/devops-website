@@ -4,12 +4,14 @@
 // ─────────────────────────────────────────────
 
 const MODULE_ORDER = [
-  'home', 'devopslife', 'networking', 'yaml',
-  'cloud', 'aws', 'linux',
-  'git', 'shell', 'maven',
+  'home',
+  'devopslife', 'networking', 'yaml',
+  'cloud', 'aws-fundamentals', 'aws-deepdive',
+  'linux', 'shell',
+  'git', 'maven',
   'jenkins', 'docker', 'kubernetes',
-  'terraform', 'monitoring',
-  'vpc', 's3deep', 'awscli', 'services',
+  'terraform', 'ansible',
+  'monitoring', 'vpc',
   'security', 'interview', 'nextsteps'
 ];
 

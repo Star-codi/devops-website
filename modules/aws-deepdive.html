@@ -1,0 +1,284 @@
+<div class="module-header"><div class="module-icon">🔶</div><div class="module-meta"><div class="module-tag">Module 05 — AWS Deep Dive</div><h2 class="module-title">AWS Deep Dive — Production Services</h2></div></div>
+
+<!-- ── INTRO ─────────────────────────────────────── -->
+<div class="section"><h3 class="section-title">Beyond the Basics</h3><p>You know EC2, S3, IAM, VPC, and CloudWatch from AWS Fundamentals. This module goes deeper into the services you'll use when building production-grade architectures — managed databases, serverless functions, load balancing, auto scaling, S3 storage optimisation, and more.</p></div>
+
+<!-- ── RDS ────────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">RDS — Managed Relational Databases</h3>
+<p><strong>Amazon RDS (Relational Database Service)</strong> manages your database for you — patching, backups, replication, and failover are all automated. You just connect and query. Supported engines: MySQL, PostgreSQL, MariaDB, Oracle, SQL Server, and Amazon Aurora.</p>
+
+<div class="callout callout-analogy"><div class="callout-label">🍽️ Analogy — Restaurant vs Home Cooking</div><p>Self-managing a database on EC2 is like cooking at home — you buy ingredients, cook, clean up, and handle everything yourself. RDS is like eating at a restaurant — you just order what you need. The kitchen (patching, backups, replication) is handled for you.</p></div>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">Multi-AZ</div><div class="cc-desc">RDS automatically maintains a standby replica in a different AZ. If the primary fails, RDS automatically fails over to the standby in ~60 seconds. Zero data loss.</div></div>
+  <div class="concept-card"><div class="cc-icon">📖</div><div class="cc-title">Read Replicas</div><div class="cc-desc">Offload read traffic to one or more read replicas. Improves performance for read-heavy workloads. Can be in different regions for global read performance.</div></div>
+  <div class="concept-card"><div class="cc-icon">💾</div><div class="cc-title">Automated Backups</div><div class="cc-desc">RDS takes daily snapshots and transaction logs. You can restore to any point in time within your retention window (up to 35 days).</div></div>
+  <div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-title">Aurora</div><div class="cc-desc">AWS's own MySQL/PostgreSQL-compatible engine. Up to 5x faster than standard MySQL. Storage auto-scales to 128TB. Serverless option available.</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Create RDS Instance</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Create a PostgreSQL RDS instance</span>
+<span class="cmd">aws rds create-db-instance \</span>
+  <span class="cmd">--db-instance-identifier my-postgres-db \</span>
+  <span class="cmd">--db-instance-class db.t3.micro \</span>
+  <span class="cmd">--engine postgres \</span>
+  <span class="cmd">--master-username admin \</span>
+  <span class="cmd">--master-user-password MySecurePass123 \</span>
+  <span class="cmd">--allocated-storage 20 \</span>
+  <span class="cmd">--multi-az \</span>
+  <span class="cmd">--no-publicly-accessible \</span>
+  <span class="cmd">--db-subnet-group-name my-db-subnet-group</span>
+
+<span class="comment"># Get the endpoint to connect</span>
+<span class="cmd">aws rds describe-db-instances \</span>
+  <span class="cmd">--query 'DBInstances[*].Endpoint.Address'</span>
+<span class="out">"my-postgres-db.abc123.ap-south-1.rds.amazonaws.com"</span>
+
+<span class="comment"># Connect with psql</span>
+<span class="cmd">psql -h my-postgres-db.abc123.ap-south-1.rds.amazonaws.com \</span>
+  <span class="cmd">-U admin -d postgres</span></div></div>
+
+<div class="callout callout-warn"><div class="callout-label">⚠️ Always put RDS in a Private Subnet</div><p>Never set <code>--publicly-accessible true</code> on a production database. Place RDS in a private subnet — only EC2 instances and Lambda functions inside the same VPC should be able to reach it. Use a security group that only allows connections from your application's security group.</p></div>
+</div>
+
+<!-- ── DYNAMODB ───────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">DynamoDB — Serverless NoSQL Database</h3>
+<p>DynamoDB is a fully managed NoSQL database. No servers to manage, no connections to configure. It scales automatically to handle millions of requests per second with single-digit millisecond latency.</p>
+
+<div class="compare-table">
+<table>
+  <tr><th>Feature</th><th>🗄️ RDS</th><th>⚡ DynamoDB</th></tr>
+  <tr><td>Type</td><td>Relational (SQL)</td><td>NoSQL (key-value + document)</td></tr>
+  <tr><td>Schema</td><td>Fixed — define columns upfront</td><td>Flexible — each item can differ</td></tr>
+  <tr><td>Scaling</td><td>Manual vertical scaling</td><td>Auto horizontal scaling</td></tr>
+  <tr><td>Latency</td><td>Milliseconds</td><td>Single-digit milliseconds</td></tr>
+  <tr><td>Queries</td><td>Complex SQL, JOINs, transactions</td><td>Simple key-based, limited queries</td></tr>
+  <tr><td>Best for</td><td>Financial data, complex relationships</td><td>Real-time apps, gaming, IoT, caching</td></tr>
+</table>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — DynamoDB Operations</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Create a table</span>
+<span class="cmd">aws dynamodb create-table \</span>
+  <span class="cmd">--table-name Users \</span>
+  <span class="cmd">--attribute-definitions AttributeName=userId,AttributeType=S \</span>
+  <span class="cmd">--key-schema AttributeName=userId,KeyType=HASH \</span>
+  <span class="cmd">--billing-mode PAY_PER_REQUEST</span>
+
+<span class="comment"># Put an item</span>
+<span class="cmd">aws dynamodb put-item \</span>
+  <span class="cmd">--table-name Users \</span>
+  <span class="cmd">--item '{"userId": {"S": "u001"}, "name": {"S": "Arjun"}, "role": {"S": "DevOps"}}'</span>
+
+<span class="comment"># Get an item by key</span>
+<span class="cmd">aws dynamodb get-item \</span>
+  <span class="cmd">--table-name Users \</span>
+  <span class="cmd">--key '{"userId": {"S": "u001"}}'</span></div></div>
+</div>
+
+<!-- ── LAMBDA ──────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Lambda — Serverless Functions</h3>
+<p>Lambda lets you run code without provisioning or managing any servers. Upload your function, define a trigger, and AWS handles everything. You pay only per invocation and execution duration — nothing when idle.</p>
+
+<div class="callout callout-analogy"><div class="callout-label">💡 Analogy — Pay-Per-Use Electricity</div><p>Running a server 24/7 is like buying a generator and running it constantly — even at 3am when nobody is using it. Lambda is like the electrical grid — you only pay for the exact milliseconds your code actually runs. Zero cost when idle.</p></div>
+
+<div class="arch-diagram">  TRIGGERS                  LAMBDA               OUTPUTS
+  ┌────────────┐            ┌──────────┐          ┌────────────┐
+  │ API Gateway│──────────► │          │ ────────► │  DynamoDB  │
+  │ S3 Event   │──────────► │    λ     │ ────────► │  SNS Alert │
+  │ Schedule   │──────────► │          │ ────────► │  S3 Write  │
+  │ SQS Queue  │──────────► │ Your code│ ────────► │  RDS Query │
+  └────────────┘            └──────────┘          └────────────┘
+                            Pay only when running</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Lambda Function — Python (Resize S3 Image)</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">import</span> boto3
+<span class="kw">import</span> json
+
+s3 = boto3.client(<span class="str">'s3'</span>)
+
+<span class="kw">def</span> <span class="cmd">lambda_handler</span>(event, context):
+    <span class="comment"># Triggered when a file is uploaded to S3</span>
+    bucket = event[<span class="str">'Records'</span>][0][<span class="str">'s3'</span>][<span class="str">'bucket'</span>][<span class="str">'name'</span>]
+    key    = event[<span class="str">'Records'</span>][0][<span class="str">'s3'</span>][<span class="str">'object'</span>][<span class="str">'key'</span>]
+
+    print(f<span class="str">"New file uploaded: {key} in {bucket}"</span>)
+
+    <span class="comment"># Download, process, re-upload logic here</span>
+
+    <span class="kw">return</span> {
+        <span class="str">'statusCode'</span>: 200,
+        <span class="str">'body'</span>: json.dumps(<span class="str">'Processed successfully'</span>)
+    }</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Deploy Lambda</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Zip your function code</span>
+<span class="cmd">zip function.zip lambda_function.py</span>
+
+<span class="comment"># Create Lambda function</span>
+<span class="cmd">aws lambda create-function \</span>
+  <span class="cmd">--function-name my-image-processor \</span>
+  <span class="cmd">--runtime python3.11 \</span>
+  <span class="cmd">--role arn:aws:iam::123456789012:role/lambda-role \</span>
+  <span class="cmd">--handler lambda_function.lambda_handler \</span>
+  <span class="cmd">--zip-file fileb://function.zip \</span>
+  <span class="cmd">--timeout 30 \</span>
+  <span class="cmd">--memory-size 256</span>
+
+<span class="comment"># Invoke manually for testing</span>
+<span class="cmd">aws lambda invoke \</span>
+  <span class="cmd">--function-name my-image-processor \</span>
+  <span class="cmd">--payload '{"test": "event"}' \</span>
+  <span class="cmd">response.json</span>
+
+<span class="comment"># View Lambda logs in CloudWatch</span>
+<span class="cmd">aws logs tail /aws/lambda/my-image-processor --follow</span></div></div>
+</div>
+
+<!-- ── S3 DEEP DIVE ───────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">S3 Deep Dive — Storage Classes & Cost Optimisation</h3>
+<p>S3 has multiple storage classes. Choosing the right one can reduce your storage costs by up to 90% without losing any data. The key factor: <strong>how often do you need to access the data?</strong></p>
+
+<div class="svg-diagram">
+<svg font-family="'DM Mono', monospace" viewbox="0 0 780 320" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#111827" height="320" width="780"></rect>
+<line stroke="#1e2d45" stroke-width="1.5" x1="50" x2="50" y1="20" y2="280"></line>
+<text fill="#64748b" font-size="9" text-anchor="middle" transform="rotate(-90,30,150)" x="30" y="150">← COST</text>
+<line stroke="#1e2d45" stroke-width="1.5" x1="50" x2="760" y1="280" y2="280"></line>
+<text fill="#64748b" font-size="9" text-anchor="middle" x="405" y="300">ACCESS FREQUENCY: Frequent ←→ Rare →</text>
+<rect fill="rgba(0,212,170,0.15)" height="235" rx="4" stroke="#00d4aa" stroke-width="1.5" width="90" x="70" y="40"></rect>
+<text fill="#00d4aa" font-size="9" font-weight="bold" text-anchor="middle" x="115" y="60">STANDARD</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="115" y="76">Highest cost</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="115" y="90">No retrieval fee</text>
+<text fill="#e2e8f0" font-size="8" text-anchor="middle" x="115" y="110">99.99% avail</text>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="115" y="130">🌐</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="115" y="152">Websites, Apps</text>
+<rect fill="rgba(0,212,170,0.10)" height="195" rx="4" stroke="#00d4aa" stroke-dasharray="4,3" stroke-width="1" width="90" x="180" y="80"></rect>
+<text fill="#00d4aa" font-size="9" font-weight="bold" text-anchor="middle" x="225" y="100">STANDARD-IA</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="225" y="116">Lower storage</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="225" y="130">Retrieval fee ⚠️</text>
+<text fill="#e2e8f0" font-size="8" text-anchor="middle" x="225" y="148">99.9% avail</text>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="225" y="168">💾</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="225" y="190">Backups, DR</text>
+<rect fill="rgba(251,191,36,0.08)" height="175" rx="4" stroke="#fbbf24" stroke-dasharray="4,3" stroke-width="1" width="90" x="290" y="100"></rect>
+<text fill="#fbbf24" font-size="9" font-weight="bold" text-anchor="middle" x="335" y="118">ONE ZONE-IA</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="335" y="134">20% cheaper</text>
+<text fill="#ff6b35" font-size="8" text-anchor="middle" x="335" y="150">⚠️ 1 AZ only!</text>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="335" y="172">📁</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="335" y="198">Re-creatable data</text>
+<rect fill="rgba(124,58,237,0.10)" height="215" rx="4" stroke="#7c3aed" stroke-width="1.5" width="90" x="400" y="60"></rect>
+<text fill="#7c3aed" font-size="9" font-weight="bold" text-anchor="middle" x="445" y="78">INTELLIGENT</text>
+<text fill="#7c3aed" font-size="9" font-weight="bold" text-anchor="middle" x="445" y="90">TIERING</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="445" y="108">Auto-moves data</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="445" y="122">Small monitor fee</text>
+<text fill="#7c3aed" font-size="20" text-anchor="middle" x="445" y="148">🤖</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="445" y="175">Unknown patterns</text>
+<rect fill="rgba(255,107,53,0.08)" height="135" rx="4" stroke="#ff6b35" stroke-dasharray="4,3" stroke-width="1" width="90" x="510" y="140"></rect>
+<text fill="#ff6b35" font-size="9" font-weight="bold" text-anchor="middle" x="555" y="160">GLACIER</text>
+<text fill="#ff6b35" font-size="9" font-weight="bold" text-anchor="middle" x="555" y="172">INSTANT</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="555" y="190">ms retrieval</text>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="555" y="210">🏔️</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="555" y="232">Medical archives</text>
+<rect fill="rgba(255,107,53,0.05)" height="100" rx="4" stroke="#ff6b35" stroke-dasharray="4,3" stroke-width="1" width="90" x="620" y="175"></rect>
+<text fill="#ff6b35" font-size="9" font-weight="bold" text-anchor="middle" x="665" y="195">GLACIER</text>
+<text fill="#ff6b35" font-size="9" font-weight="bold" text-anchor="middle" x="665" y="207">FLEXIBLE</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="665" y="222">1min–12hr</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="665" y="248">Long archives</text>
+</svg>
+<div class="diagram-caption">S3 storage classes — choose based on how frequently you need your data</div>
+</div>
+
+<div class="compare-table">
+<table>
+  <tr><th>Class</th><th>Access</th><th>Retrieval Cost</th><th>Best For</th></tr>
+  <tr><td><span class="badge-good">Standard</span></td><td>Frequent</td><td>None</td><td>Websites, active data</td></tr>
+  <tr><td>Standard-IA</td><td>Infrequent</td><td>Per GB fee</td><td>Backups, disaster recovery</td></tr>
+  <tr><td>One Zone-IA</td><td>Infrequent</td><td>Per GB fee</td><td>Re-creatable data (1 AZ risk)</td></tr>
+  <tr><td><span class="badge-good">Intelligent-Tiering</span></td><td>Unknown</td><td>None</td><td>Data lakes, ML datasets</td></tr>
+  <tr><td>Glacier Instant</td><td>Rare</td><td>Per GB fee</td><td>Medical archives</td></tr>
+  <tr><td>Glacier Flexible</td><td>Rare</td><td>Per GB fee</td><td>Long-term backups</td></tr>
+  <tr><td><span class="badge-bad">Deep Archive</span></td><td>Very rare</td><td>Per GB fee</td><td>Legal/financial records 7+ years</td></tr>
+</table>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">S3 Lifecycle Policy — Auto-Transition Between Classes</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">{
+  <span class="str">"Rules"</span>: [{
+    <span class="str">"ID"</span>: <span class="str">"auto-archive-logs"</span>,
+    <span class="str">"Status"</span>: <span class="str">"Enabled"</span>,
+    <span class="str">"Filter"</span>: { <span class="str">"Prefix"</span>: <span class="str">"logs/"</span> },
+    <span class="str">"Transitions"</span>: [
+      { <span class="str">"Days"</span>: 30,  <span class="str">"StorageClass"</span>: <span class="str">"STANDARD_IA"</span> },
+      { <span class="str">"Days"</span>: 90,  <span class="str">"StorageClass"</span>: <span class="str">"GLACIER_FLEXIBLE"</span> },
+      { <span class="str">"Days"</span>: 365, <span class="str">"StorageClass"</span>: <span class="str">"DEEP_ARCHIVE"</span> }
+    ],
+    <span class="str">"Expiration"</span>: { <span class="str">"Days"</span>: 2555 }  <span class="comment">// delete after 7 years</span>
+  }]
+}</div></div>
+</div>
+
+<!-- ── ELB & AUTO SCALING ─────────────────────────── -->
+<div class="section">
+<h3 class="section-title">ELB & Auto Scaling — High Availability at Scale</h3>
+<p>A single EC2 instance will eventually fail or get overwhelmed. <strong>Elastic Load Balancer (ELB)</strong> distributes traffic across multiple instances. <strong>Auto Scaling</strong> automatically adds or removes instances based on demand.</p>
+
+<div class="arch-diagram">  USERS
+    ↓
+  [Application Load Balancer]  ← distributes traffic
+    ↓         ↓         ↓
+  [EC2-1]   [EC2-2]   [EC2-3]  ← Auto Scaling Group
+                                  (scales 2–20 instances)
+  Auto Scaling watches CloudWatch metrics:
+  CPU > 70% → add instances
+  CPU < 30% → remove instances</div>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">⚖️</div><div class="cc-title">Application LB (ALB)</div><div class="cc-desc">Layer 7 (HTTP/HTTPS). Routes based on URL path, hostname, or headers. Best for web apps and microservices. Supports WebSockets and HTTP/2.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔌</div><div class="cc-title">Network LB (NLB)</div><div class="cc-desc">Layer 4 (TCP/UDP). Extremely low latency, millions of requests/sec. Use for high-performance, non-HTTP traffic — databases, gaming, IoT.</div></div>
+  <div class="concept-card"><div class="cc-icon">📈</div><div class="cc-title">Auto Scaling Groups</div><div class="cc-desc">Define min, max, and desired instance count. Scaling policies trigger based on CloudWatch alarms. New instances launch from a Launch Template.</div></div>
+  <div class="concept-card"><div class="cc-icon">🎯</div><div class="cc-title">Target Tracking</div><div class="cc-desc">Simplest scaling policy — set a target metric (e.g. 60% CPU) and Auto Scaling maintains it automatically. No need to define scale-up/scale-down thresholds separately.</div></div>
+</div>
+</div>
+
+<!-- ── SNS & SQS ──────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">SNS & SQS — Messaging Services</h3>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">📢</div><div class="cc-title">SNS — Simple Notification Service</div><div class="cc-desc">Pub/Sub messaging. Publish one message to a Topic and it fans out to all subscribers (email, SMS, Lambda, SQS, HTTP). Use for alerts, broadcasts, and triggering multiple services from one event.</div></div>
+  <div class="concept-card"><div class="cc-icon">📬</div><div class="cc-title">SQS — Simple Queue Service</div><div class="cc-desc">Message queue. Producer puts messages in, consumer reads them. Decouples services — producer doesn't wait for consumer. Messages stored until processed (up to 14 days).</div></div>
+</div>
+
+<div class="arch-diagram">  SNS (Fan-out pattern):
+  S3 Upload → SNS Topic → Email notification
+                        → Lambda (resize image)
+                        → SQS (process later)
+
+  SQS (Decoupling pattern):
+  Web App → SQS Queue → Lambda Worker → Database
+  (producer doesn't wait — queue buffers the load)</div>
+</div>
+
+<!-- ── MINI PROJECT ───────────────────────────────── -->
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Serverless Image Processing Pipeline</div>
+<ol class="steps">
+  <li>Create two S3 buckets: <code>uploads-bucket</code> and <code>processed-bucket</code></li>
+  <li>Create a Lambda function (Python) triggered on S3 uploads — it logs the filename and copies it to <code>processed-bucket</code></li>
+  <li>Create an SNS topic and subscribe your email to it</li>
+  <li>Update the Lambda to publish a message to SNS after processing</li>
+  <li>Set up a Lifecycle Policy on <code>uploads-bucket</code> — move objects to Standard-IA after 30 days</li>
+  <li>Add a CloudWatch alarm that triggers if Lambda errors > 0 and sends an SNS alert</li>
+  <li>Upload a test file — verify email notification arrives and file appears in processed bucket</li>
+</ol></div>
+
+<!-- ── SUMMARY ───────────────────────────────────── -->
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist">
+  <li>RDS = managed relational databases; always use Multi-AZ + private subnet in production</li>
+  <li>DynamoDB = serverless NoSQL; use for high-throughput, flexible schema workloads</li>
+  <li>Lambda = serverless functions; pay per invocation, scales automatically, zero idle cost</li>
+  <li>S3 storage classes — Standard for frequent access, Glacier for archives; use Lifecycle Policies to automate transitions and cut costs</li>
+  <li>ELB distributes traffic across instances; ALB for HTTP apps, NLB for TCP/high-performance</li>
+  <li>Auto Scaling adjusts instance count based on demand — set min/max/desired carefully</li>
+  <li>SNS for fan-out notifications; SQS for decoupling services with message queues</li>
+</ul></div>
+
+<div class="next-card" onclick="showModule('linux')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🐧 Linux Basics</div><div class="next-why">All cloud servers run Linux. Master the command line to configure, deploy, and troubleshoot them effectively.</div></div><div class="next-arrow">→</div></div>
