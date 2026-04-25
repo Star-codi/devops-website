@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker CLI Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2128;
+  --border: #30363d;
+  --green: #3fb950;
+  --green-dim: #1a4a24;
+  --blue: #58a6ff;
+  --yellow: #e3b341;
+  --red: #f85149;
+  --cyan: #39c5cf;
+  --purple: #bc8cff;
+  --muted: #6e7681;
+  --text: #c9d1d9;
+  --white: #f0f6fc;
+  --prompt-color: #3fb950;
+  --whale: #1d97d4;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* ─── layout ─── */
+.app {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 260px 1fr;
+  grid-template-areas: "header header" "sidebar terminal" "footer footer";
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ─── header ─── */
+header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.whale-icon {
+  width: 36px; height: 36px;
+  background: var(--whale);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+header h1 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.3px;
+}
+
+header p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.header-right {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.status-label { font-size: 12px; color: var(--green); font-family: 'JetBrains Mono', monospace; }
+
+/* ─── sidebar ─── */
+.sidebar {
+  grid-area: sidebar;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 16px 0;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 6px 16px 4px;
+}
+
+.cmd-group {
+  margin-bottom: 2px;
+}
+
+.cmd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: background .12s;
+  border-left: 2px solid transparent;
+}
+
+.cmd-item:hover {
+  background: var(--surface2);
+  border-left-color: var(--border);
+}
+
+.cmd-item.active {
+  background: var(--green-dim);
+  border-left-color: var(--green);
+}
+
+.cmd-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--cyan);
+  min-width: 90px;
+}
+
+.cmd-desc {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 10px 16px;
+}
+
+/* ─── terminal ─── */
+.terminal-wrap {
+  grid-area: terminal;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.terminal-tabs {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding: 0 16px;
+  gap: 2px;
+}
+
+.tab {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 10px 16px 9px;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .12s;
+}
+
+.tab.active {
+  color: var(--white);
+  border-bottom-color: var(--green);
+}
+
+.tab:hover:not(.active) { color: var(--text); }
+
+.terminal-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  background: var(--bg);
+  min-height: 0;
+  max-height: 520px;
+}
+
+.terminal-output::-webkit-scrollbar { width: 6px; }
+.terminal-output::-webkit-scrollbar-track { background: transparent; }
+.terminal-output::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* output lines */
+.line { display: block; white-space: pre-wrap; word-break: break-all; }
+.line-cmd { color: var(--white); }
+.line-cmd::before { content: '$ '; color: var(--green); }
+.line-out { color: var(--text); }
+.line-err { color: var(--red); }
+.line-success { color: var(--green); }
+.line-comment { color: var(--muted); }
+.line-header { color: var(--yellow); font-weight: 700; }
+.line-info { color: var(--cyan); }
+.line-blank { display: block; height: .8em; }
+.line-sep { color: var(--border); }
+.line-section { color: var(--purple); font-weight: 600; }
+
+/* welcome banner */
+.welcome-banner {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  background: var(--surface);
+}
+
+.whale-art {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--whale);
+  white-space: pre;
+  line-height: 1.3;
+}
+
+.banner-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--white);
+  margin: 10px 0 4px;
+}
+
+.banner-sub { font-size: 12px; color: var(--muted); }
+.banner-hint { font-size: 12px; color: var(--green); margin-top: 6px; }
+
+/* input row */
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.prompt-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--green);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.cmd-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--white);
+  caret-color: var(--green);
+}
+
+.cmd-input::placeholder { color: var(--muted); }
+
+.run-btn {
+  background: var(--green);
+  color: #000;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .12s, transform .1s;
+}
+
+.run-btn:hover { opacity: .88; }
+.run-btn:active { transform: scale(.97); }
+
+/* state panel (sidebar bottom) */
+.state-panel {
+  padding: 12px 16px;
+  margin-top: 4px;
+}
+
+.state-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.state-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 0;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  border-bottom: 1px solid var(--border);
+}
+
+.state-item:last-child { border-bottom: none; }
+
+.state-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-running { background: var(--green); }
+.dot-stopped { background: var(--red); }
+.dot-image   { background: var(--blue); }
+.dot-volume  { background: var(--purple); }
+.dot-network { background: var(--yellow); }
+
+.state-name { color: var(--text); flex: 1; }
+.state-tag  { color: var(--muted); font-size: 10px; }
+
+/* footer */
+footer {
+  grid-area: footer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.footer-left { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.footer-right { display: flex; gap: 16px; }
+
+.shortcut {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.shortcut kbd {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 10px;
+  color: var(--text);
+}
+
+/* typing animation */
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.cursor {
+  display: inline-block;
+  width: 8px; height: 14px;
+  background: var(--green);
+  vertical-align: middle;
+  animation: blink .9s step-start infinite;
+  margin-left: 2px;
+}
+
+/* quick-commands bar */
+.quick-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.quick-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--cyan);
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+  white-space: nowrap;
+}
+
+.quick-btn:hover {
+  background: var(--surface);
+  border-color: var(--cyan);
+}
+
+/* responsive */
+@media (max-width: 700px) {
+  .app { grid-template-columns: 1fr; grid-template-areas: "header" "terminal" "footer"; }
+  .sidebar { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<header>
+  <div class="whale-icon">🐳</div>
+  <div>
+    <h1>Docker CLI Simulator</h1>
+    <p>Module 08 — Interactive Terminal</p>
+  </div>
+  <div class="header-right">
+    <div class="status-dot"></div>
+    <span class="status-label">daemon running</span>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-title">Images</div>
+    <div class="cmd-item" onclick="fillCmd('docker images')">
+      <span class="cmd-name">images</span>
+      <span class="cmd-desc">list images</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker pull nginx:alpine')">
+      <span class="cmd-name">pull</span>
+      <span class="cmd-desc">download image</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker build -t my-app:1.0 .')">
+      <span class="cmd-name">build</span>
+      <span class="cmd-desc">build from Dockerfile</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker rmi my-app:1.0')">
+      <span class="cmd-name">rmi</span>
+      <span class="cmd-desc">remove image</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker tag my-app:1.0 myuser/my-app:1.0')">
+      <span class="cmd-name">tag</span>
+      <span class="cmd-desc">tag an image</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker push myuser/my-app:1.0')">
+      <span class="cmd-name">push</span>
+      <span class="cmd-desc">push to registry</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker history my-app:1.0')">
+      <span class="cmd-name">history</span>
+      <span class="cmd-desc">show image layers</span>
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-title">Containers</div>
+    <div class="cmd-item" onclick="fillCmd('docker run -d -p 8080:80 --name web nginx:alpine')">
+      <span class="cmd-name">run</span>
+      <span class="cmd-desc">start a container</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker ps')">
+      <span class="cmd-name">ps</span>
+      <span class="cmd-desc">running containers</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker ps -a')">
+      <span class="cmd-name">ps -a</span>
+      <span class="cmd-desc">all containers</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker stop web')">
+      <span class="cmd-name">stop</span>
+      <span class="cmd-desc">stop container</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker start web')">
+      <span class="cmd-name">start</span>
+      <span class="cmd-desc">start stopped container</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker rm web')">
+      <span class="cmd-name">rm</span>
+      <span class="cmd-desc">remove container</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker logs -f web')">
+      <span class="cmd-name">logs</span>
+      <span class="cmd-desc">view logs</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker exec -it web sh')">
+      <span class="cmd-name">exec</span>
+      <span class="cmd-desc">run inside container</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker inspect web')">
+      <span class="cmd-name">inspect</span>
+      <span class="cmd-desc">container details</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker stats')">
+      <span class="cmd-name">stats</span>
+      <span class="cmd-desc">resource usage</span>
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-title">Networks & Volumes</div>
+    <div class="cmd-item" onclick="fillCmd('docker network ls')">
+      <span class="cmd-name">network ls</span>
+      <span class="cmd-desc">list networks</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker network create app-net')">
+      <span class="cmd-name">network create</span>
+      <span class="cmd-desc">create network</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker volume ls')">
+      <span class="cmd-name">volume ls</span>
+      <span class="cmd-desc">list volumes</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker volume create db-data')">
+      <span class="cmd-name">volume create</span>
+      <span class="cmd-desc">create volume</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker volume inspect db-data')">
+      <span class="cmd-name">volume inspect</span>
+      <span class="cmd-desc">volume details</span>
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-title">System</div>
+    <div class="cmd-item" onclick="fillCmd('docker system df')">
+      <span class="cmd-name">system df</span>
+      <span class="cmd-desc">disk usage</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker system prune')">
+      <span class="cmd-name">system prune</span>
+      <span class="cmd-desc">remove unused data</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker info')">
+      <span class="cmd-name">info</span>
+      <span class="cmd-desc">system info</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('docker version')">
+      <span class="cmd-name">version</span>
+      <span class="cmd-desc">client/server version</span>
+    </div>
+    <div class="cmd-item" onclick="fillCmd('help')">
+      <span class="cmd-name">help</span>
+      <span class="cmd-desc">all commands</span>
+    </div>
+    <div class="cmd-item" onclick="clearTerminal()">
+      <span class="cmd-name">clear</span>
+      <span class="cmd-desc">clear terminal</span>
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <!-- Live State -->
+  <div class="state-panel">
+    <div class="state-title">Live State</div>
+    <div id="state-containers"></div>
+    <div id="state-images"></div>
+    <div id="state-volumes"></div>
+    <div id="state-networks"></div>
+  </div>
+</aside>
+
+<!-- TERMINAL -->
+<div class="terminal-wrap">
+  <div class="terminal-tabs">
+    <div class="tab active">terminal</div>
+    <div class="tab" onclick="showCheatsheet()">cheatsheet</div>
+  </div>
+
+  <!-- Quick command bar -->
+  <div class="quick-bar">
+    <button class="quick-btn" onclick="runQuick('docker run -d -p 8080:80 --name web nginx:alpine')">▶ run nginx</button>
+    <button class="quick-btn" onclick="runQuick('docker run -d -p 5432:5432 --name db -e POSTGRES_PASSWORD=secret postgres:15-alpine')">▶ run postgres</button>
+    <button class="quick-btn" onclick="runQuick('docker ps')">ps</button>
+    <button class="quick-btn" onclick="runQuick('docker images')">images</button>
+    <button class="quick-btn" onclick="runQuick('docker stats')">stats</button>
+    <button class="quick-btn" onclick="runQuick('docker system df')">disk usage</button>
+    <button class="quick-btn" onclick="runFullDemo()">▶ full demo</button>
+    <button class="quick-btn" onclick="clearTerminal()">✕ clear</button>
+  </div>
+
+  <div class="terminal-output" id="output"></div>
+
+  <div class="input-row">
+    <span class="prompt-label">~/devops $</span>
+    <input class="cmd-input" id="cmd-input" type="text" placeholder="type a docker command…" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="run-btn" onclick="submitCommand()">Run ↵</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-left" id="footer-info">Docker 24.0.7  •  Linux amd64</span>
+  <div class="footer-right">
+    <span class="shortcut"><kbd>↑</kbd><kbd>↓</kbd> history</span>
+    <span class="shortcut"><kbd>Tab</kbd> autocomplete</span>
+    <span class="shortcut"><kbd>Ctrl+L</kbd> clear</span>
+  </div>
+</footer>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+const state = {
+  containers: [],   // {id, name, image, status, ports, created}
+  images: [
+    { id: 'sha256:a1b2c3', repo: 'nginx',    tag: 'alpine',       size: '41MB',  created: '3 days ago' },
+    { id: 'sha256:b2c3d4', repo: 'postgres', tag: '15-alpine',    size: '268MB', created: '5 days ago' },
+    { id: 'sha256:c3d4e5', repo: 'redis',    tag: '7-alpine',     size: '43MB',  created: '1 week ago' },
+    { id: 'sha256:d4e5f6', repo: 'node',     tag: '18-alpine',    size: '173MB', created: '2 weeks ago' },
+  ],
+  volumes: [],
+  networks: [
+    { id: 'a1b2c3d4e5', name: 'bridge',   driver: 'bridge', scope: 'local' },
+    { id: 'b2c3d4e5f6', name: 'host',     driver: 'host',   scope: 'local' },
+    { id: 'c3d4e5f6a1', name: 'none',     driver: 'null',   scope: 'local' },
+  ],
+};
+
+let cmdHistory = [];
+let histIdx = -1;
+let activeTab = 'terminal';
+
+/* ═══════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════ */
+function shortId(id) { return id ? id.slice(-12) : randomHex(12); }
+function randomHex(n) {
+  return [...Array(n)].map(()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+}
+function ts() { return new Date().toISOString().replace('T',' ').slice(0,19) + ' UTC'; }
+function ago(s) { return s; }
+function pad(s, n) { return String(s).padEnd(n); }
+function idStr() { return randomHex(12); }
+
+/* ═══════════════════════════════════════════════════
+   OUTPUT HELPERS
+═══════════════════════════════════════════════════ */
+const out = document.getElementById('output');
+
+function print(text, cls='line-out') {
+  const el = document.createElement('span');
+  el.className = 'line ' + cls;
+  el.textContent = text;
+  out.appendChild(el);
+}
+
+function printRaw(html) {
+  const el = document.createElement('span');
+  el.className = 'line line-out';
+  el.innerHTML = html;
+  out.appendChild(el);
+}
+
+function blank() {
+  const el = document.createElement('span');
+  el.className = 'line-blank';
+  out.appendChild(el);
+}
+
+function printCmd(cmd) {
+  print(cmd, 'line-cmd');
+}
+
+function scrollDown() {
+  out.scrollTop = out.scrollHeight;
+}
+
+/* ═══════════════════════════════════════════════════
+   STATE PANEL
+═══════════════════════════════════════════════════ */
+function updateStatePanel() {
+  const sc = document.getElementById('state-containers');
+  const si = document.getElementById('state-images');
+  const sv = document.getElementById('state-volumes');
+  const sn = document.getElementById('state-networks');
+
+  sc.innerHTML = '';
+  if (state.containers.length === 0) {
+    sc.innerHTML = '<div class="state-item"><span class="state-tag" style="color:var(--muted)">no containers</span></div>';
+  } else {
+    state.containers.forEach(c => {
+      const running = c.status === 'running';
+      sc.innerHTML += `<div class="state-item">
+        <div class="state-dot ${running ? 'dot-running' : 'dot-stopped'}"></div>
+        <span class="state-name">${c.name}</span>
+        <span class="state-tag">${running ? 'up' : 'exited'}</span>
+      </div>`;
+    });
+  }
+
+  si.innerHTML = `<div class="state-item"><div class="state-dot dot-image"></div><span class="state-name">${state.images.length} images</span><span class="state-tag">${state.images.reduce((a,i)=>a+parseFloat(i.size),0).toFixed(0)}MB</span></div>`;
+
+  sv.innerHTML = state.volumes.length
+    ? state.volumes.map(v=>`<div class="state-item"><div class="state-dot dot-volume"></div><span class="state-name">${v.name}</span><span class="state-tag">local</span></div>`).join('')
+    : '<div class="state-item"><span class="state-tag" style="color:var(--muted)">no volumes</span></div>';
+
+  sn.innerHTML = state.networks.map(n=>`<div class="state-item"><div class="state-dot dot-network"></div><span class="state-name">${n.name}</span><span class="state-tag">${n.driver}</span></div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   COMMAND ENGINE
+═══════════════════════════════════════════════════ */
+function parseCmd(raw) {
+  // Simple tokeniser respecting quoted strings
+  const tokens = [];
+  let cur = '', inQ = false, qc = '';
+  for (const ch of raw.trim()) {
+    if (inQ) { if (ch === qc) inQ = false; else cur += ch; }
+    else if (ch === '"' || ch === "'") { inQ = true; qc = ch; }
+    else if (ch === ' ' || ch === '\t') { if (cur) { tokens.push(cur); cur = ''; } }
+    else cur += ch;
+  }
+  if (cur) tokens.push(cur);
+  return tokens;
+}
+
+function flag(tokens, name) {
+  const i = tokens.indexOf(name);
+  return i !== -1 ? tokens[i+1] : null;
+}
+
+function hasFlag(tokens, ...names) { return names.some(n => tokens.includes(n)); }
+
+function execCmd(raw) {
+  if (!raw.trim()) return;
+  const tokens = parseCmd(raw);
+  const cmd = tokens[0];
+
+  if (cmd === 'clear') { clearTerminal(); return; }
+  if (cmd === 'help') { showHelp(); return; }
+
+  if (cmd !== 'docker') {
+    printCmd(raw);
+    print(`command not found: ${cmd}`, 'line-err');
+    print('Hint: all commands start with "docker" or use the sidebar shortcuts.', 'line-comment');
+    blank();
+    return;
+  }
+
+  const sub = tokens[1];
+  const rest = tokens.slice(2);
+
+  printCmd(raw);
+
+  switch(sub) {
+    case 'version':    cmdVersion(); break;
+    case 'info':       cmdInfo(); break;
+    case 'images':     cmdImages(rest); break;
+    case 'pull':       cmdPull(rest); break;
+    case 'build':      cmdBuild(rest); break;
+    case 'tag':        cmdTag(rest); break;
+    case 'push':       cmdPush(rest); break;
+    case 'rmi':        cmdRmi(rest); break;
+    case 'history':    cmdHistory2(rest); break;
+    case 'run':        cmdRun(rest); break;
+    case 'ps':         cmdPs(rest); break;
+    case 'stop':       cmdStop(rest); break;
+    case 'start':      cmdStart(rest); break;
+    case 'rm':         cmdRm(rest); break;
+    case 'logs':       cmdLogs(rest); break;
+    case 'exec':       cmdExec(rest); break;
+    case 'inspect':    cmdInspect(rest); break;
+    case 'stats':      cmdStats(); break;
+    case 'network':    cmdNetwork(rest); break;
+    case 'volume':     cmdVolume(rest); break;
+    case 'system':     cmdSystem(rest); break;
+    case 'compose':    cmdCompose(rest); break;
+    case 'login':      cmdLogin(rest); break;
+    case 'logout':     print('Removing login credentials for registry-1.docker.io', 'line-success'); break;
+    case 'scan':       cmdScan(rest); break;
+    default:
+      print(`docker: '${sub}' is not a docker command.`, 'line-err');
+      print("See 'docker --help'", 'line-comment');
+  }
+
+  blank();
+  updateStatePanel();
+  scrollDown();
+}
+
+/* ─── individual commands ─── */
+
+function cmdVersion() {
+  print('Client: Docker Engine - Community');
+  print(' Version:           24.0.7');
+  print(' API version:       1.43');
+  print(' Go version:        go1.20.10');
+  print(' Git commit:        af74183');
+  print(' Built:             Fri Oct 6 18:01:28 2023');
+  print(' OS/Arch:           linux/amd64');
+  blank();
+  print('Server: Docker Engine - Community');
+  print(' Engine:');
+  print('  Version:          24.0.7');
+  print('  API version:      1.43 (minimum version 1.12)');
+  print('  Go version:       go1.20.10');
+  print('  Git commit:       311b9ff');
+  print('  Built:            Fri Oct 6 17:59:21 2023');
+  print('  OS/Arch:          linux/amd64');
+  print('  Experimental:     false');
+  print(' containerd:');
+  print('  Version:          1.6.24');
+  print('  GitCommit:        61f9fd88f513907dc54a7f13a98d4ab5c3c6b63c');
+  print(' runc:');
+  print('  Version:          1.1.9');
+  print('  GitCommit:        v1.1.9-0-gccaecfc');
+}
+
+function cmdInfo() {
+  const running = state.containers.filter(c=>c.status==='running').length;
+  const stopped = state.containers.filter(c=>c.status!=='running').length;
+  print('Client:');
+  print(' Context:    default');
+  print(' Debug Mode: false');
+  blank();
+  print('Server:');
+  print(' Containers: ' + state.containers.length);
+  print('  Running: ' + running);
+  print('  Paused: 0');
+  print('  Stopped: ' + stopped);
+  print(' Images: ' + state.images.length);
+  print(' Server Version: 24.0.7');
+  print(' Storage Driver: overlay2');
+  print('  Backing Filesystem: extfs');
+  print('  Supports d_type: true');
+  print(' Cgroup Driver: systemd');
+  print(' Cgroup Version: 2');
+  print(' Plugins:');
+  print('  Volume: local');
+  print('  Network: bridge host ipvlan macvlan null overlay');
+  print('  Log: awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog');
+  print(' Swarm: inactive');
+  print(' Runtimes: io.containerd.runc.v2 runc');
+  print(' Default Runtime: runc');
+  print(' Init Binary: docker-init');
+  print(' containerd version: 61f9fd88f513907dc54a7f13a98d4ab5c3c6b63c');
+  print(' runc version: v1.1.9-0-gccaecfc');
+  print(' init version: de40ad0');
+  print(' Security Options:');
+  print('  apparmor');
+  print('  seccomp');
+  print('   Profile: builtin');
+  print('  cgroupns');
+  print(' Kernel Version: 5.15.0-89-generic');
+  print(' Operating System: Ubuntu 22.04.3 LTS');
+  print(' OSType: linux');
+  print(' Architecture: x86_64');
+  print(' CPUs: 4');
+  print(' Total Memory: 7.764GiB');
+  print(' Docker Root Dir: /var/lib/docker');
+  print(' Debug Mode: false');
+  print(' Experimental: false');
+  print(' Insecure Registries:');
+  print('  127.0.0.0/8');
+  print(' Live Restore Enabled: false');
+}
+
+function cmdImages(args) {
+  if (state.images.length === 0) {
+    print('REPOSITORY   TAG       IMAGE ID   CREATED   SIZE');
+    return;
+  }
+  print(pad('REPOSITORY', 18) + pad('TAG', 14) + pad('IMAGE ID', 14) + pad('CREATED', 16) + 'SIZE', 'line-header');
+  state.images.forEach(img => {
+    print(pad(img.repo, 18) + pad(img.tag, 14) + pad(img.id.slice(-12), 14) + pad(img.created, 16) + img.size);
+  });
+}
+
+function cmdPull(args) {
+  const imgArg = args[0];
+  if (!imgArg) { print('Usage: docker pull IMAGE[:TAG]', 'line-err'); return; }
+  
+  let [repo, tag] = imgArg.includes(':') ? imgArg.split(':') : [imgArg, 'latest'];
+  
+  // Check if already exists
+  if (state.images.find(i => i.repo === repo && i.tag === tag)) {
+    print(`${tag}: Pulling from library/${repo}`);
+    print('Digest: sha256:' + randomHex(64));
+    print(`Status: Image is up to date for ${repo}:${tag}`);
+    print(`docker.io/library/${repo}:${tag}`);
+    return;
+  }
+
+  print(`${tag}: Pulling from library/${repo}`);
+  print(randomHex(12) + ': Pull complete');
+  print(randomHex(12) + ': Pull complete');
+  print(randomHex(12) + ': Pull complete');
+  print('Digest: sha256:' + randomHex(64));
+  print(`Status: Downloaded newer image for ${repo}:${tag}`, 'line-success');
+  print(`docker.io/library/${repo}:${tag}`);
+
+  const sizes = { nginx: '41MB', postgres: '268MB', redis: '43MB', ubuntu: '77MB', alpine: '7.3MB', node: '173MB', python: '349MB', mysql: '577MB' };
+  const sz = sizes[repo] || Math.floor(Math.random()*300+30) + 'MB';
+  
+  state.images.push({ id: 'sha256:'+randomHex(8), repo, tag, size: sz, created: 'just now' });
+}
+
+function cmdBuild(args) {
+  const tIdx = args.indexOf('-t') !== -1 ? args.indexOf('-t') : args.indexOf('--tag');
+  const tagVal = tIdx !== -1 ? args[tIdx+1] : null;
+  
+  if (!tagVal) {
+    print("Sending build context to Docker daemon  12.34kB");
+    print("Step 1/7 : FROM node:18-alpine");
+    print(" ---> a1b2c3d4e5f6");
+    print("Step 2/7 : WORKDIR /app");
+    print(" ---> Running in b2c3d4e5f6a1");
+    print(" ---> c3d4e5f6a1b2");
+    print("Step 3/7 : COPY package*.json ./");
+    print(" ---> d4e5f6a1b2c3");
+    print("Step 4/7 : RUN npm install");
+    print(" ---> Running in e5f6a1b2c3d4");
+    print("npm warn deprecated: rimraf@2.7.1");
+    print("added 157 packages in 8.234s");
+    print(" ---> f6a1b2c3d4e5");
+    print("Step 5/7 : COPY . .");
+    print(" ---> a1b2c3d4e5f7");
+    print("Step 6/7 : EXPOSE 3000");
+    print(" ---> Running in b2c3d4e5f6a2");
+    print(" ---> c3d4e5f6a1b3");
+    print("Step 7/7 : CMD [\"node\",\"app.js\"]");
+    print(" ---> Running in d4e5f6a1b2c4");
+    print(" ---> e5f6a1b2c3d5");
+    print('Successfully built e5f6a1b2c3d5', 'line-success');
+    print('Tip: Use -t to give your image a name, e.g. docker build -t my-app:1.0 .', 'line-comment');
+    return;
+  }
+
+  const [repo, tag] = tagVal.includes(':') ? tagVal.split(':') : [tagVal, 'latest'];
+  
+  print(`Sending build context to Docker daemon  12.34kB`);
+  ['FROM','WORKDIR','COPY package*.json','RUN npm install','COPY .','EXPOSE','CMD'].forEach((step, i) => {
+    print(`Step ${i+1}/7 : ${step}`);
+    if (step.startsWith('RUN')) {
+      print(' ---> Running in ' + randomHex(12));
+      print('npm warn deprecated: rimraf@2.7.1');
+      print('added 157 packages in 8.234s');
+    }
+    print(' ---> ' + randomHex(12));
+  });
+
+  const newId = 'sha256:' + randomHex(8);
+  print(`Successfully built ${newId.slice(-12)}`, 'line-success');
+  print(`Successfully tagged ${tagVal}`, 'line-success');
+  state.images.push({ id: newId, repo, tag, size: '183MB', created: 'just now' });
+}
+
+function cmdTag(args) {
+  if (args.length < 2) { print('Usage: docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]', 'line-err'); return; }
+  const [src, dst] = args;
+  const [drepo, dtag] = dst.includes(':') ? dst.split(':') : [dst, 'latest'];
+  const existing = state.images.find(i => src.startsWith(i.repo));
+  if (!existing) { print(`Error: No such image: ${src}`, 'line-err'); return; }
+  state.images.push({ id: existing.id, repo: drepo, tag: dtag || 'latest', size: existing.size, created: 'just now' });
+  // No output on success (Docker's behaviour)
+}
+
+function cmdPush(args) {
+  const img = args[0];
+  if (!img) { print('Usage: docker push NAME[:TAG]', 'line-err'); return; }
+  print(`Using default tag: latest`);
+  print(`The push refers to repository [docker.io/${img}]`);
+  [randomHex(12), randomHex(12), randomHex(12)].forEach(id => {
+    print(`${id}: Pushed`);
+  });
+  print(`latest: digest: sha256:${randomHex(64)} size: 529`);
+}
+
+function cmdRmi(args) {
+  if (!args.length) { print('Usage: docker rmi IMAGE [IMAGE...]', 'line-err'); return; }
+  args.forEach(arg => {
+    const [repo, tag] = arg.includes(':') ? arg.split(':') : [arg, 'latest'];
+    const idx = state.images.findIndex(i => i.repo === repo && i.tag === (tag||'latest'));
+    if (idx === -1) { print(`Error: No such image: ${arg}`, 'line-err'); return; }
+    const img = state.images[idx];
+    // Check if any running container uses it
+    const inUse = state.containers.find(c => c.image === arg);
+    if (inUse) { print(`Error: conflict: unable to remove repository reference "${arg}"`, 'line-err'); print(`(must force remove '${inUse.name}' to remove it)`, 'line-comment'); return; }
+    print(`Untagged: ${img.repo}:${img.tag}`);
+    print(`Deleted: sha256:${randomHex(64)}`);
+    state.images.splice(idx, 1);
+  });
+}
+
+function cmdHistory2(args) {
+  const img = args[0];
+  if (!img) { print('Usage: docker history IMAGE', 'line-err'); return; }
+  const found = state.images.find(i => img.startsWith(i.repo) || img === i.repo+':'+i.tag);
+  if (!found) { print(`Error: No such image: ${img}`, 'line-err'); return; }
+  print(pad('IMAGE',14) + pad('CREATED',14) + pad('CREATED BY',48) + pad('SIZE',8) + 'COMMENT', 'line-header');
+  const layers = [
+    ['CMD ["node" "app.js"]', '0B'],
+    ['EXPOSE 3000', '0B'],
+    ['COPY . . # buildkit', '8.41kB'],
+    ['RUN npm install', '64.2MB'],
+    ['COPY package*.json ./', '1.42kB'],
+    ['WORKDIR /app', '0B'],
+    ['/bin/sh -c #(nop) FROM node:18-alpine', '6.72MB'],
+  ];
+  layers.forEach(([by, size], i) => {
+    print(pad(i===0?found.id.slice(-12):'<missing>',14) + pad('Just now',14) + pad(by.slice(0,47),48) + size);
+  });
+}
+
+function cmdRun(args) {
+  // Parse flags
+  const detached = hasFlag(args, '-d', '--detach');
+  const interactive = hasFlag(args, '-i', '-it', '--interactive');
+  const remove = hasFlag(args, '--rm');
+  const nameIdx = args.findIndex(a => a === '--name');
+  const givenName = nameIdx !== -1 ? args[nameIdx+1] : null;
+  const portFlags = [];
+  args.forEach((a,i) => { if (a==='-p'||a==='--publish') portFlags.push(args[i+1]); });
+  const envFlags = [];
+  args.forEach((a,i) => { if (a==='-e'||a==='--env') envFlags.push(args[i+1]); });
+  const volFlags = [];
+  args.forEach((a,i) => { if (a==='-v'||a==='--volume') volFlags.push(args[i+1]); });
+  const netIdx = args.findIndex(a=>a==='--network'||a==='--net');
+  const network = netIdx !== -1 ? args[netIdx+1] : 'bridge';
+  const memIdx = args.findIndex(a=>a==='--memory'||a==='-m');
+  const mem = memIdx !== -1 ? args[memIdx+1] : null;
+
+  // Find image arg (first non-flag token after we strip flags)
+  let imgArg = null;
+  let inFlag = false;
+  const flagsWithVal = new Set(['-p','--publish','-e','--env','-v','--volume','--name','--network','--net','-m','--memory','--entrypoint','--hostname','-h','--workdir','-w']);
+  for (let i=0; i<args.length; i++) {
+    if (inFlag) { inFlag = false; continue; }
+    if (args[i].startsWith('-')) { if (flagsWithVal.has(args[i])) inFlag = true; continue; }
+    imgArg = args[i]; break;
+  }
+
+  if (!imgArg) { print('Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]', 'line-err'); return; }
+
+  const [imgRepo, imgTag] = imgArg.includes(':') ? imgArg.split(':') : [imgArg, 'latest'];
+  
+  // Auto-pull if not present
+  if (!state.images.find(i => i.repo === imgRepo)) {
+    print(`Unable to find image '${imgArg}' locally`);
+    print(`${imgTag}: Pulling from library/${imgRepo}`);
+    print(randomHex(12) + ': Pull complete');
+    print(randomHex(12) + ': Pull complete');
+    print(`Status: Downloaded newer image for ${imgRepo}:${imgTag}`, 'line-success');
+    const sizes = { nginx: '41MB', postgres: '268MB', redis: '43MB', ubuntu: '77MB', alpine: '7.3MB', node: '173MB', python: '349MB', mysql: '577MB' };
+    state.images.push({ id: 'sha256:'+randomHex(8), repo: imgRepo, tag: imgTag, size: sizes[imgRepo]||'86MB', created: 'just now' });
+    blank();
+  }
+
+  const cid = randomHex(12);
+  const name = givenName || imgRepo + '_' + randomHex(4);
+
+  // Check name collision
+  if (givenName && state.containers.find(c => c.name === givenName)) {
+    print(`Error: The container name "/${givenName}" is already in use.`, 'line-err');
+    print(`You have to remove (or rename) that container to reuse that name.`, 'line-comment');
+    return;
+  }
+
+  // Network validation
+  if (network !== 'bridge' && network !== 'host' && network !== 'none' && !state.networks.find(n=>n.name===network)) {
+    print(`Error: No such network: ${network}`, 'line-err');
+    print(`Create it first: docker network create ${network}`, 'line-comment');
+    return;
+  }
+
+  const container = {
+    id: cid, name, image: imgArg, status: 'running',
+    ports: portFlags, created: 'just now', network,
+    pid: Math.floor(Math.random()*30000+1000)
+  };
+
+  state.containers.push(container);
+
+  // Handle auto-create volumes from -v
+  volFlags.forEach(v => {
+    const [vname] = v.split(':');
+    if (!vname.startsWith('/') && !vname.startsWith('.') && !state.volumes.find(vol=>vol.name===vname)) {
+      state.volumes.push({ name: vname, driver: 'local', created: 'just now' });
+    }
+  });
+
+  if (detached) {
+    print(cid, 'line-info');
+  } else if (interactive) {
+    print(`/ # `, 'line-success');
+    print(`(Simulated: interactive shell not available here. Use 'docker exec -it ${name} sh' to re-enter.)`, 'line-comment');
+    container.status = 'exited';
+    if (remove) state.containers.splice(state.containers.indexOf(container), 1);
+  } else {
+    // foreground — show some fake app output
+    print(`Starting ${imgRepo}...`);
+    if (imgRepo === 'nginx') {
+      print('/docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration');
+      print('/docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/');
+      print('2024/01/15 08:23:11 [notice] 1#1: nginx/1.25.3');
+      print('2024/01/15 08:23:11 [notice] 1#1: built by gcc 12.2.1 20220924 (Alpine 12.2.1_git20220924-r10)');
+      print('2024/01/15 08:23:11 [notice] 1#1: OS: Linux 5.15.0-89-generic');
+      print('2024/01/15 08:23:11 [notice] 1#1: start worker processes');
+    } else {
+      print(`${imgRepo} is ready and listening.`);
+    }
+  }
+}
+
+function cmdPs(args) {
+  const all = hasFlag(args, '-a', '--all');
+  const toShow = all ? state.containers : state.containers.filter(c => c.status === 'running');
+
+  print(pad('CONTAINER ID',14) + pad('IMAGE',22) + pad('COMMAND',20) + pad('CREATED',14) + pad('STATUS',14) + pad('PORTS',22) + 'NAMES', 'line-header');
+  if (toShow.length === 0) { return; }
+  toShow.forEach(c => {
+    const statusStr = c.status === 'running' ? `Up ${c.created}` : `Exited (0) ${c.created}`;
+    const portsStr = c.ports.join(', ').slice(0,20);
+    print(pad(c.id.slice(0,12),14) + pad(c.image,22) + pad('"docker-entrypoint"',20) + pad(c.created,14) + pad(statusStr,14) + pad(portsStr,22) + c.name);
+  });
+}
+
+function cmdStop(args) {
+  if (!args.length) { print('Usage: docker stop CONTAINER [CONTAINER...]', 'line-err'); return; }
+  args.forEach(name => {
+    const c = state.containers.find(c => c.name === name || c.id.startsWith(name));
+    if (!c) { print(`Error: No such container: ${name}`, 'line-err'); return; }
+    if (c.status !== 'running') { print(`${name}`, 'line-comment'); return; }
+    c.status = 'exited';
+    print(name);
+  });
+}
+
+function cmdStart(args) {
+  if (!args.length) { print('Usage: docker start CONTAINER [CONTAINER...]', 'line-err'); return; }
+  args.forEach(name => {
+    const c = state.containers.find(c => c.name === name || c.id.startsWith(name));
+    if (!c) { print(`Error: No such container: ${name}`, 'line-err'); return; }
+    c.status = 'running';
+    print(name);
+  });
+}
+
+function cmdRm(args) {
+  if (!args.length) { print('Usage: docker rm CONTAINER [CONTAINER...]', 'line-err'); return; }
+  const force = hasFlag(args, '-f', '--force');
+  args.filter(a=>!a.startsWith('-')).forEach(name => {
+    const idx = state.containers.findIndex(c => c.name === name || c.id.startsWith(name));
+    if (idx === -1) { print(`Error: No such container: ${name}`, 'line-err'); return; }
+    const c = state.containers[idx];
+    if (c.status === 'running' && !force) {
+      print(`Error: You cannot remove a running container ${c.id}.`, 'line-err');
+      print(`Stop the container before attempting removal or force remove with -f flag.`, 'line-comment');
+      return;
+    }
+    state.containers.splice(idx, 1);
+    print(name);
+  });
+}
+
+function cmdLogs(args) {
+  const follow = hasFlag(args, '-f', '--follow');
+  const tail = flag(args, '--tail') || flag(args, '-n') || 'all';
+  const name = args.find(a => !a.startsWith('-') && a !== tail);
+  if (!name) { print('Usage: docker logs [OPTIONS] CONTAINER', 'line-err'); return; }
+  const c = state.containers.find(c => c.name === name || c.id.startsWith(name));
+  if (!c) { print(`Error: No such container: ${name}`, 'line-err'); return; }
+  
+  const img = c.image.split(':')[0];
+  if (img === 'nginx') {
+    print('2024/01/15 08:23:11 [notice] 1#1: nginx/1.25.3');
+    print('2024/01/15 08:23:11 [notice] 1#1: start worker processes');
+    print('172.17.0.1 - - [15/Jan/2024:08:25:00 +0000] "GET / HTTP/1.1" 200 615 "-" "curl/7.81.0"');
+    print('172.17.0.1 - - [15/Jan/2024:08:25:02 +0000] "GET /healthz HTTP/1.1" 200 3 "-" "kube-probe/1.28"');
+    print('172.17.0.1 - - [15/Jan/2024:08:25:10 +0000] "GET / HTTP/1.1" 200 615 "-" "Mozilla/5.0"');
+  } else if (img === 'postgres') {
+    print('PostgreSQL Database directory appears to contain a database; Skipping initialization');
+    print('2024-01-15 08:23:11.421 UTC [1] LOG:  starting PostgreSQL 15.4 on x86_64-pc-linux-musl');
+    print('2024-01-15 08:23:11.421 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432');
+    print('2024-01-15 08:23:11.523 UTC [1] LOG:  database system is ready to accept connections', 'line-success');
+  } else {
+    print(`[${new Date().toISOString()}] ${c.name} started`);
+    print(`[${new Date().toISOString()}] Listening on port ${c.ports[0]?.split(':')[1] || '8080'}`);
+    print(`[${new Date().toISOString()}] Health check: OK`);
+  }
+
+  if (follow) {
+    print('(Simulated: use Ctrl+C to stop following. Type another command to continue.)', 'line-comment');
+  }
+}
+
+function cmdExec(args) {
+  const it = hasFlag(args, '-it', '-i', '-t');
+  const name = args.find(a => !a.startsWith('-'));
+  if (!name) { print('Usage: docker exec [OPTIONS] CONTAINER COMMAND [ARG...]', 'line-err'); return; }
+  const c = state.containers.find(c => c.name === name || c.id.startsWith(name));
+  if (!c) { print(`Error: No such container: ${name}`, 'line-err'); return; }
+  if (c.status !== 'running') { print(`Error: Container "${name}" is not running`, 'line-err'); return; }
+
+  const execCmd2 = args.slice(args.indexOf(name)+1).join(' ');
+  if (execCmd2 === 'sh' || execCmd2 === 'bash' || execCmd2 === '/bin/sh' || execCmd2 === '/bin/bash') {
+    print(`/${c.name} # `, 'line-success');
+    print(`(Simulated interactive shell. In a real terminal you'd get full shell access.)`, 'line-comment');
+    print('Try commands like: ls, pwd, env, ps aux, cat /etc/os-release', 'line-comment');
+  } else if (execCmd2.startsWith('ls')) {
+    print('bin  dev  etc  home  lib  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var');
+  } else if (execCmd2 === 'env') {
+    print('PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin');
+    print('HOSTNAME=' + c.name);
+    print('NODE_VERSION=18.18.2');
+    print('YARN_VERSION=1.22.19');
+    print('HOME=/root');
+  } else if (execCmd2.includes('psql')) {
+    print('psql (15.4)');
+    print('Type "help" for help.');
+    blank();
+    print('postgres=# ');
+    print('(Simulated psql prompt)', 'line-comment');
+  } else {
+    print(`OCI runtime exec failed: command not found: ${execCmd2 || '(none)'}`, 'line-err');
+  }
+}
+
+function cmdInspect(args) {
+  const name = args[0];
+  if (!name) { print('Usage: docker inspect CONTAINER|IMAGE|NETWORK|VOLUME', 'line-err'); return; }
+  const c = state.containers.find(c => c.name === name || c.id.startsWith(name));
+  if (!c) { print(`Error: No such object: ${name}`, 'line-err'); return; }
+
+  print('[');
+  print('    {');
+  print(`        "Id": "${c.id}",`);
+  print(`        "Created": "2024-01-15T08:23:11.000000000Z",`);
+  print(`        "Path": "docker-entrypoint.sh",`);
+  print(`        "Args": [],`);
+  print(`        "State": {`);
+  print(`            "Status": "${c.status}",`);
+  print(`            "Running": ${c.status==='running'},`);
+  print(`            "Paused": false,`);
+  print(`            "Restarting": false,`);
+  print(`            "OOMKilled": false,`);
+  print(`            "Dead": false,`);
+  print(`            "Pid": ${c.pid},`);
+  print(`            "ExitCode": 0,`);
+  print(`            "StartedAt": "2024-01-15T08:23:11.000000000Z"`);
+  print(`        },`);
+  print(`        "Image": "sha256:${randomHex(64)}",`);
+  print(`        "Name": "/${c.name}",`);
+  print(`        "HostConfig": {`);
+  print(`            "Binds": [],`);
+  print(`            "NetworkMode": "${c.network}",`);
+  print(`            "RestartPolicy": { "Name": "no", "MaximumRetryCount": 0 }`);
+  print(`        },`);
+  print(`        "NetworkSettings": {`);
+  print(`            "IPAddress": "172.17.0.${state.containers.indexOf(c)+2}",`);
+  print(`            "Ports": {}`);
+  print(`        }`);
+  print('    }');
+  print(']');
+}
+
+function cmdStats() {
+  const running = state.containers.filter(c=>c.status==='running');
+  if (running.length === 0) { print('No running containers.', 'line-comment'); return; }
+  print(pad('CONTAINER ID',14) + pad('NAME',18) + pad('CPU %',8) + pad('MEM USAGE / LIMIT',22) + pad('MEM %',8) + pad('NET I/O',18) + 'BLOCK I/O', 'line-header');
+  running.forEach(c => {
+    const cpu  = (Math.random()*5).toFixed(2);
+    const mem  = (Math.random()*200+50).toFixed(1);
+    const memP = (mem/7936*100).toFixed(2);
+    const netI = (Math.random()*10).toFixed(2) + 'MB';
+    const netO = (Math.random()*5).toFixed(2) + 'MB';
+    const blkR = (Math.random()*50).toFixed(2) + 'MB';
+    const blkW = (Math.random()*10).toFixed(2) + 'MB';
+    print(pad(c.id.slice(0,12),14) + pad(c.name,18) + pad(cpu+'%',8) + pad(`${mem}MiB / 7.764GiB`,22) + pad(memP+'%',8) + pad(`${netI} / ${netO}`,18) + `${blkR} / ${blkW}`);
+  });
+  print('(Stats are simulated — run once, not streaming)', 'line-comment');
+}
+
+function cmdNetwork(args) {
+  const sub2 = args[0];
+  if (!sub2) { print('Usage: docker network COMMAND', 'line-err'); return; }
+
+  if (sub2 === 'ls') {
+    print(pad('NETWORK ID',14) + pad('NAME',18) + pad('DRIVER',10) + 'SCOPE', 'line-header');
+    state.networks.forEach(n => {
+      print(pad(n.id.slice(0,12),14) + pad(n.name,18) + pad(n.driver,10) + n.scope);
+    });
+  } else if (sub2 === 'create') {
+    const name = args[1];
+    if (!name) { print('Usage: docker network create NETWORK', 'line-err'); return; }
+    if (state.networks.find(n=>n.name===name)) { print(`Error: network with name ${name} already exists`, 'line-err'); return; }
+    const nid = randomHex(64);
+    state.networks.push({ id: nid, name, driver: 'bridge', scope: 'local' });
+    print(nid, 'line-info');
+  } else if (sub2 === 'rm' || sub2 === 'remove') {
+    const name = args[1];
+    const idx = state.networks.findIndex(n=>n.name===name);
+    if (idx === -1) { print(`Error: No such network: ${name}`, 'line-err'); return; }
+    if (['bridge','host','none'].includes(name)) { print(`Error: ${name} is a pre-defined network and cannot be removed`, 'line-err'); return; }
+    state.networks.splice(idx,1);
+    print(name);
+  } else if (sub2 === 'inspect') {
+    const name = args[1];
+    const n = state.networks.find(n=>n.name===name);
+    if (!n) { print(`Error: No such network: ${name}`, 'line-err'); return; }
+    print('[');
+    print(`    { "Name": "${n.name}", "Id": "${n.id}", "Driver": "${n.driver}", "Scope": "${n.scope}", "IPAM": { "Config": [{ "Subnet": "172.18.0.0/16", "Gateway": "172.18.0.1" }] }, "Containers": {} }`);
+    print(']');
+  } else if (sub2 === 'connect') {
+    print('Connected.', 'line-success');
+  } else if (sub2 === 'disconnect') {
+    print('Disconnected.', 'line-success');
+  } else {
+    print(`docker network: '${sub2}' is not a docker network command.`, 'line-err');
+  }
+}
+
+function cmdVolume(args) {
+  const sub2 = args[0];
+  if (!sub2) { print('Usage: docker volume COMMAND', 'line-err'); return; }
+
+  if (sub2 === 'ls') {
+    print(pad('DRIVER',10) + 'VOLUME NAME', 'line-header');
+    if (state.volumes.length === 0) { return; }
+    state.volumes.forEach(v => print(pad(v.driver,10) + v.name));
+  } else if (sub2 === 'create') {
+    const name = args[1];
+    if (!name) { print('Usage: docker volume create VOLUME', 'line-err'); return; }
+    if (state.volumes.find(v=>v.name===name)) { print(name); return; }
+    state.volumes.push({ name, driver: 'local', created: 'just now' });
+    print(name);
+  } else if (sub2 === 'rm' || sub2 === 'remove') {
+    const name = args[1];
+    const inUse = state.containers.find(c => c.ports.join().includes(name));
+    if (inUse) { print(`Error: remove ${name}: volume is in use`, 'line-err'); return; }
+    const idx = state.volumes.findIndex(v=>v.name===name);
+    if (idx === -1) { print(`Error: No such volume: ${name}`, 'line-err'); return; }
+    state.volumes.splice(idx,1);
+    print(name);
+  } else if (sub2 === 'inspect') {
+    const name = args[1];
+    const v = state.volumes.find(v=>v.name===name);
+    if (!v) { print(`Error: No such volume: ${name}`, 'line-err'); return; }
+    print('[');
+    print(`    {`);
+    print(`        "CreatedAt": "2024-01-15T08:23:11Z",`);
+    print(`        "Driver": "${v.driver}",`);
+    print(`        "Mountpoint": "/var/lib/docker/volumes/${v.name}/_data",`);
+    print(`        "Name": "${v.name}",`);
+    print(`        "Scope": "local"`);
+    print(`    }`);
+    print(']');
+  } else if (sub2 === 'prune') {
+    const before = state.volumes.length;
+    state.volumes = state.volumes.filter(v => {
+      return state.containers.some(c => c.ports.join().includes(v.name));
+    });
+    const removed = before - state.volumes.length;
+    print(`Deleted Volumes:\n`, 'line-success');
+    print(`Total reclaimed space: ${removed * Math.floor(Math.random()*50+10)}MB`);
+  } else {
+    print(`docker volume: '${sub2}' is not a docker volume command.`, 'line-err');
+  }
+}
+
+function cmdSystem(args) {
+  const sub2 = args[0];
+  if (sub2 === 'df') {
+    const imgSize = state.images.reduce((a,i)=>a+parseFloat(i.size),0);
+    const conSize = state.containers.length * 12;
+    const volSize = state.volumes.length * 150;
+    print(pad('TYPE',20) + pad('TOTAL',8) + pad('ACTIVE',8) + pad('SIZE',12) + 'RECLAIMABLE', 'line-header');
+    print(pad('Images',20) + pad(state.images.length,8) + pad(state.images.length,8) + pad(imgSize.toFixed(0)+'MB',12) + '0B (0%)');
+    print(pad('Containers',20) + pad(state.containers.length,8) + pad(state.containers.filter(c=>c.status==='running').length,8) + pad(conSize+'MB',12) + conSize + 'MB (100%)');
+    print(pad('Local Volumes',20) + pad(state.volumes.length,8) + pad(state.volumes.length,8) + pad(volSize+'MB',12) + '0B (0%)');
+    print(pad('Build Cache',20) + pad('0',8) + pad('0',8) + pad('0B',12) + '0B');
+  } else if (sub2 === 'prune') {
+    const stopped = state.containers.filter(c=>c.status!=='running');
+    stopped.forEach(c => state.containers.splice(state.containers.indexOf(c),1));
+    print('Deleted Containers:');
+    stopped.forEach(c => print(c.id));
+    blank();
+    print(`Total reclaimed space: ${stopped.length * 12}MB`, 'line-success');
+  } else if (sub2 === 'events') {
+    print('2024-01-15T08:23:11.000000000Z container start ' + (state.containers[0]?.id||randomHex(64)));
+    print('(Simulated — streaming events not available in simulator)', 'line-comment');
+  } else {
+    print(`Usage: docker system COMMAND`, 'line-err');
+    print('Commands: df, prune, events, info');
+  }
+}
+
+function cmdCompose(args) {
+  const sub2 = args[0];
+  if (sub2 === 'up') {
+    const detached = hasFlag(args, '-d', '--detach');
+    print('Creating network "project_default" with the default driver');
+    print('Creating volume "project_db-data" with default driver');
+    blank();
+    ['db','cache','web'].forEach((svc,i) => {
+      print(`Creating project_${svc}_1 ... `, 'line-out');
+      print(`project_${svc}_1`.padEnd(25) + 'done', 'line-success');
+    });
+    if (!detached) {
+      blank();
+      print('Attaching to project_db_1, project_cache_1, project_web_1');
+      print('project_db_1    | PostgreSQL init process complete; ready for start up.');
+      print('project_cache_1 | 1:M 15 Jan 2024 08:23:12.000 * Ready to accept connections', 'line-success');
+      print('project_web_1   | Server listening on port 3000', 'line-success');
+    }
+  } else if (sub2 === 'down') {
+    print('Stopping project_web_1   ... done');
+    print('Stopping project_cache_1 ... done');
+    print('Stopping project_db_1    ... done');
+    print('Removing project_web_1   ... done');
+    print('Removing project_cache_1 ... done');
+    print('Removing project_db_1    ... done');
+    print('Removing network project_default');
+  } else if (sub2 === 'ps') {
+    print(pad('NAME',26) + pad('SERVICE',12) + pad('STATUS',14) + 'PORTS', 'line-header');
+    print(pad('project_web_1',26) + pad('web',12) + pad('running',14) + '0.0.0.0:3000->3000/tcp');
+    print(pad('project_db_1',26) + pad('db',12) + pad('running',14) + '5432/tcp');
+    print(pad('project_cache_1',26) + pad('cache',12) + pad('running',14) + '6379/tcp');
+  } else if (sub2 === 'logs') {
+    print('project_db_1    | 2024-01-15 08:23:11 UTC [1] LOG: database system is ready');
+    print('project_web_1   | Server listening on port 3000');
+    print('project_cache_1 | Ready to accept connections');
+  } else if (sub2 === 'build') {
+    print('Building web');
+    print('Sending build context to Docker daemon  14.34kB');
+    print('Step 1/7 : FROM node:18-alpine');
+    print('Step 7/7 : CMD ["node","app.js"]');
+    print('Successfully built e5f6a1b2c3d5', 'line-success');
+  } else if (sub2 === 'exec') {
+    print('Running in compose service...');
+  } else {
+    print('Usage: docker compose [up|down|ps|logs|build|exec]', 'line-err');
+  }
+}
+
+function cmdLogin(args) {
+  const registry = args[0] || 'registry-1.docker.io';
+  print(`Authenticating with existing credentials...`);
+  print(`Login Succeeded`, 'line-success');
+  print(`Logged in as: devopsbuddy`);
+}
+
+function cmdScan(args) {
+  const img = args[0];
+  if (!img) { print('Usage: docker scan IMAGE', 'line-err'); return; }
+  print(`Testing ${img}...`);
+  blank();
+  print('Organization:      docker-desktop-test');
+  print('Package manager:   apk');
+  print('Project name:      docker-image|' + img);
+  print('Docker image:      ' + img);
+  blank();
+  print('✓ Tested 37 dependencies for known vulnerabilities, found 2 issues.', 'line-header');
+  blank();
+  print('Issues with no direct upgrade or patch:');
+  print('  ✗ Use after free [Medium Severity]', 'line-err');
+  print('    https://snyk.io/vuln/SNYK-ALPINE318-BUSYBOX-6021396');
+  print('    introduced by busybox@1.36.1-r2');
+  blank();
+  print('Tip: Run docker scan --file path/to/Dockerfile IMAGE to get more details', 'line-comment');
+}
+
+function showHelp() {
+  print('Usage:  docker [OPTIONS] COMMAND', 'line-header');
+  blank();
+  print('Management Commands:', 'line-section');
+  [
+    ['  container', 'Manage containers'],
+    ['  image',     'Manage images'],
+    ['  network',   'Manage networks'],
+    ['  system',    'Manage Docker'],
+    ['  volume',    'Manage volumes'],
+  ].forEach(([c,d]) => print(pad(c,18)+d));
+  blank();
+  print('Common Commands:', 'line-section');
+  [
+    ['  run',     'Create and run a new container from an image'],
+    ['  exec',    'Execute a command in a running container'],
+    ['  ps',      'List containers'],
+    ['  build',   'Build an image from a Dockerfile'],
+    ['  pull',    'Download an image from a registry'],
+    ['  push',    'Upload an image to a registry'],
+    ['  images',  'List images'],
+    ['  login',   'Log in to a registry'],
+    ['  logout',  'Log out from a registry'],
+    ['  search',  'Search Docker Hub for images'],
+    ['  version', 'Show the Docker version information'],
+    ['  info',    'Display system-wide information'],
+    ['  stats',   'Display a live stream of container resource usage'],
+    ['  logs',    'Fetch the logs of a container'],
+    ['  stop',    'Stop one or more running containers'],
+    ['  rm',      'Remove one or more containers'],
+    ['  rmi',     'Remove one or more images'],
+    ['  tag',     'Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE'],
+    ['  compose', 'Docker Compose (up, down, ps, logs, build)'],
+  ].forEach(([c,d]) => print(pad(c,14)+d));
+  blank();
+  print("Run 'docker COMMAND --help' for more information on a command.", 'line-comment');
+}
+
+function clearTerminal() {
+  out.innerHTML = '';
+  renderWelcome();
+}
+
+/* ═══════════════════════════════════════════════════
+   WELCOME BANNER
+═══════════════════════════════════════════════════ */
+function renderWelcome() {
+  const banner = document.createElement('div');
+  banner.className = 'welcome-banner';
+  banner.innerHTML = `
+    <pre class="whale-art">    ____             __             
+   / __ \\____  _____/ /_____  _____
+  / / / / __ \\/ ___/ //_/ _ \\/ ___/
+ / /_/ / /_/ / /__/ ,< /  __/ /    
+/_____/\\____/\\___/_/|_|\\___/_/     </pre>
+    <div class="banner-title">Docker CLI Simulator — Module 08</div>
+    <div class="banner-sub">A fully interactive terminal. All state is live — run containers, pull images, create networks.</div>
+    <div class="banner-hint">→ Type a command below, click the sidebar, or hit "▶ full demo" to see everything in action.</div>
+  `;
+  out.appendChild(banner);
+  blank();
+  print('Type  help  to see all available commands', 'line-comment');
+  print('Tip:  Try running:  docker run -d -p 8080:80 --name web nginx:alpine', 'line-comment');
+  blank();
+}
+
+/* ═══════════════════════════════════════════════════
+   FULL DEMO
+═══════════════════════════════════════════════════ */
+async function runFullDemo() {
+  clearTerminal();
+  const steps = [
+    ['docker pull redis:7-alpine', 800],
+    ['docker images', 600],
+    ['docker network create app-net', 600],
+    ['docker volume create db-data', 600],
+    ['docker run -d -p 8080:80 --name web nginx:alpine', 700],
+    ['docker run -d -p 5432:5432 --name db -v db-data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=secret --network app-net postgres:15-alpine', 900],
+    ['docker run -d --name cache --network app-net redis:7-alpine', 700],
+    ['docker ps', 600],
+    ['docker stats', 600],
+    ['docker logs web', 600],
+    ['docker network ls', 500],
+    ['docker volume ls', 500],
+    ['docker system df', 600],
+  ];
+
+  for (const [cmd, delay] of steps) {
+    await sleep(delay);
+    execCmd(cmd);
+    scrollDown();
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ═══════════════════════════════════════════════════
+   INPUT HANDLING
+═══════════════════════════════════════════════════ */
+function submitCommand() {
+  const input = document.getElementById('cmd-input');
+  const val = input.value.trim();
+  if (!val) return;
+  cmdHistory.unshift(val);
+  histIdx = -1;
+  input.value = '';
+  execCmd(val);
+}
+
+function fillCmd(cmd) {
+  const input = document.getElementById('cmd-input');
+  input.value = cmd;
+  input.focus();
+  // Highlight sidebar
+  document.querySelectorAll('.cmd-item').forEach(el => el.classList.remove('active'));
+  // find match
+  document.querySelectorAll('.cmd-item').forEach(el => {
+    if (el.getAttribute('onclick')?.includes(cmd.replace(/'/g,'"'))) {
+      el.classList.add('active');
+    }
+  });
+}
+
+function runQuick(cmd) {
+  const input = document.getElementById('cmd-input');
+  input.value = cmd;
+  submitCommand();
+}
+
+function showCheatsheet() {
+  clearTerminal();
+  print('DOCKER CHEATSHEET', 'line-section');
+  blank();
+  print('── IMAGES ─────────────────────────────────────────────', 'line-comment');
+  print('docker pull IMAGE[:TAG]              download image from registry');
+  print('docker images                        list all local images');
+  print('docker build -t NAME:TAG .           build image from Dockerfile in .');
+  print('docker rmi IMAGE                     remove image');
+  print('docker tag SRC DEST                  create alias for image');
+  print('docker push NAME[:TAG]               upload to registry');
+  print('docker history IMAGE                 show layer history');
+  blank();
+  print('── CONTAINERS ──────────────────────────────────────────', 'line-comment');
+  print('docker run -d -p HOST:CONT IMAGE     run in background, map port');
+  print('docker run --name NAME IMAGE         run with a name');
+  print('docker run -e VAR=val IMAGE          pass environment variable');
+  print('docker run -v vol:/path IMAGE        mount a volume');
+  print('docker run --network NET IMAGE       attach to network');
+  print('docker ps                            list running containers');
+  print('docker ps -a                         list all containers');
+  print('docker stop NAME                     stop container');
+  print('docker start NAME                    start stopped container');
+  print('docker rm NAME                       remove container');
+  print('docker rm -f NAME                    force remove (even running)');
+  print('docker logs -f NAME                  follow container logs');
+  print('docker exec -it NAME sh              interactive shell inside');
+  print('docker inspect NAME                  JSON details about container');
+  print('docker stats                         live resource usage');
+  blank();
+  print('── NETWORKS ────────────────────────────────────────────', 'line-comment');
+  print('docker network ls                    list networks');
+  print('docker network create NAME           create bridge network');
+  print('docker network rm NAME               remove network');
+  blank();
+  print('── VOLUMES ─────────────────────────────────────────────', 'line-comment');
+  print('docker volume ls                     list volumes');
+  print('docker volume create NAME            create named volume');
+  print('docker volume rm NAME                remove volume');
+  print('docker volume inspect NAME           show volume details');
+  blank();
+  print('── SYSTEM ──────────────────────────────────────────────', 'line-comment');
+  print('docker system df                     disk usage breakdown');
+  print('docker system prune                  remove all stopped containers');
+  print('docker info                          system-wide info');
+  print('docker version                       client + daemon versions');
+  blank();
+  print('── COMPOSE ─────────────────────────────────────────────', 'line-comment');
+  print('docker compose up -d                 start all services detached');
+  print('docker compose down                  stop and remove containers');
+  print('docker compose ps                    list compose services');
+  print('docker compose logs -f               follow all service logs');
+  print('docker compose build                 rebuild images');
+  blank();
+  print('── DOCKERFILE QUICK REF ────────────────────────────────', 'line-comment');
+  print('FROM image:tag            base image');
+  print('WORKDIR /path             set working directory');
+  print('COPY src dest             copy from host to image');
+  print('RUN command               execute at build time');
+  print('ENV KEY=value             set environment variable');
+  print('EXPOSE port               document the port (informational)');
+  print('CMD ["exec","arg"]        default command at runtime');
+  print('ENTRYPOINT ["exec"]       override with CMD args');
+  blank();
+  print('Type any command to return to the terminal.', 'line-comment');
+  scrollDown();
+}
+
+/* ─── keyboard ─── */
+document.getElementById('cmd-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { submitCommand(); return; }
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (histIdx < cmdHistory.length-1) { histIdx++; this.value = cmdHistory[histIdx]; }
+    return;
+  }
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (histIdx > 0) { histIdx--; this.value = cmdHistory[histIdx]; }
+    else { histIdx = -1; this.value = ''; }
+    return;
+  }
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const val = this.value;
+    const cmds = ['docker run','docker ps','docker ps -a','docker stop','docker start','docker rm','docker rmi','docker build','docker pull','docker push','docker images','docker logs','docker exec','docker inspect','docker stats','docker network ls','docker network create','docker volume ls','docker volume create','docker volume inspect','docker system df','docker system prune','docker compose up','docker compose down','docker compose ps','docker info','docker version','clear','help'];
+    const match = cmds.find(c => c.startsWith(val) && c !== val);
+    if (match) this.value = match;
+    return;
+  }
+  if (e.ctrlKey && e.key === 'l') { e.preventDefault(); clearTerminal(); }
+});
+
+document.querySelectorAll('.tab').forEach((tab, i) => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    if (i === 1) showCheatsheet();
+    else { clearTerminal(); }
+  });
+});
+
+/* ─── boot ─── */
+renderWelcome();
+updateStatePanel();
+document.getElementById('cmd-input').focus();
+</script>
+</body>
+</html>

@@ -282,6 +282,100 @@ docs/</div></div>
 <span class="cmd">trivy image --exit-code 1 --severity HIGH,CRITICAL my-node-app:1.0</span></div></div>
 </div>
 
+<div class="section">
+<h3 class="section-title">🖥️ Interactive — Docker CLI Simulator</h3>
+<p>Run real Docker commands in a live simulated environment. State is tracked — containers, images, volumes and networks all update as you run commands. Use the sidebar to explore commands or type freely below.</p>
+<div style="margin-top:16px;border-radius:10px;overflow:hidden;border:1px solid #30363d">
+<iframe src="docker-terminal.html" style="width:100%;height:680px;border:none;display:block"></iframe>
+</div>
+</div>
+
+<div class="section">
+<h3 class="section-title">📦 Interactive — Docker Layer Visualiser</h3>
+<p>See exactly how each Dockerfile instruction creates a layer, what it costs in image size, and — critically — which layers get <strong>cached</strong> vs <strong>rebuilt</strong> when your code changes. Switch between scenarios and hit "simulate code change" to see caching in action.</p>
+<div style="margin-top:16px;padding:16px;background:#0d1117;border-radius:10px;border:1px solid #30363d">
+<!-- Layer Visualiser -->
+<style>
+.lv-root{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 0;color:#c9d1d9;font-family:ui-sans-serif,system-ui,sans-serif}
+.lv-col-head{font-size:11px;font-weight:500;color:#6e7681;letter-spacing:.05em;padding:0 0 8px;display:flex;align-items:center;justify-content:space-between}
+.lv-df-editor{width:100%;background:#161b22;border:0.5px solid #30363d;border-radius:6px;padding:10px 12px;font-family:ui-monospace,monospace;font-size:12px;line-height:1.9;color:#c9d1d9;resize:none;outline:none;min-height:280px}
+.lv-df-editor:focus{border-color:#58a6ff}
+.lv-btn-row{display:flex;gap:6px;margin-top:8px}
+.lv-btn{font-size:11px;padding:5px 12px;border:0.5px solid #30363d;border-radius:6px;background:transparent;cursor:pointer;color:#c9d1d9;transition:background .12s}
+.lv-btn:hover{background:#161b22}
+.lv-btn-primary{background:#1c3a5e;color:#58a6ff;border-color:#1f4a7a}
+.lv-btn-primary:hover{opacity:.85}
+.lv-layer{border-radius:6px;margin-bottom:3px;overflow:hidden;border:0.5px solid transparent;transition:all .25s ease;cursor:pointer}
+.lv-layer:hover{filter:brightness(1.1)}
+.lv-layer-inner{display:flex;align-items:center;gap:8px;padding:7px 10px}
+.lv-num{font-size:10px;color:#6e7681;min-width:16px;font-family:ui-monospace,monospace;flex-shrink:0}
+.lv-kw{font-family:ui-monospace,monospace;font-size:11px;font-weight:500;min-width:76px;flex-shrink:0}
+.lv-val{font-family:ui-monospace,monospace;font-size:11px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#8b949e}
+.lv-size{font-size:10px;min-width:40px;text-align:right;font-family:ui-monospace,monospace;flex-shrink:0}
+.lv-cache{font-size:9px;font-weight:600;padding:2px 5px;border-radius:3px;flex-shrink:0;letter-spacing:.03em}
+.lv-hit{background:#1a3a1a;color:#3fb950}
+.lv-miss{background:#3a1a1a;color:#f85149}
+.lv-meta{background:#2a2a1a;color:#e3b341}
+.lv-bar-wrap{height:3px;background:#21262d;border-radius:2px;margin:0 10px 5px}
+.lv-bar{height:100%;border-radius:2px;transition:width .4s ease}
+.lv-total{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-top:1px solid #21262d;margin-top:4px}
+.lv-detail{background:#161b22;border:0.5px solid #30363d;border-radius:6px;padding:10px 12px;margin-top:10px;font-size:12px;line-height:1.6;color:#8b949e;min-height:58px}
+.lv-scenario-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.lv-sbtn{font-size:11px;padding:4px 10px;border:0.5px solid #30363d;border-radius:20px;background:transparent;cursor:pointer;color:#8b949e;transition:all .12s;white-space:nowrap}
+.lv-sbtn:hover{background:#161b22}
+.lv-sbtn.lv-active{border-color:#1f4a7a;background:#1c3a5e;color:#58a6ff}
+.lv-legend{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+.lv-li{display:flex;align-items:center;gap:5px;font-size:10px;color:#6e7681}
+.lv-ld{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+</style>
+
+<div class="lv-scenario-row" id="lv-scenario-row"></div>
+
+<div class="lv-root">
+  <div>
+    <div class="lv-col-head"><span>dockerfile</span><span style="font-size:10px;font-weight:400">edit to update</span></div>
+    <textarea class="lv-df-editor" id="lv-input" spellcheck="false"></textarea>
+    <div class="lv-btn-row">
+      <button class="lv-btn lv-btn-primary" onclick="lvBuild()">▶ build</button>
+      <button class="lv-btn" onclick="lvSimChange()">simulate code change</button>
+    </div>
+    <div class="lv-legend">
+      <div class="lv-li"><span class="lv-cache lv-hit">CACHED</span>layer reused</div>
+      <div class="lv-li"><span class="lv-cache lv-miss">REBUILT</span>invalidated</div>
+      <div class="lv-li"><span class="lv-cache lv-meta">0B</span>metadata only</div>
+    </div>
+  </div>
+  <div>
+    <div class="lv-col-head"><span>image layers</span><span id="lv-summary" style="font-size:10px;font-weight:400"></span></div>
+    <div id="lv-wrap"><div style="font-size:12px;color:#6e7681;padding:40px 0;text-align:center">click build to visualise layers</div></div>
+    <div class="lv-detail" id="lv-detail">click a layer to learn what it does</div>
+  </div>
+</div>
+
+<script>
+(function(){
+const SC=[{label:'bad order (slow)',df:`FROM node:18-alpine\nCOPY . .\nRUN npm install\nEXPOSE 3000\nCMD ["node", "app.js"]`},{label:'good order (fast)',df:`FROM node:18-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nCOPY . .\nEXPOSE 3000\nCMD ["node", "app.js"]`},{label:'multi-stage',df:`FROM node:18-alpine AS builder\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nCOPY . .\nRUN npm run build\n\nFROM node:18-alpine\nWORKDIR /app\nCOPY --from=builder /app/dist ./dist\nEXPOSE 3000\nCMD ["node", "dist/app.js"]`},{label:'python app',df:`FROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install -r requirements.txt\nCOPY . .\nEXPOSE 8000\nCMD ["python", "app.py"]`}];
+const LM={FROM:{c:'#B5D4F4',kc:'#4a9eda',sz:[0],cache:'meta',ex:'Sets the base image. Use slim/alpine variants to keep image size small. Cached after first pull.'},WORKDIR:{c:'#CECBF6',kc:'#9a8eda',sz:[0],cache:'meta',ex:'Creates and sets the working directory. All following instructions run relative to this. Zero bytes — pure metadata.'},COPY:{c:'#C0DD97',kc:'#7ab03a',sz:[2,80,200],cache:'cond',ex:(v)=>v.includes('package')||v.includes('requirements')?'Copies dependency manifest only — not source code. Key caching trick: npm install only re-runs when this file changes, not on every code edit.':'Copies source code — changes on every edit. Placed AFTER install so the expensive install layer stays cached.'},RUN:{c:'#F5C4B3',kc:'#e07050',sz:[40,180,300],cache:'cond',ex:(v)=>v.includes('install')?'Most expensive layer. With correct COPY ordering, Docker caches this and skips it unless package.json changed — saves minutes per build.':'Executes a build command. Creates a layer with any filesystem changes. Chain commands with && to minimise layer count.'},ENV:{c:'#EEEDFE',kc:'#9a8eda',sz:[0],cache:'meta',ex:'Bakes an env var into the image. Never use for secrets — anyone with the image can read it with docker history.'},EXPOSE:{c:'#9FE1CB',kc:'#3ab090',sz:[0],cache:'meta',ex:'Documents which port the container listens on. Informational only — does not publish the port. Use -p in docker run.'},CMD:{c:'#D3D1C7',kc:'#888',sz:[0],cache:'meta',ex:'Default command when the container starts. Only the last CMD is used. Overridable with docker run IMAGE mycommand.'},USER:{c:'#F7C1C1',kc:'#c05050',sz:[0],cache:'meta',ex:'Switches to non-root user. Critical for production — running as root is a major security risk.'},ARG:{c:'#FBEAF0',kc:'#d07090',sz:[0],cache:'meta',ex:'Build-time variable. Unlike ENV, does not persist in the final image. Safe for build config, never for secrets.'},ENTRYPOINT:{c:'#D3D1C7',kc:'#888',sz:[0],cache:'meta',ex:'Makes container behave like an executable. CMD args are appended to this.'}};
+let lvState={layers:[],changed:false};
+function lvParse(t){const r=[];let s=0;t.split('\n').map(l=>l.trim()).filter(l=>l&&!l.startsWith('#')).forEach((line,i)=>{const sp=line.indexOf(' ');const kw=(sp===-1?line:line.slice(0,sp)).toUpperCase();const val=sp===-1?'':line.slice(sp+1).trim();if(kw==='FROM')s++;r.push({kw,val,si:s-1});});return r;}
+function lvSz(kw,val,i){const m=LM[kw]||{sz:[0]};const p=m.sz;const b=p[i%p.length];return b+Math.floor(Math.sin(i*2.3)*b*.15);}
+function lvBuild(changed){const t=document.getElementById('lv-input').value;lvState={layers:lvParse(t),changed:!!changed};lvRender();}
+function lvRender(){const wrap=document.getElementById('lv-wrap');wrap.innerHTML='';const {layers,changed}=lvState;if(!layers.length)return;let total=0,maxSz=0,hit=0,miss=0;const sizes=layers.map((l,i)=>{const s=lvSz(l.kw,l.val,i);total+=s;if(s>maxSz)maxSz=s;return s;});let inv=false;layers.forEach((l,i)=>{const meta=LM[l.kw]||{c:'#888',kc:'#888',sz:[0],cache:'cond'};const sz=sizes[i];let status='hit';if(meta.cache==='meta'){status='meta';}else if(!inv){if(changed&&l.kw==='COPY'&&!l.val.includes('package')&&!l.val.includes('requirements')){inv=true;status='miss';}else{status='hit';}}else{status='miss';}
+if(status==='hit')hit++;if(status==='miss')miss++;
+const bw=maxSz>0?Math.max(4,Math.round(sz/maxSz*100)):0;const el=document.createElement('div');el.className='lv-layer';el.style.background=meta.c+'22';el.style.borderColor=meta.c+'66';const badge=status==='hit'?'<span class="lv-cache lv-hit">CACHED</span>':status==='miss'?'<span class="lv-cache lv-miss">REBUILT</span>':'<span class="lv-cache lv-meta">META</span>';el.innerHTML=`<div class="lv-layer-inner"><span class="lv-num">${i+1}</span><span class="lv-kw" style="color:${meta.kc}">${l.kw}</span><span class="lv-val">${l.val.replace(/</g,'&lt;')}</span><span class="lv-size" style="color:${meta.kc}">${sz===0?'0B':sz+'MB'}</span>${badge}</div>${sz>0?`<div class="lv-bar-wrap"><div class="lv-bar" style="width:${bw}%;background:${meta.c}"></div></div>`:''}`;
+el.addEventListener('click',()=>{document.querySelectorAll('.lv-layer').forEach((e,j)=>{e.style.outline=j===i?`2px solid ${meta.c}`:'none';});const ex=typeof meta.ex==='function'?meta.ex(l.val):meta.ex;document.getElementById('lv-detail').innerHTML=`<strong style="color:#c9d1d9">${l.kw} ${l.val.replace(/</g,'&lt;')}</strong><br>${ex}`;});wrap.appendChild(el);});
+const tot=document.createElement('div');tot.className='lv-total';const ms=layers.filter(l=>l.kw==='FROM').length>1;const saved=ms?Math.round(total*.55):0;tot.innerHTML=`<span style="font-size:11px;color:#6e7681">${ms?'final stage':'total image'}</span><span style="font-size:15px;font-weight:500;font-family:ui-monospace,monospace;color:#c9d1d9">${total-saved}MB${ms?` <span style="font-size:11px;color:#3fb950">(-${saved}MB build tools)</span>`:''}</span>`;wrap.appendChild(tot);
+const sum=document.getElementById('lv-summary');if(changed){sum.textContent=`${hit} cached · ${miss} rebuilt`;sum.style.color=miss>0?'#e3b341':'#3fb950';}else{sum.textContent=`${layers.length} layers`;sum.style.color='';}}
+function lvSimChange(){lvBuild(true);document.getElementById('lv-detail').innerHTML='<strong style="color:#c9d1d9">simulating a code change</strong><br>Notice which layers are REBUILT. In "good order": only the last COPY and CMD rebuild. In "bad order": npm install runs from scratch every time — even for a one-line code change.';}
+function lvSetScenario(i){document.querySelectorAll('.lv-sbtn').forEach((b,j)=>b.classList.toggle('lv-active',j===i));document.getElementById('lv-input').value=SC[i].df;lvBuild(false);document.getElementById('lv-detail').textContent='click a layer to learn what it does';}
+document.getElementById('lv-input').addEventListener('input',()=>lvBuild(false));
+const row=document.getElementById('lv-scenario-row');SC.forEach((s,i)=>{const b=document.createElement('button');b.className='lv-sbtn'+(i===1?' lv-active':'');b.textContent=s.label;b.onclick=()=>lvSetScenario(i);row.appendChild(b);});
+lvSetScenario(1);
+})();
+</script>
+</div>
+</div>
+
 <div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Full Stack App with Docker Compose</div>
 <p>Build a complete 3-tier app:</p>
 <ol class="steps">
