@@ -36,20 +36,33 @@ async function loadModule(id) {
     return html;
   } catch (err) {
     console.error(err);
-    return `<p style="color:var(--accent2)">⚠️ Could not load module "${id}". Please check the file exists in /modules/.</p>`;
+    return `<p style="color:var(--accent2)">Could not load module "${id}". Check the file exists in /modules/.</p>`;
   }
 }
 
 /**
+ * Re-execute <script> tags injected via innerHTML.
+ * Browsers silently ignore scripts set via innerHTML — this fixes that.
+ */
+function runInjectedScripts(container) {
+  container.querySelectorAll('script').forEach(oldScript => {
+    const newScript = document.createElement('script');
+    Array.from(oldScript.attributes).forEach(attr =>
+      newScript.setAttribute(attr.name, attr.value)
+    );
+    newScript.textContent = oldScript.textContent;
+    oldScript.parentNode.replaceChild(newScript, oldScript);
+  });
+}
+
+/**
  * Show a module by ID
- * Fetches HTML from /modules/{id}.html and injects into #mod-home container
+ * Fetches HTML from /modules/{id}.html and injects into the main container
  */
 async function showModule(id) {
-  // Get or create the section for this module
   let section = document.getElementById('mod-' + id);
 
   if (!section) {
-    // Create a new section for this module
     section = document.createElement('section');
     section.className = 'module';
     section.id = 'mod-' + id;
@@ -61,6 +74,10 @@ async function showModule(id) {
     section.innerHTML = '<p style="padding:40px;color:var(--muted)">Loading...</p>';
     const html = await loadModule(id);
     section.innerHTML = html;
+
+    // Re-run any scripts that were injected (innerHTML drops them silently)
+    runInjectedScripts(section);
+
     section.dataset.loaded = 'true';
   }
 
@@ -107,13 +124,11 @@ function toggleSidebar() {
 
 // ─── Init ───────────────────────────────────────
 
-// Load module from URL hash on page load (e.g. devopsbuddy.in/#docker)
 window.addEventListener('DOMContentLoaded', () => {
   const hash = window.location.hash.replace('#', '') || 'home';
   showModule(hash);
 });
 
-// Handle browser back/forward
 window.addEventListener('popstate', (e) => {
   const id = e.state?.module || 'home';
   showModule(id);
