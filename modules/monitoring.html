@@ -76,6 +76,138 @@
 <span class="comment"># Grafana: http://localhost:3000 (admin/admin)</span>
 <span class="comment"># Import dashboard ID 1860 from grafana.com for Node Exporter Full 🎉</span></div></div>
 </div>
+<!-- ── INTERACTIVE MONITORING DASHBOARD ──────────── -->
+<div class="section">
+<h3 class="section-title">🖥️ Interactive — Live Prometheus & Grafana Dashboard</h3>
+<p>A real-time simulated monitoring dashboard. Metrics update every 2 seconds. Set alert thresholds, trigger incidents, and watch how Prometheus fires alerts into Grafana.</p>
+<div style="margin-top:16px;border-radius:10px;overflow:hidden;border:1px solid #30363d">
+<style>
+#mon-sim{--bg:#0d1117;--sur:#161b22;--sur2:#1c2128;--bdr:#30363d;--grn:#3fb950;--blu:#58a6ff;--yel:#e3b341;--red:#f85149;--cyn:#39c5cf;--pur:#bc8cff;--mut:#6e7681;--txt:#c9d1d9;--wht:#f0f6fc;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--txt);}
+#mon-sim *{box-sizing:border-box;margin:0;padding:0;}
+#mon-sim .m-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--sur);border-bottom:1px solid var(--bdr);}
+#mon-sim .m-title{font-size:14px;font-weight:600;color:var(--wht);}
+#mon-sim .m-sub{font-size:11px;color:var(--mut);margin-top:1px;}
+#mon-sim .m-body{padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+#mon-sim .m-body-full{padding:0 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+#mon-sim .card{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:12px;}
+#mon-sim .card.alert{border-color:var(--red);background:rgba(248,81,73,0.06);}
+#mon-sim .card.warn{border-color:var(--yel);background:rgba(227,179,65,0.06);}
+#mon-sim .card-title{font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+#mon-sim .metric-val{font-size:28px;font-weight:700;font-family:'DM Mono',monospace;line-height:1;}
+#mon-sim .metric-unit{font-size:12px;color:var(--mut);margin-left:3px;}
+#mon-sim .metric-sub{font-size:10px;color:var(--mut);margin-top:4px;}
+#mon-sim .sparkline{width:100%;height:48px;margin-top:10px;}
+#mon-sim .m-controls{padding:0 16px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+#mon-sim .m-btn{padding:5px 12px;border-radius:5px;border:none;font-size:11px;font-weight:600;cursor:pointer;transition:opacity .12s;font-family:'DM Mono',monospace;}
+#mon-sim .m-btn:hover{opacity:.85;}
+#mon-sim .m-btn.spike{background:var(--red);color:#fff;}
+#mon-sim .m-btn.mem{background:var(--yel);color:#000;}
+#mon-sim .m-btn.err{background:var(--pur);color:#fff;}
+#mon-sim .m-btn.norm{background:var(--grn);color:#000;}
+#mon-sim .m-btn.tog{background:var(--sur2);color:var(--txt);border:1px solid var(--bdr);}
+#mon-sim .alert-box{margin:0 16px 12px;background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.4);border-radius:6px;padding:8px 12px;font-size:11px;font-family:'DM Mono',monospace;display:none;}
+#mon-sim .alert-box.show{display:block;}
+#mon-sim .alert-row{display:flex;align-items:center;gap:8px;padding:2px 0;}
+#mon-sim .alert-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:blink-a .8s step-start infinite;flex-shrink:0;}
+@keyframes blink-a{0%,100%{opacity:1}50%{opacity:0}}
+#mon-sim .thresh-row{display:flex;align-items:center;gap:8px;font-size:11px;}
+#mon-sim .thresh-row input{background:var(--bg);border:1px solid var(--bdr);border-radius:4px;color:var(--cyn);font-family:'DM Mono',monospace;font-size:11px;padding:3px 6px;width:54px;outline:none;}
+#mon-sim .prom-panel{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:12px;}
+#mon-sim .prom-query{display:flex;gap:6px;margin-bottom:8px;}
+#mon-sim .prom-input{flex:1;background:var(--bg);border:1px solid var(--bdr);border-radius:4px;color:var(--cyn);font-family:'DM Mono',monospace;font-size:12px;padding:5px 8px;outline:none;}
+#mon-sim .prom-input:focus{border-color:var(--cyn);}
+#mon-sim .prom-result{background:var(--bg);border-radius:4px;padding:8px;font-family:'DM Mono',monospace;font-size:11px;min-height:60px;color:var(--grn);line-height:1.7;}
+#mon-sim .status-row{display:flex;gap:12px;padding:8px 16px;background:var(--sur);border-top:1px solid var(--bdr);font-size:10px;font-family:'DM Mono',monospace;align-items:center;}
+#mon-sim .s-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+</style>
+<div id="mon-sim">
+<div class="m-hdr">
+  <div><div class="m-title">📊 Grafana — Node Metrics Dashboard</div><div class="m-sub">prometheus scrape interval: 2s · target: localhost:9100 (node_exporter)</div></div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span id="mon-time" style="font-size:11px;color:var(--mut);font-family:DM Mono,monospace;"></span>
+    <span style="width:7px;height:7px;border-radius:50%;background:var(--grn);display:inline-block;box-shadow:0 0 4px var(--grn)"></span>
+  </div>
+</div>
+
+<!-- Alert banner -->
+<div class="alert-box" id="mon-alert">
+  <div style="font-weight:600;color:var(--red);margin-bottom:4px;">🔥 FIRING ALERTS</div>
+  <div id="mon-alert-rows"></div>
+</div>
+
+<!-- Metric cards -->
+<div class="m-body">
+  <div class="card" id="cpu-card">
+    <div class="card-title">CPU Usage · node_cpu_seconds_total</div>
+    <div><span class="metric-val" id="cpu-val">0</span><span class="metric-unit">%</span></div>
+    <div class="metric-sub" id="cpu-status">Threshold: <span id="cpu-thresh-disp">80</span>%</div>
+    <svg class="sparkline" id="cpu-spark" viewBox="0 0 200 48" preserveAspectRatio="none"><polyline id="cpu-line" fill="none" stroke="var(--grn)" stroke-width="1.5" points=""/></svg>
+  </div>
+  <div class="card" id="mem-card">
+    <div class="card-title">Memory Usage · node_memory_MemAvailable</div>
+    <div><span class="metric-val" id="mem-val">0</span><span class="metric-unit">%</span></div>
+    <div class="metric-sub" id="mem-status">Threshold: <span id="mem-thresh-disp">85</span>%</div>
+    <svg class="sparkline" id="mem-spark" viewBox="0 0 200 48" preserveAspectRatio="none"><polyline id="mem-line" fill="none" stroke="var(--blu)" stroke-width="1.5" points=""/></svg>
+  </div>
+  <div class="card" id="err-card">
+    <div class="card-title">HTTP Error Rate · http_requests_total</div>
+    <div><span class="metric-val" id="err-val">0</span><span class="metric-unit">%</span></div>
+    <div class="metric-sub" id="err-status">Threshold: <span id="err-thresh-disp">5</span>%</div>
+    <svg class="sparkline" id="err-spark" viewBox="0 0 200 48" preserveAspectRatio="none"><polyline id="err-line" fill="none" stroke="var(--pur)" stroke-width="1.5" points=""/></svg>
+  </div>
+</div>
+
+<!-- Second row -->
+<div class="m-body-full">
+  <div class="card">
+    <div class="card-title">Request Rate · rate(http_requests_total[1m])</div>
+    <div><span class="metric-val" id="req-val">0</span><span class="metric-unit">req/s</span></div>
+    <div class="metric-sub">p99 latency: <span id="lat-val">0</span>ms</div>
+    <svg class="sparkline" id="req-spark" viewBox="0 0 200 48" preserveAspectRatio="none"><polyline id="req-line" fill="none" stroke="var(--cyn)" stroke-width="1.5" points=""/></svg>
+  </div>
+  <!-- Prometheus query panel -->
+  <div class="prom-panel">
+    <div class="card-title">Prometheus Query (PromQL)</div>
+    <div class="prom-query">
+      <input class="prom-input" id="prom-q" value="node_cpu_usage_percent" placeholder="PromQL expression">
+      <button class="m-btn tog" onclick="monRunQuery()">▶ Execute</button>
+    </div>
+    <div class="prom-result" id="prom-result">Click Execute to run a query...</div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+      <button class="m-btn tog" style="font-size:10px" onclick="monSetQ('node_cpu_usage_percent')">cpu</button>
+      <button class="m-btn tog" style="font-size:10px" onclick="monSetQ('node_memory_usage_percent')">memory</button>
+      <button class="m-btn tog" style="font-size:10px" onclick="monSetQ('rate(http_requests_total[1m])')">req rate</button>
+      <button class="m-btn tog" style="font-size:10px" onclick="monSetQ('http_error_rate_percent')">error rate</button>
+      <button class="m-btn tog" style="font-size:10px" onclick="monSetQ('up{job=\"node_exporter\"}')">up</button>
+    </div>
+  </div>
+</div>
+
+<!-- Controls -->
+<div class="m-controls">
+  <span style="font-size:10px;color:var(--mut)">Simulate:</span>
+  <button class="m-btn spike" onclick="monSpike()">🔥 CPU spike</button>
+  <button class="m-btn mem" onclick="monMemLeak()">💾 Memory leak</button>
+  <button class="m-btn err" onclick="monErrSpike()">🚨 Error spike</button>
+  <button class="m-btn norm" onclick="monNormalise()">✅ Normalise</button>
+  <div style="margin-left:auto;display:flex;gap:12px;flex-wrap:wrap;">
+    <div class="thresh-row"><span style="color:var(--mut)">CPU alert &gt;</span><input id="cpu-thresh" type="number" value="80" min="1" max="100" onchange="monUpdateThresh()">%</div>
+    <div class="thresh-row"><span style="color:var(--mut)">Mem alert &gt;</span><input id="mem-thresh" type="number" value="85" min="1" max="100" onchange="monUpdateThresh()">%</div>
+    <div class="thresh-row"><span style="color:var(--mut)">Err alert &gt;</span><input id="err-thresh" type="number" value="5" min="0" max="100" onchange="monUpdateThresh()">%</div>
+  </div>
+</div>
+
+<div class="status-row">
+  <div class="s-dot" style="background:var(--grn)"></div><span style="color:var(--grn)">Prometheus</span>
+  <div class="s-dot" style="background:var(--grn)"></div><span style="color:var(--grn)">Grafana</span>
+  <div class="s-dot" style="background:var(--grn)"></div><span style="color:var(--grn)">node_exporter :9100</span>
+  <span style="color:var(--mut);margin-left:auto">Scrape interval: 2s · Targets: 1/1 up</span>
+</div>
+</div>
+<script src="mon-sim.js"></script>
+</div>
+</div>
+
 <div class="callout callout-project"><div class="callout-label">🚀 Final Mini Project — Full Monitoring Stack</div><p>Deploy Prometheus + Grafana + Node Exporter on your EC2 server → Import the "Node Exporter Full" dashboard from Grafana.com → Set up an alert that fires on Slack when CPU usage exceeds 70% for 5 minutes.</p></div>
 <div class="section">
 <h3 class="section-title">🎓 You've Completed the DevOps Journey!</h3>

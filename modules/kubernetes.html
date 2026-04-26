@@ -363,6 +363,144 @@
         <span class="cmd">averageUtilization</span>: 70   <span class="comment"># scale up if CPU > 70%</span></div></div>
 </div>
 
+
+<!-- ── INTERACTIVE CLUSTER SIMULATOR ─────────────── -->
+<div class="section">
+<h3 class="section-title">🖥️ Interactive — Kubernetes Cluster Simulator</h3>
+<p>Deploy pods, scale deployments, kill pods and watch Kubernetes self-heal. Everything updates live — scheduler assigns pods to nodes, the control loop maintains desired state automatically.</p>
+<div style="margin-top:16px;border-radius:10px;overflow:hidden;border:1px solid #30363d">
+<style>
+#k8s-sim{--bg:#0d1117;--surface:#161b22;--surface2:#1c2128;--border:#30363d;--green:#3fb950;--blue:#58a6ff;--yellow:#e3b341;--red:#f85149;--cyan:#39c5cf;--purple:#bc8cff;--muted:#6e7681;--text:#c9d1d9;--white:#f0f6fc;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);padding:0;}
+#k8s-sim *{box-sizing:border-box;margin:0;padding:0;}
+#k8s-sim .k-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border);}
+#k8s-sim .k-title{font-size:14px;font-weight:600;color:var(--white);}
+#k8s-sim .k-subtitle{font-size:11px;color:var(--muted);margin-top:2px;}
+#k8s-sim .k-body{display:grid;grid-template-columns:220px 1fr;min-height:480px;}
+#k8s-sim .k-controls{background:var(--surface);border-right:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;}
+#k8s-sim .k-cluster{padding:16px;overflow-y:auto;}
+#k8s-sim .ctrl-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+#k8s-sim .ctrl-group{margin-bottom:4px;}
+#k8s-sim .ctrl-input{display:flex;gap:6px;align-items:center;}
+#k8s-sim .k-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:12px;padding:5px 8px;font-family:'DM Mono',monospace;outline:none;}
+#k8s-sim .k-input:focus{border-color:var(--blue);}
+#k8s-sim .k-btn{padding:5px 10px;border-radius:5px;border:none;font-size:11px;font-weight:600;cursor:pointer;transition:opacity .12s,transform .1s;white-space:nowrap;}
+#k8s-sim .k-btn:active{transform:scale(.97);}
+#k8s-sim .k-btn.primary{background:var(--green);color:#000;}
+#k8s-sim .k-btn.danger{background:var(--red);color:#fff;}
+#k8s-sim .k-btn.info{background:var(--blue);color:#000;}
+#k8s-sim .k-btn.warn{background:var(--yellow);color:#000;}
+#k8s-sim .k-btn:hover{opacity:.85;}
+#k8s-sim .divider{height:1px;background:var(--border);margin:4px 0;}
+#k8s-sim .log-box{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:10px;height:130px;overflow-y:auto;line-height:1.6;}
+#k8s-sim .log-info{color:var(--cyan);}
+#k8s-sim .log-ok{color:var(--green);}
+#k8s-sim .log-warn{color:var(--yellow);}
+#k8s-sim .log-err{color:var(--red);}
+#k8s-sim .log-muted{color:var(--muted);}
+#k8s-sim .control-plane{background:rgba(88,166,255,0.06);border:1px solid rgba(88,166,255,0.25);border-radius:8px;padding:12px;margin-bottom:12px;}
+#k8s-sim .cp-title{font-size:11px;font-weight:600;color:var(--blue);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+#k8s-sim .cp-components{display:flex;gap:6px;flex-wrap:wrap;}
+#k8s-sim .cp-comp{background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);border-radius:4px;padding:4px 8px;font-size:10px;color:var(--blue);}
+#k8s-sim .nodes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+#k8s-sim .node-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;transition:border-color .2s;}
+#k8s-sim .node-card.pressure{border-color:var(--yellow);}
+#k8s-sim .node-card.full{border-color:var(--red);}
+#k8s-sim .node-name{font-size:11px;font-weight:600;color:var(--white);margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;}
+#k8s-sim .node-stats{font-size:10px;color:var(--muted);margin-bottom:8px;}
+#k8s-sim .node-bar-wrap{height:4px;background:var(--border);border-radius:2px;margin-bottom:8px;}
+#k8s-sim .node-bar{height:4px;border-radius:2px;transition:width .4s;}
+#k8s-sim .pods-wrap{display:flex;flex-wrap:wrap;gap:4px;min-height:28px;}
+#k8s-sim .pod{width:28px;height:28px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:transform .15s,opacity .3s;position:relative;border:1px solid transparent;}
+#k8s-sim .pod:hover{transform:scale(1.15);}
+#k8s-sim .pod.running{background:rgba(63,185,80,0.15);border-color:rgba(63,185,80,0.4);}
+#k8s-sim .pod.pending{background:rgba(227,179,65,0.15);border-color:rgba(227,179,65,0.4);animation:k8s-pulse 1s ease-in-out infinite;}
+#k8s-sim .pod.terminating{background:rgba(248,81,73,0.15);border-color:rgba(248,81,73,0.4);opacity:.5;}
+#k8s-sim .pod.healing{background:rgba(63,185,80,0.08);border-color:rgba(63,185,80,0.2);animation:k8s-pulse .6s ease-in-out infinite;}
+@keyframes k8s-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+#k8s-sim .pod-tooltip{display:none;position:absolute;bottom:34px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:9px;color:var(--text);white-space:nowrap;z-index:10;}
+#k8s-sim .pod:hover .pod-tooltip{display:block;}
+#k8s-sim .deployments-section{margin-top:12px;}
+#k8s-sim .dep-title{font-size:11px;font-weight:600;color:var(--white);margin-bottom:8px;}
+#k8s-sim .dep-row{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;font-size:11px;}
+#k8s-sim .dep-name{flex:1;color:var(--cyan);font-family:'DM Mono',monospace;}
+#k8s-sim .dep-count{color:var(--green);font-family:'DM Mono',monospace;min-width:40px;}
+#k8s-sim .dep-scale{display:flex;gap:4px;align-items:center;}
+#k8s-sim .scale-btn{width:20px;height:20px;border:1px solid var(--border);border-radius:3px;background:var(--surface2);color:var(--text);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+#k8s-sim .scale-btn:hover{border-color:var(--green);color:var(--green);}
+#k8s-sim .status-bar{display:flex;gap:16px;padding:8px 20px;background:var(--surface);border-top:1px solid var(--border);font-size:11px;}
+#k8s-sim .stat{display:flex;align-items:center;gap:5px;}
+#k8s-sim .stat-dot{width:7px;height:7px;border-radius:50%;}
+#k8s-sim select.k-input{cursor:pointer;}
+</style>
+<div id="k8s-sim">
+<div class="k-header">
+  <div><div class="k-title">☸️ Kubernetes Cluster Simulator</div><div class="k-subtitle">3-node cluster · Deploy pods · Kill them · Watch self-healing</div></div>
+  <button class="k-btn warn" onclick="k8sReset()">↺ Reset</button>
+</div>
+<div class="k-body">
+  <div class="k-controls">
+    <div class="ctrl-group">
+      <div class="ctrl-label">Deploy</div>
+      <div class="ctrl-input" style="margin-bottom:6px;">
+        <input class="k-input" id="k8s-dep-name" value="my-app" placeholder="deployment name">
+      </div>
+      <div class="ctrl-input" style="margin-bottom:6px;">
+        <select class="k-input" id="k8s-dep-image">
+          <option value="nginx">nginx:alpine</option>
+          <option value="node">node:18-alpine</option>
+          <option value="redis">redis:7-alpine</option>
+          <option value="postgres">postgres:15</option>
+          <option value="python">python:3.11</option>
+        </select>
+      </div>
+      <div class="ctrl-input">
+        <input class="k-input" id="k8s-dep-replicas" type="number" value="3" min="1" max="9" style="width:60px;">
+        <span style="font-size:11px;color:var(--muted)">replicas</span>
+        <button class="k-btn primary" onclick="k8sDeploy()" style="margin-left:auto">▶ Apply</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="ctrl-group">
+      <div class="ctrl-label">Simulate</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <button class="k-btn danger" onclick="k8sKillRandom()">💀 Kill random pod</button>
+        <button class="k-btn warn" onclick="k8sNodeFailure()">⚡ Node failure</button>
+        <button class="k-btn info" onclick="k8sRollingUpdate()">🔄 Rolling update</button>
+        <button class="k-btn info" onclick="k8sHPASpike()">📈 Traffic spike (HPA)</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="ctrl-label">Control plane log</div>
+    <div class="log-box" id="k8s-log"></div>
+  </div>
+  <div class="k-cluster">
+    <div class="control-plane">
+      <div class="cp-title">🧠 Control Plane</div>
+      <div class="cp-components">
+        <div class="cp-comp">kube-apiserver</div>
+        <div class="cp-comp">etcd</div>
+        <div class="cp-comp">scheduler</div>
+        <div class="cp-comp">controller-manager</div>
+      </div>
+    </div>
+    <div class="nodes-grid" id="k8s-nodes"></div>
+    <div class="deployments-section">
+      <div class="dep-title">Deployments</div>
+      <div id="k8s-deps"><div style="font-size:11px;color:var(--muted);padding:8px 0;">No deployments yet — apply one above</div></div>
+    </div>
+  </div>
+</div>
+<div class="status-bar">
+  <div class="stat"><div class="stat-dot" style="background:var(--green)"></div><span id="k8s-stat-running">0 running</span></div>
+  <div class="stat"><div class="stat-dot" style="background:var(--yellow)"></div><span id="k8s-stat-pending">0 pending</span></div>
+  <div class="stat"><div class="stat-dot" style="background:var(--red)"></div><span id="k8s-stat-term">0 terminating</span></div>
+  <div class="stat" style="margin-left:auto"><span id="k8s-stat-nodes">3 nodes ready</span></div>
+</div>
+</div>
+<script src="k8s-sim.js"></script>
+</div>
+</div>
+
 <!-- ── MINI PROJECT ───────────────────────────────── -->
 <div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Deploy a Full App on K8s</div>
 <p>Use Minikube (free local Kubernetes) to deploy a complete application:</p>

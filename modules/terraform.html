@@ -51,6 +51,356 @@
 <span class="out">Destroy complete! Resources: 2 destroyed.</span></div></div>
 </div>
 <div class="section"><h3 class="section-title">Key Benefits of Terraform</h3><div class="concept-grid"><div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">Documented</div><div class="cc-desc">Your infrastructure is described in code. New team members can read exactly what was built.</div></div><div class="concept-card"><div class="cc-icon">♻️</div><div class="cc-title">Reproducible</div><div class="cc-desc">Recreate identical environments (dev, staging, prod) from the same code.</div></div><div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">Version Controlled</div><div class="cc-desc">Store Terraform files in Git. See who changed what and when.</div></div><div class="concept-card"><div class="cc-icon">🌍</div><div class="cc-title">Multi-Cloud</div><div class="cc-desc">Same tool works for AWS, Azure, GCP, and 1000+ other providers.</div></div></div></div>
+<!-- ── INTERACTIVE TERRAFORM SIMULATOR ───────────── -->
+<div class="section">
+<h3 class="section-title">🖥️ Interactive — Terraform Simulator</h3>
+<p>Write real HCL, run <code>init</code> → <code>plan</code> → <code>apply</code> → <code>destroy</code>. The simulator parses your resources, shows a plan diff, tracks state, and simulates AWS provisioning with realistic output.</p>
+<div style="margin-top:16px;border-radius:10px;overflow:hidden;border:1px solid #30363d">
+<style>
+#tfs{--bg:#0d1117;--sur:#161b22;--sur2:#1c2128;--bdr:#30363d;--grn:#3fb950;--blu:#58a6ff;--yel:#e3b341;--red:#f85149;--cyn:#39c5cf;--pur:#bc8cff;--mut:#6e7681;--txt:#c9d1d9;--wht:#f0f6fc;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--txt);}
+#tfs *{box-sizing:border-box;margin:0;padding:0;}
+#tfs .hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--sur);border-bottom:1px solid var(--bdr);}
+#tfs .hdr-title{font-size:14px;font-weight:600;color:var(--wht);}
+#tfs .hdr-sub{font-size:11px;color:var(--mut);margin-top:2px;}
+#tfs .qbar{display:flex;gap:6px;padding:8px 14px;background:var(--sur2);border-bottom:1px solid var(--bdr);flex-wrap:wrap;align-items:center;}
+#tfs .qbtn{font-size:10px;padding:3px 8px;border:1px solid var(--bdr);border-radius:3px;background:transparent;color:var(--cyn);cursor:pointer;font-family:'DM Mono',monospace;}
+#tfs .qbtn:hover{border-color:var(--cyn);background:rgba(57,197,207,.08);}
+#tfs .body{display:grid;grid-template-columns:1fr 1fr;min-height:400px;}
+#tfs .pane{display:flex;flex-direction:column;}
+#tfs .pane-title{font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;padding:8px 14px;border-bottom:1px solid var(--bdr);background:var(--sur);}
+#tfs .editor{flex:1;background:var(--bg);border:none;border-right:1px solid var(--bdr);color:#a5d6ff;font-family:'DM Mono',monospace;font-size:12px;padding:14px;outline:none;resize:none;line-height:1.7;min-height:320px;}
+#tfs .terminal{flex:1;background:var(--bg);font-family:'DM Mono',monospace;font-size:12px;padding:14px;overflow-y:auto;line-height:1.7;min-height:320px;}
+#tfs .btns{display:flex;gap:8px;padding:10px 14px;background:var(--sur);border-top:1px solid var(--bdr);}
+#tfs .btn{padding:6px 14px;border-radius:5px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .12s,transform .1s;font-family:'DM Mono',monospace;}
+#tfs .btn:hover{opacity:.85;}#tfs .btn:active{transform:scale(.97);}
+#tfs .btn:disabled{opacity:.3;cursor:not-allowed;}
+#tfs .btn.i{background:#7c3aed;color:#fff;}
+#tfs .btn.p{background:var(--blu);color:#000;}
+#tfs .btn.a{background:var(--grn);color:#000;}
+#tfs .btn.d{background:var(--red);color:#fff;}
+#tfs .btn.r{background:var(--sur2);color:var(--txt);border:1px solid var(--bdr);}
+#tfs .sbar{display:flex;gap:12px;padding:8px 14px;background:var(--sur);border-top:1px solid var(--bdr);font-size:10px;font-family:'DM Mono',monospace;flex-wrap:wrap;}
+#tfs .ok{color:var(--grn);}#tfs .er{color:var(--red);}#tfs .wa{color:var(--yel);}
+#tfs .inf{color:var(--cyn);}#tfs .pu{color:var(--pur);}#tfs .mu{color:var(--mut);}#tfs .wh{color:var(--wht);}
+#tfs .add{color:var(--grn);}#tfs .del{color:var(--red);}
+#tfs .badge{padding:3px 8px;border-radius:4px;background:var(--sur2);border:1px solid var(--bdr);font-size:11px;font-family:'DM Mono',monospace;}
+</style>
+<div id="tfs">
+<div class="hdr">
+  <div><div class="hdr-title">🏗️ Terraform Simulator</div><div class="hdr-sub">Write HCL · init · plan · apply · destroy</div></div>
+  <span class="badge" id="tfs-badge" style="color:var(--mut)">uninitialised</span>
+</div>
+<div class="qbar">
+  <span style="font-size:10px;color:var(--mut)">Templates:</span>
+  <button class="qbtn" onclick="tfsLoad('ec2')">EC2 instance</button>
+  <button class="qbtn" onclick="tfsLoad('vpc')">VPC + subnet</button>
+  <button class="qbtn" onclick="tfsLoad('s3')">S3 bucket</button>
+  <button class="qbtn" onclick="tfsLoad('full')">Full stack</button>
+</div>
+<div class="body">
+  <div class="pane">
+    <div class="pane-title">main.tf — editor</div>
+    <textarea class="editor" id="tfs-code" spellcheck="false" placeholder="Write HCL here or pick a template above..."></textarea>
+    <div class="btns">
+      <button class="btn i" id="tfs-init" onclick="tfsInit()">$ init</button>
+      <button class="btn p" id="tfs-plan" onclick="tfsPlan()" disabled>$ plan</button>
+      <button class="btn a" id="tfs-apply" onclick="tfsApply()" disabled>$ apply</button>
+      <button class="btn d" id="tfs-destroy" onclick="tfsDestroy()" disabled>$ destroy</button>
+      <button class="btn r" onclick="tfsReset()" style="margin-left:auto">↺</button>
+    </div>
+  </div>
+  <div class="pane">
+    <div class="pane-title">output</div>
+    <div class="terminal" id="tfs-out"></div>
+  </div>
+</div>
+<div class="sbar" id="tfs-sbar"><span class="mu">State: empty — no resources managed</span></div>
+</div>
+<script>
+(function(){
+const TMPLS={
+ec2:`provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  tags = {
+    Name = "web-server"
+    Env  = "dev"
+  }
+}
+
+output "public_ip" {
+  value = aws_instance.web.public_ip
+}`,
+vpc:`provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  tags = { Name = "main-vpc" }
+}
+
+resource "aws_subnet" "public" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+  tags = { Name = "public-subnet" }
+}
+
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
+  tags   = { Name = "main-igw" }
+}`,
+s3:`provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_s3_bucket" "assets" {
+  bucket = "my-devops-assets-2024"
+  tags   = { Name = "assets", Env = "production" }
+}
+
+resource "aws_s3_bucket_versioning" "assets" {
+  bucket = aws_s3_bucket.assets.id
+  versioning_configuration { status = "Enabled" }
+}`,
+full:`provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+  tags = { Name = "prod-vpc" }
+}
+
+resource "aws_subnet" "public" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+  tags = { Name = "public-subnet" }
+}
+
+resource "aws_security_group" "web_sg" {
+  name   = "web-sg"
+  vpc_id = aws_vpc.main.id
+  ingress { from_port=80; to_port=80; protocol="tcp"; cidr_blocks=["0.0.0.0/0"] }
+  egress  { from_port=0;  to_port=0;  protocol="-1";  cidr_blocks=["0.0.0.0/0"] }
+}
+
+resource "aws_instance" "web" {
+  ami                    = "ami-0c55b159cbfafe1f0"
+  instance_type          = "t3.medium"
+  subnet_id              = aws_subnet.public.id
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  tags = { Name = "web-server" }
+}
+
+output "web_ip" {
+  value = aws_instance.web.public_ip
+}`
+};
+
+const FAKE_IDS={aws_instance:'i-',aws_vpc:'vpc-',aws_subnet:'subnet-',aws_security_group:'sg-',aws_internet_gateway:'igw-',aws_s3_bucket:'',aws_s3_bucket_versioning:''};
+const FAKE_VALS={aws_instance:{public_ip:()=>'13.'+rnd(200)+'.'+rnd(255)+'.'+rnd(255)},aws_vpc:{id:()=>'vpc-'+hex(8)},aws_subnet:{id:()=>'subnet-'+hex(8)},aws_security_group:{id:()=>'sg-'+hex(8)},aws_internet_gateway:{id:()=>'igw-'+hex(8)},aws_s3_bucket:{arn:(n)=>'arn:aws:s3:::'+n},aws_s3_bucket_versioning:{}};
+const TIMINGS={aws_instance:2800,aws_vpc:1200,aws_subnet:800,aws_security_group:900,aws_internet_gateway:700,aws_s3_bucket:600,aws_s3_bucket_versioning:400};
+
+function rnd(n){return Math.floor(Math.random()*n);}
+function hex(n){return Math.random().toString(16).slice(2,2+n);}
+
+let phase='uninit', planned=[], state=[];
+const el=id=>document.getElementById(id);
+const out=el('tfs-out');
+
+function p(text,cls=''){const d=document.createElement('div');if(cls)d.className=cls;d.textContent=text;out.appendChild(d);out.scrollTop=out.scrollHeight;}
+function ph(html){const d=document.createElement('div');d.innerHTML=html;out.appendChild(d);out.scrollTop=out.scrollHeight;}
+function pb(){const d=document.createElement('div');d.innerHTML='&nbsp;';out.appendChild(d);}
+function clr(){out.innerHTML='';}
+
+function badge(txt,col){const b=el('tfs-badge');b.textContent=txt;b.style.color=col;b.style.borderColor=col;}
+
+function parseHCL(hcl){
+  const res=[],re=/resource\s+"([^"]+)"\s+"([^"]+)"/g;let m;
+  while((m=re.exec(hcl))!==null) res.push({type:m[1],name:m[2],full:m[1]+'.'+m[2]});
+  const outs=[],ro=/output\s+"([^"]+)"/g;
+  while((m=ro.exec(hcl))!==null) outs.push(m[1]);
+  const hasProv=/provider\s+"aws"/.test(hcl);
+  return{resources:res,outputs:outs,hasProvider:hasProv};
+}
+
+async function tfsInit(){
+  clr();badge('initialising…','var(--pur)');
+  p('Initialising the backend...','inf');
+  await wait(400);
+  p('Initialising provider plugins...','inf');
+  await wait(600);
+  p('- Finding hashicorp/aws versions matching ">= 5.0.0"...','mu');
+  await wait(500);
+  p('- Installing hashicorp/aws v5.31.0...','mu');
+  await wait(800);
+  p('- Installed hashicorp/aws v5.31.0 (signed by HashiCorp)','ok');
+  pb();
+  p('Terraform has been successfully initialised! ✅','ok');
+  p('You may now begin working with Terraform.','mu');
+  phase='init';badge('initialised','var(--pur)');
+  dis('tfs-plan',false);dis('tfs-apply',true);dis('tfs-destroy',true);
+}
+
+async function tfsPlan(){
+  const hcl=el('tfs-code').value.trim();
+  if(!hcl){clr();p('Error: editor is empty — write some HCL first','er');return;}
+  const parsed=parseHCL(hcl);
+  if(!parsed.hasProvider){clr();p('Error: No provider block found. Add:\nprovider "aws" { region = "ap-south-1" }','er');return;}
+  if(!parsed.resources.length){clr();p('Error: No resource blocks found. Add at least one resource.','er');return;}
+  clr();badge('planning…','var(--blu)');
+  p('Refreshing Terraform state in-memory prior to plan...','inf');
+  await wait(600);
+  p('Note: Objects have changed outside of Terraform','mu');
+  pb();
+  const toAdd=parsed.resources.filter(r=>!state.find(s=>s.full===r.full));
+  const toDestroy=state.filter(s=>!parsed.resources.find(r=>r.full===s.full));
+  const unchanged=state.filter(s=>parsed.resources.find(r=>r.full===s.full));
+  planned=parsed.resources;
+  p('Terraform used the selected providers to generate the following execution plan.','mu');
+  p('Resource actions are indicated with the following symbols:','mu');
+  if(toAdd.length) p('  + create','add');
+  if(toDestroy.length) p('  - destroy','del');
+  pb();
+  p('Terraform will perform the following actions:','wh');
+  pb();
+  for(const r of toAdd){
+    p('  # '+r.full+' will be created','add');
+    p('  + resource "'+r.type+'" "'+r.name+'" {','add');
+    p('      + id = (known after apply)','add');
+    p('    }','add');
+    pb();
+  }
+  for(const r of toDestroy){
+    p('  # '+r.full+' will be destroyed','del');
+    p('  - resource "'+r.type+'" "'+r.name+'" {','del');
+    p('      - id = "'+r.id+'"','del');
+    p('    }','del');
+    pb();
+  }
+  for(const r of unchanged){
+    p('  # '+r.full+' is unchanged','mu');
+  }
+  pb();
+  p('Plan: '+toAdd.length+' to add, '+unchanged.length+' to change, '+toDestroy.length+' to destroy.','wh');
+  pb();
+  p('Note: You didn\'t use the -out option to save this plan.','mu');
+  phase='planned';badge('planned','var(--blu)');
+  dis('tfs-apply',false);
+  if(state.length) dis('tfs-destroy',false);
+}
+
+async function tfsApply(){
+  if(phase!=='planned'&&phase!=='init'){p('Run plan first','er');return;}
+  const hcl=el('tfs-code').value.trim();
+  const parsed=parseHCL(hcl);
+  const toAdd=parsed.resources.filter(r=>!state.find(s=>s.full===r.full));
+  const toDestroy=state.filter(s=>!parsed.resources.find(r=>r.full===s.full));
+  clr();badge('applying…','var(--grn)');
+  p('Do you want to perform these actions?','wh');
+  p('  Terraform will perform the actions described above.','mu');
+  p('  Only \'yes\' will be accepted to approve.','mu');
+  pb();
+  p('  Enter a value: yes (auto-approved)','ok');
+  pb();
+  // Destroy old
+  for(const r of toDestroy){
+    p('Destroying... ['+r.full+']','del');
+    await wait(600);
+    p(''+r.full+': Destruction complete after 1s','del');
+    state=state.filter(s=>s.full!==r.full);
+    renderState();
+  }
+  // Create new
+  for(const r of toAdd){
+    p('Creating... ['+r.full+']','add');
+    await wait(TIMINGS[r.type]||1000);
+    const id=(FAKE_IDS[r.type]||'')+hex(8);
+    const fv=FAKE_VALS[r.type]||{};
+    const vals={};
+    Object.entries(fv).forEach(([k,fn])=>{ vals[k]=typeof fn==='function'?fn(r.name):fn; });
+    const sr={...r,id,vals};
+    state.push(sr);
+    p(''+r.full+': Creation complete after '+Math.round((TIMINGS[r.type]||1000)/1000)+'s [id='+id+']','ok');
+    renderState();
+  }
+  pb();
+  p('Apply complete! Resources: '+toAdd.length+' added, 0 changed, '+toDestroy.length+' destroyed.','ok');
+  pb();
+  // Outputs
+  if(parsed.outputs.length){
+    p('Outputs:','wh');pb();
+    parsed.outputs.forEach(o=>{
+      const matchRes=state.find(r=>r.type==='aws_instance'||r.type==='aws_s3_bucket');
+      let val='(computed)';
+      if(matchRes&&matchRes.vals){
+        const v=Object.values(matchRes.vals)[0];
+        if(v) val=v;
+      }
+      p(o+' = "'+val+'"','ok');
+    });
+  }
+  phase='applied';badge('applied ✓','var(--grn)');
+  dis('tfs-destroy',false);dis('tfs-apply',true);dis('tfs-plan',false);
+}
+
+async function tfsDestroy(){
+  if(!state.length){p('No resources in state to destroy','er');return;}
+  clr();badge('destroying…','var(--red)');
+  p('Terraform will destroy all your managed infrastructure.','wa');
+  p('There is no undo. Only \'yes\' will be accepted.','wa');
+  pb();p('  Enter a value: yes (auto-approved)','ok');pb();
+  const toDestroy=[...state].reverse();
+  for(const r of toDestroy){
+    p('Destroying... ['+r.full+']','del');
+    await wait(600);
+    state=state.filter(s=>s.full!==r.full);
+    p(''+r.full+': Destruction complete after 1s','del');
+    renderState();
+  }
+  pb();
+  p('Destroy complete! Resources: 0 added, 0 changed, '+toDestroy.length+' destroyed.','ok');
+  phase='init';badge('initialised','var(--pur)');
+  dis('tfs-destroy',true);dis('tfs-apply',true);dis('tfs-plan',false);
+  renderState();
+}
+
+function tfsLoad(t){el('tfs-code').value=TMPLS[t]||'';}
+
+function tfsReset(){
+  clr();state=[];planned=[];phase='uninit';
+  badge('uninitialised','var(--mut)');
+  dis('tfs-plan',true);dis('tfs-apply',true);dis('tfs-destroy',true);
+  renderState();p('Simulator reset','mu');
+}
+
+function dis(id,v){el(id).disabled=v;}
+
+function renderState(){
+  const sb=el('tfs-sbar');
+  if(!state.length){sb.innerHTML='<span class="mu">State: empty — no resources managed</span>';return;}
+  sb.innerHTML=state.map(r=>'<span class="ok">✓ '+r.full+'</span>').join(' &nbsp; ');
+}
+
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+
+window.tfsInit=tfsInit;window.tfsPlan=tfsPlan;window.tfsApply=tfsApply;
+window.tfsDestroy=tfsDestroy;window.tfsLoad=tfsLoad;window.tfsReset=tfsReset;
+
+p('Terraform Simulator ready','mu');
+p('Pick a template or write HCL, then click $ init','mu');
+})();
+</script>
+</div>
+</div>
+
 <div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Infrastructure Setup with Terraform</div><p>Write Terraform code to create: 1 VPC, 2 subnets (public + private), 1 EC2 web server in public subnet, 1 RDS database in private subnet, security groups with proper rules. Then destroy it all with one command.</p></div>
 <div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist"><li>Terraform manages cloud infrastructure as code — no manual clicking</li><li>Write .tf files → terraform plan (preview) → terraform apply (create)</li><li>Infrastructure is version-controlled, documented, and reproducible</li><li>Works with AWS, Azure, GCP, and 1000+ providers</li><li>terraform destroy removes everything cleanly</li></ul></div>
 <div class="next-card" onclick="showModule('monitoring')"><div class="next-text"><div class="next-label">Final Module →</div><div class="next-title">📊 Prometheus &amp; Grafana — Monitoring</div><div class="next-why">Your app is running in production. But how do you know it's healthy? You need monitoring — alerts, dashboards, and insights into your system's performance.</div></div><div class="next-arrow">→</div></div>
