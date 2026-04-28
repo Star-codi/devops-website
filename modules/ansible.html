@@ -1,0 +1,395 @@
+<div class="module-header"><div class="module-icon">⚙️</div><div class="module-meta"><div class="module-tag">Module 13 — Configuration Management</div><h2 class="module-title">Ansible — Automate Everything</h2></div></div>
+
+<!-- ── WHAT IS ANSIBLE ───────────────────────────── -->
+<div class="section"><h3 class="section-title">What Problem Does Ansible Solve?</h3><p>Terraform just created 10 EC2 servers for you. Now what? Someone has to install Nginx, configure firewalls, create users, deploy your app, and apply security patches — on all 10 servers. Doing this manually by SSH-ing into each one is slow, error-prone, and inconsistent.</p><p><strong>Ansible automates all of this.</strong> You describe the desired state of your servers in simple YAML files called <strong>Playbooks</strong>, and Ansible connects to all your servers over SSH and makes it happen — simultaneously, consistently, on any number of machines.</p></div>
+
+<div class="callout callout-analogy"><div class="callout-label">👨‍🍳 Analogy — Recipe for a Chef</div><p>Imagine you're opening 10 restaurant branches. You need every kitchen set up identically — same equipment, same layout, same processes. You could personally visit each branch and set it up manually. Or you could write a detailed <strong>recipe/manual</strong> and hand it to a team that sets up all 10 branches simultaneously from the same instructions. <strong>Ansible is that recipe — and it executes itself.</strong></p></div>
+
+<!-- ── ANSIBLE vs TERRAFORM ──────────────────────── -->
+<div class="section">
+<h3 class="section-title">Ansible vs Terraform — What's the Difference?</h3>
+<div class="compare-table">
+<table>
+  <tr><th>Aspect</th><th>Terraform</th><th>Ansible</th></tr>
+  <tr><td>Purpose</td><td>Provision infrastructure (servers, networks, databases)</td><td>Configure software on existing servers</td></tr>
+  <tr><td>What it manages</td><td>Cloud resources (EC2, VPC, S3, RDS)</td><td>OS settings, packages, files, services, users</td></tr>
+  <tr><td>Approach</td><td>Declarative (define desired state)</td><td>Procedural (define steps to run)</td></tr>
+  <tr><td>Agent needed?</td><td>No</td><td>No (agentless — uses SSH)</td></tr>
+  <tr><td>Language</td><td>HCL</td><td>YAML</td></tr>
+  <tr><td>Used together?</td><td colspan="2">✅ Yes — Terraform creates servers, Ansible configures them</td></tr>
+</table>
+</div>
+</div>
+
+<!-- ── HOW ANSIBLE WORKS ──────────────────────────── -->
+<div class="section">
+<h3 class="section-title">How Ansible Works — No Agent Required</h3>
+<p>Unlike most tools, Ansible is <strong>agentless</strong>. You don't install anything on the servers you're managing. Ansible connects via plain SSH, runs tasks, and disconnects. That's it.</p>
+
+<div class="arch-diagram">  ┌─────────────────────────────────────────────────────┐
+  │              YOUR MACHINE (Control Node)             │
+  │                                                      │
+  │  ansible-playbook site.yml                           │
+  │       │                                              │
+  │  reads Inventory (list of servers)                   │
+  │  reads Playbook  (list of tasks)                     │
+  └───────┬──────────────────────────────────────────────┘
+          │  SSH (port 22) — no agent needed on servers
+          ├──────────────────┬──────────────────┐
+          ▼                  ▼                  ▼
+  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+  │   Server 1   │  │   Server 2   │  │   Server 3   │
+  │  (web-01)    │  │  (web-02)    │  │  (db-01)     │
+  │  10.0.1.10   │  │  10.0.1.11   │  │  10.0.2.10   │
+  └──────────────┘  └──────────────┘  └──────────────┘
+  Tasks run in parallel across all servers simultaneously</div>
+</div>
+
+<!-- ── INSTALLATION ───────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Installing Ansible</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Install Ansible</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Ubuntu / Debian</span>
+<span class="cmd">sudo apt update && sudo apt install ansible -y</span>
+
+<span class="comment"># macOS</span>
+<span class="cmd">brew install ansible</span>
+
+<span class="comment"># pip (any OS)</span>
+<span class="cmd">pip install ansible</span>
+
+<span class="comment"># Verify installation</span>
+<span class="cmd">ansible --version</span>
+<span class="out">ansible [core 2.16.0]</span>
+<span class="out">  python version = 3.11.0</span></div></div>
+</div>
+
+<!-- ── INVENTORY ──────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Inventory — Tell Ansible About Your Servers</h3>
+<p>The <strong>inventory</strong> is a list of all the servers Ansible should manage. You can group servers by role — web servers, database servers, etc. — and target specific groups in your playbooks.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">inventory.ini — Static Inventory</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Individual server</span>
+[webservers]
+web-01 ansible_host=10.0.1.10
+web-02 ansible_host=10.0.1.11
+web-03 ansible_host=10.0.1.12
+
+[databases]
+db-01 ansible_host=10.0.2.10
+db-02 ansible_host=10.0.2.11
+
+<span class="comment"># Group of groups</span>
+[production:children]
+webservers
+databases
+
+<span class="comment"># Variables for a group</span>
+[webservers:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=~/.ssh/my-key.pem
+ansible_python_interpreter=/usr/bin/python3</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Test Connectivity</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Ping all servers to verify SSH works</span>
+<span class="cmd">ansible all -i inventory.ini -m ping</span>
+<span class="out">web-01 | SUCCESS => { "ping": "pong" }</span>
+<span class="out">web-02 | SUCCESS => { "ping": "pong" }</span>
+<span class="out">db-01  | SUCCESS => { "ping": "pong" }</span>
+
+<span class="comment"># Run an ad-hoc command on all webservers</span>
+<span class="cmd">ansible webservers -i inventory.ini -m command -a "uptime"</span>
+<span class="out">web-01 | SUCCESS | rc=0 >> 14:23:01 up 2 days, 3:12</span>
+<span class="out">web-02 | SUCCESS | rc=0 >> 14:23:01 up 2 days, 3:14</span>
+
+<span class="comment"># Check disk space on all servers</span>
+<span class="cmd">ansible all -i inventory.ini -a "df -h"</span></div></div>
+</div>
+
+<!-- ── PLAYBOOKS ──────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Playbooks — The Heart of Ansible</h3>
+<p>A <strong>Playbook</strong> is a YAML file that describes a series of tasks to run on your servers. Each task uses an Ansible <strong>module</strong> — a pre-built unit of work (install a package, copy a file, start a service, create a user, etc.).</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">webserver.yml — Install & Configure Nginx</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">---
+- <span class="kw">name</span>: Configure web servers
+  <span class="kw">hosts</span>: webservers       <span class="comment"># target the webservers group</span>
+  <span class="kw">become</span>: true           <span class="comment"># use sudo for all tasks</span>
+
+  <span class="kw">tasks</span>:
+
+    - <span class="kw">name</span>: Update apt cache
+      <span class="kw">apt</span>:
+        update_cache: yes
+        cache_valid_time: 3600  <span class="comment"># only update if cache is older than 1hr</span>
+
+    - <span class="kw">name</span>: Install Nginx
+      <span class="kw">apt</span>:
+        name: nginx
+        state: present          <span class="comment"># present = installed, absent = removed</span>
+
+    - <span class="kw">name</span>: Copy custom Nginx config
+      <span class="kw">template</span>:
+        src: templates/nginx.conf.j2  <span class="comment"># Jinja2 template on your machine</span>
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: <span class="str">'0644'</span>
+      <span class="kw">notify</span>: Restart Nginx          <span class="comment"># trigger handler if this changes</span>
+
+    - <span class="kw">name</span>: Ensure Nginx is started and enabled
+      <span class="kw">service</span>:
+        name: nginx
+        state: started
+        enabled: yes             <span class="comment"># start on boot</span>
+
+    - <span class="kw">name</span>: Open port 80 in UFW firewall
+      <span class="kw">ufw</span>:
+        rule: allow
+        port: <span class="str">'80'</span>
+        proto: tcp
+
+  <span class="kw">handlers</span>:
+    <span class="comment"># Handlers run ONLY when notified, and only once at the end</span>
+    - <span class="kw">name</span>: Restart Nginx
+      <span class="kw">service</span>:
+        name: nginx
+        state: restarted</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Run a Playbook</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Run the playbook</span>
+<span class="cmd">ansible-playbook -i inventory.ini webserver.yml</span>
+<span class="out">PLAY [Configure web servers] *******************************************</span>
+<span class="out">TASK [Install Nginx] ***************************************************</span>
+<span class="out">changed: [web-01]</span>
+<span class="out">changed: [web-02]</span>
+<span class="out">TASK [Ensure Nginx is started] *****************************************</span>
+<span class="out">ok: [web-01]</span>
+<span class="out">ok: [web-02]</span>
+<span class="out">PLAY RECAP *************************************************************</span>
+<span class="out">web-01 : ok=4  changed=2  unreachable=0  failed=0</span>
+<span class="out">web-02 : ok=4  changed=2  unreachable=0  failed=0</span>
+
+<span class="comment"># Dry run — see what WOULD change without applying</span>
+<span class="cmd">ansible-playbook -i inventory.ini webserver.yml --check</span>
+
+<span class="comment"># Run with verbose output for debugging</span>
+<span class="cmd">ansible-playbook -i inventory.ini webserver.yml -v</span>
+
+<span class="comment"># Run only specific tasks using tags</span>
+<span class="cmd">ansible-playbook -i inventory.ini webserver.yml --tags "nginx"</span>
+
+<span class="comment"># Target a specific server only</span>
+<span class="cmd">ansible-playbook -i inventory.ini webserver.yml --limit web-01</span></div></div>
+
+<div class="callout callout-tip"><div class="callout-label">💡 Idempotency — Run It 10 Times, Same Result</div><p>Ansible tasks are <strong>idempotent</strong> — running a playbook 10 times produces the same result as running it once. If Nginx is already installed, the "Install Nginx" task shows <code>ok</code> (no change) instead of <code>changed</code>. This means you can safely re-run playbooks to fix drift or apply updates without breaking anything.</p></div>
+</div>
+
+<!-- ── VARIABLES ──────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Variables — Make Playbooks Flexible</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">vars.yml — Variables File</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">---
+app_name: my-webapp
+app_port: 3000
+app_user: appuser
+app_dir: /opt/my-webapp
+packages:
+  - nginx
+  - nodejs
+  - git</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">playbook.yml — Using Variables</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">---
+- <span class="kw">name</span>: Deploy application
+  <span class="kw">hosts</span>: webservers
+  <span class="kw">become</span>: true
+  <span class="kw">vars_files</span>:
+    - vars.yml
+
+  <span class="kw">tasks</span>:
+    - <span class="kw">name</span>: Install required packages
+      <span class="kw">apt</span>:
+        name: <span class="str">"{{ item }}"</span>     <span class="comment"># loop over packages list</span>
+        state: present
+      <span class="kw">loop</span>: <span class="str">"{{ packages }}"</span>
+
+    - <span class="kw">name</span>: Create app user
+      <span class="kw">user</span>:
+        name: <span class="str">"{{ app_user }}"</span>
+        shell: /bin/bash
+        state: present
+
+    - <span class="kw">name</span>: Create app directory
+      <span class="kw">file</span>:
+        path: <span class="str">"{{ app_dir }}"</span>
+        state: directory
+        owner: <span class="str">"{{ app_user }}"</span>
+        mode: <span class="str">'0755'</span></div></div>
+</div>
+
+<!-- ── ANSIBLE VAULT ─────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Ansible Vault — Encrypting Secrets</h3>
+<p>Never store passwords or API keys in plain text in your playbooks or variable files. Ansible Vault encrypts sensitive files so they can be safely committed to Git.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Ansible Vault</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Create an encrypted variables file</span>
+<span class="cmd">ansible-vault create secrets.yml</span>
+<span class="comment"># Opens editor — type your secrets:</span>
+<span class="comment"># db_password: supersecret</span>
+<span class="comment"># api_key: abc123xyz</span>
+
+<span class="comment"># Encrypt an existing file</span>
+<span class="cmd">ansible-vault encrypt vars/secrets.yml</span>
+<span class="out">Encryption successful</span>
+
+<span class="comment"># View encrypted file</span>
+<span class="cmd">ansible-vault view secrets.yml</span>
+
+<span class="comment"># Edit encrypted file</span>
+<span class="cmd">ansible-vault edit secrets.yml</span>
+
+<span class="comment"># Run playbook with vault password</span>
+<span class="cmd">ansible-playbook site.yml --ask-vault-pass</span>
+
+<span class="comment"># Or use a password file (for CI/CD)</span>
+<span class="cmd">ansible-playbook site.yml --vault-password-file ~/.vault_pass</span></div></div>
+</div>
+
+<!-- ── ROLES ──────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Roles — Organise Playbooks at Scale</h3>
+<p>As your infrastructure grows, a single playbook file becomes hard to maintain. <strong>Roles</strong> let you split your playbook into reusable, well-structured components — one role per responsibility (nginx, docker, users, monitoring).</p>
+
+<div class="arch-diagram">  roles/
+  ├── nginx/
+  │   ├── tasks/
+  │   │   └── main.yml      ← all nginx tasks
+  │   ├── handlers/
+  │   │   └── main.yml      ← restart nginx handler
+  │   ├── templates/
+  │   │   └── nginx.conf.j2 ← Jinja2 config template
+  │   ├── vars/
+  │   │   └── main.yml      ← nginx-specific variables
+  │   └── defaults/
+  │       └── main.yml      ← default variable values
+  ├── docker/
+  │   └── tasks/main.yml
+  └── users/
+      └── tasks/main.yml</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">site.yml — Using Roles</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">---
+- <span class="kw">name</span>: Configure web servers
+  <span class="kw">hosts</span>: webservers
+  <span class="kw">become</span>: true
+  <span class="kw">roles</span>:
+    - users          <span class="comment"># create system users first</span>
+    - nginx          <span class="comment"># install and configure nginx</span>
+    - docker         <span class="comment"># install docker</span>
+
+- <span class="kw">name</span>: Configure database servers
+  <span class="kw">hosts</span>: databases
+  <span class="kw">become</span>: true
+  <span class="kw">roles</span>:
+    - users
+    - postgresql</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Create a Role</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Ansible generates the folder structure automatically</span>
+<span class="cmd">ansible-galaxy init roles/nginx</span>
+<span class="out">- Role roles/nginx was created successfully</span>
+
+<span class="comment"># Install a community role from Ansible Galaxy</span>
+<span class="cmd">ansible-galaxy install geerlingguy.docker</span>
+
+<span class="comment"># requirements.yml — pin your role versions</span>
+<span class="comment"># roles:</span>
+<span class="comment">#   - name: geerlingguy.docker</span>
+<span class="comment">#     version: 6.1.0</span>
+<span class="cmd">ansible-galaxy install -r requirements.yml</span></div></div>
+</div>
+
+<!-- ── TEMPLATES ──────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Jinja2 Templates — Dynamic Config Files</h3>
+<p>Templates let you generate configuration files dynamically using variables. The same template produces different configs for dev, staging, and production.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">templates/nginx.conf.j2 — Jinja2 Template</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">server {
+    listen 80;
+    server_name {{ server_name }};       {# variable from vars file #}
+
+    location / {
+        proxy_pass http://127.0.0.1:{{ app_port }};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    {% if enable_ssl %}                   {# conditional block #}
+    listen 443 ssl;
+    ssl_certificate /etc/ssl/certs/cert.pem;
+    ssl_certificate_key /etc/ssl/private/key.pem;
+    {% endif %}
+
+    {% for upstream in upstream_servers %}  {# loop #}
+    upstream backend {
+        server {{ upstream }};
+    }
+    {% endfor %}
+}</div></div>
+</div>
+
+<!-- ── TERRAFORM + ANSIBLE ───────────────────────── -->
+<div class="section">
+<h3 class="section-title">Terraform + Ansible Together — The Full Flow</h3>
+<p>This is how real DevOps teams provision and configure infrastructure end to end:</p>
+
+<div class="arch-diagram">  Step 1 — Terraform provisions infrastructure
+  terraform apply
+  → Creates EC2 instances, VPC, security groups
+  → Outputs IP addresses
+
+  Step 2 — Generate dynamic Ansible inventory from Terraform output
+  terraform output -json | python3 generate_inventory.py > inventory.ini
+
+  Step 3 — Ansible configures the servers
+  ansible-playbook -i inventory.ini site.yml
+  → Installs packages, configures Nginx, deploys app, sets up monitoring
+
+  Result: Fully provisioned + configured infrastructure from code</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Makefile — Full Workflow</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">provision</span>:
+	terraform apply -auto-approve
+	terraform output -json > tf_output.json
+	python3 scripts/generate_inventory.py
+
+<span class="cmd">configure</span>:
+	ansible-playbook -i inventory.ini site.yml
+
+<span class="cmd">deploy</span>: provision configure
+	@echo "Infrastructure provisioned and configured"
+
+<span class="cmd">destroy</span>:
+	terraform destroy -auto-approve</div></div>
+</div>
+
+<!-- ── MINI PROJECT ───────────────────────────────── -->
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Provision with Terraform, Configure with Ansible</div>
+<ol class="steps">
+  <li>Use Terraform to create 2 EC2 instances (web servers) and output their IPs</li>
+  <li>Write an <code>inventory.ini</code> using the output IPs</li>
+  <li>Create an Ansible Role called <code>webserver</code> with tasks to: update packages, install Nginx and Node.js, create an app user, copy a config template, start and enable Nginx</li>
+  <li>Create a <code>secrets.yml</code> with Ansible Vault containing a fake DB password — reference it in your playbook</li>
+  <li>Write <code>site.yml</code> that applies the webserver role to the webservers group</li>
+  <li>Run the playbook — verify Nginx is accessible on both server IPs</li>
+  <li>Change a variable (e.g. app port) and re-run — verify idempotency (only changed tasks show "changed")</li>
+  <li>Clean up with <code>terraform destroy</code></li>
+</ol></div>
+
+<!-- ── SUMMARY ───────────────────────────────────── -->
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist">
+  <li>Ansible configures servers — Terraform creates them. Use both together.</li>
+  <li>Agentless — connects via SSH, nothing to install on target servers</li>
+  <li>Inventory defines which servers to manage, grouped by role</li>
+  <li>Playbooks are YAML files describing tasks to run — readable by anyone</li>
+  <li>Tasks are idempotent — safe to re-run without breaking anything</li>
+  <li>Handlers only run when notified and only once — perfect for service restarts</li>
+  <li>Use Ansible Vault to encrypt secrets — never commit plain text passwords</li>
+  <li>Roles organise large playbooks into reusable, shareable components</li>
+  <li>Jinja2 templates generate dynamic config files from variables</li>
+</ul></div>
+
+<div class="next-card" onclick="showModule('monitoring')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">📊 Prometheus & Grafana — Monitoring</div><div class="next-why">Your infrastructure is running. Now how do you know everything is healthy? You need monitoring, alerting, and dashboards — that's what Prometheus and Grafana are for.</div></div><div class="next-arrow">→</div></div>
