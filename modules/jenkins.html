@@ -1,26 +1,65 @@
-<div class="module-header"><div class="module-icon">🤖</div><div class="module-meta"><div class="module-tag">Module 07 — CI/CD</div><h2 class="module-title">Jenkins — Continuous Integration &amp; Delivery</h2></div></div>
-<div class="section"><h3 class="section-title">What is CI/CD?</h3><p><strong>CI (Continuous Integration)</strong> means: every time a developer pushes code, it's automatically built and tested. No more "it works on my machine!" problems.</p><p><strong>CD (Continuous Delivery/Deployment)</strong> means: if all tests pass, the code is automatically deployed to production. No manual deployment steps.</p></div>
-<div class="callout callout-analogy"><div class="callout-label">🏭 Analogy — Factory Assembly Line</div><p>Imagine a car factory. <strong>Old way:</strong> workers build the whole car, then quality checks it at the end — finding defects when it's too late. <strong>CI/CD way:</strong> at every step of the assembly line, the car part is automatically checked. Problems are caught immediately. <strong>Jenkins is the factory manager</strong> running the assembly line — triggering each step automatically.</p></div>
+<div class="module-header"><div class="module-icon">🤖</div><div class="module-meta"><div class="module-tag">Module 07 — CI/CD</div><h2 class="module-title">Jenkins — Continuous Integration & Delivery</h2></div></div>
+
+<!-- ── WHAT IS CI/CD ─────────────────────────────── -->
+<div class="section"><h3 class="section-title">What is CI/CD?</h3><p><strong>CI (Continuous Integration)</strong> means every time a developer pushes code, it's automatically built and tested. Bugs are caught immediately — not weeks later.</p><p><strong>CD (Continuous Delivery)</strong> means if all tests pass, the code is automatically packaged and made ready to deploy. <strong>Continuous Deployment</strong> goes one step further — it deploys straight to production with no human intervention.</p></div>
+
+<div class="callout callout-analogy"><div class="callout-label">🏭 Analogy — Factory Assembly Line</div><p>Old way: workers build the entire car, quality check it at the end — finding defects when it's expensive to fix. CI/CD way: every step of the assembly line automatically checks quality. Problems are caught immediately at the source. <strong>Jenkins is the factory manager</strong> — it triggers each step automatically the moment a developer pushes code.</p></div>
+
+<!-- ── JENKINS ARCHITECTURE ──────────────────────── -->
 <div class="section">
-<h3 class="section-title">Jenkins Pipeline — How It Works</h3>
-<div class="flow"><div class="flow-step"><div class="flow-box active">Developer Pushes Code</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">GitHub Webhook</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">Jenkins Triggered</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">Build + Test</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box active">Deploy 🚀</div></div></div>
+<h3 class="section-title">Jenkins Architecture</h3>
+<p>Jenkins uses a <strong>Controller + Agent</strong> model. The Controller manages pipelines and the UI. Agents (workers) actually run the pipeline jobs — on separate machines, Docker containers, or cloud instances.</p>
+
+<div class="arch-diagram">  ┌─────────────────────────────────────────────────────────┐
+  │                   JENKINS CONTROLLER                     │
+  │  - Web UI (port 8080)                                    │
+  │  - Pipeline scheduling & management                      │
+  │  - Plugin management                                     │
+  │  - Stores build history & logs                           │
+  └──────────┬──────────────┬────────────────┬──────────────┘
+             │              │                │
+             ▼              ▼                ▼
+    ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+    │   Agent 1    │ │   Agent 2    │ │   Agent 3    │
+    │  (Linux VM)  │ │  (Docker)    │ │  (Windows)   │
+    │  Java builds │ │  Node builds │ │  .NET builds │
+    └──────────────┘ └──────────────┘ └──────────────┘</div>
+
+<div class="callout callout-tip"><div class="callout-label">💡 Why Agents?</div><p>Running all builds on the Controller is a bad practice — it becomes a bottleneck and a single point of failure. Agents let you run many builds in parallel, on different environments, without touching the Controller.</p></div>
 </div>
+
+<!-- ── PIPELINE FLOW ──────────────────────────────── -->
 <div class="section">
-<h3 class="section-title">Your First Jenkinsfile</h3>
-<p>A <strong>Jenkinsfile</strong> is a script that defines what Jenkins should do. It lives in your project's root directory alongside your code.</p>
-<div class="code-block"><div class="code-header"><span class="code-lang">Jenkinsfile — CI/CD Pipeline</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">pipeline</span> {
-    <span class="kw">agent</span> any    <span class="comment">// run on any available server</span>
-<span class="kw">stages</span> {
+<h3 class="section-title">CI/CD Pipeline Flow</h3>
+<div class="flow"><div class="flow-step"><div class="flow-box active">Push to GitHub</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">Webhook triggers Jenkins</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">Build</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">Test</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box">Docker Build & Push</div><div class="flow-arrow">→</div></div><div class="flow-step"><div class="flow-box active">Deploy to K8s 🚀</div></div></div>
+</div>
+
+<!-- ── JENKINSFILE BASICS ─────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Jenkinsfile — Declarative Pipeline</h3>
+<p>A <strong>Jenkinsfile</strong> defines your pipeline as code. It lives in your repo root alongside your application code — versioned, reviewable, and auditable.</p>
+<p>There are two syntax styles: <strong>Declarative</strong> (structured, recommended for beginners) and <strong>Scripted</strong> (Groovy-based, more flexible). We'll use Declarative.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Jenkinsfile — Basic Structure</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">pipeline</span> {
+    <span class="kw">agent</span> any          <span class="comment">// run on any available agent</span>
+
+    <span class="kw">environment</span> {       <span class="comment">// pipeline-wide environment variables</span>
+        APP_NAME = <span class="str">'my-app'</span>
+        DOCKER_HUB = <span class="str">'yourusername'</span>
+    }
+
+    <span class="kw">stages</span> {
+
         <span class="kw">stage</span>(<span class="str">'Checkout'</span>) {
             <span class="kw">steps</span> {
                 git branch: <span class="str">'main'</span>,
-                    url: <span class="str">'https://github.com/arjun/my-app.git'</span>
+                    url: <span class="str">'https://github.com/yourusername/my-app.git'</span>
             }
         }
 
         <span class="kw">stage</span>(<span class="str">'Build'</span>) {
             <span class="kw">steps</span> {
-                sh <span class="str">'mvn clean package'</span>
+                sh <span class="str">'mvn clean package -DskipTests'</span>
             }
         }
 
@@ -28,29 +67,240 @@
             <span class="kw">steps</span> {
                 sh <span class="str">'mvn test'</span>
             }
-        }
-
-        <span class="kw">stage</span>(<span class="str">'Docker Build &amp; Push'</span>) {
-            <span class="kw">steps</span> {
-                sh <span class="str">'docker build -t arjun/my-app:${BUILD_NUMBER} .'</span>
-                sh <span class="str">'docker push arjun/my-app:${BUILD_NUMBER}'</span>
+            <span class="kw">post</span> {
+                always {
+                    <span class="comment">// publish test results even if tests fail</span>
+                    junit <span class="str">'target/surefire-reports/*.xml'</span>
+                }
             }
         }
 
-        <span class="kw">stage</span>(<span class="str">'Deploy'</span>) {
+        <span class="kw">stage</span>(<span class="str">'Docker Build & Push'</span>) {
             <span class="kw">steps</span> {
-                sh <span class="str">'kubectl set image deployment/my-app my-app=arjun/my-app:${BUILD_NUMBER}'</span>
+                <span class="comment">// use credentials stored in Jenkins — never hardcode</span>
+                withCredentials([usernamePassword(
+                    credentialsId: <span class="str">'dockerhub-creds'</span>,
+                    usernameVariable: <span class="str">'DOCKER_USER'</span>,
+                    passwordVariable: <span class="str">'DOCKER_PASS'</span>
+                )]) {
+                    sh <span class="str">"""
+                        docker build -t ${DOCKER_HUB}/${APP_NAME}:${BUILD_NUMBER} .
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push ${DOCKER_HUB}/${APP_NAME}:${BUILD_NUMBER}
+                    """</span>
+                }
+            }
+        }
+
+        <span class="kw">stage</span>(<span class="str">'Deploy to Kubernetes'</span>) {
+            <span class="kw">steps</span> {
+                sh <span class="str">"""
+                    kubectl set image deployment/${APP_NAME} \
+                    ${APP_NAME}=${DOCKER_HUB}/${APP_NAME}:${BUILD_NUMBER}
+                    kubectl rollout status deployment/${APP_NAME}
+                """</span>
             }
         }
     }
 
     <span class="kw">post</span> {
-        <span class="kw">success</span> { echo <span class="str">'✅ Pipeline succeeded!'</span> }
-        <span class="kw">failure</span> { echo <span class="str">'❌ Pipeline failed — check logs!'</span> }
+        <span class="kw">success</span> {
+            echo <span class="str">'✅ Pipeline succeeded! App deployed.'</span>
+        }
+        <span class="kw">failure</span> {
+            echo <span class="str">'❌ Pipeline failed — check the logs above.'</span>
+            <span class="comment">// emailext to: 'team@company.com', subject: 'Build Failed'</span>
+        }
+        <span class="kw">always</span> {
+            <span class="comment">// clean up workspace after every run</span>
+            cleanWs()
+        }
     }
 }</div></div>
 </div>
-<div class="section"><h3 class="section-title">Why Docker After Jenkins?</h3><div class="callout callout-warn"><div class="callout-label">⚠️ Problem Jenkins Reveals</div><p>Jenkins builds and deploys perfectly on the build server. But on the production server: "It works in Jenkins but crashes in prod!" Why? Different Java version, different OS, missing libraries. Jenkins automates deployment — but doesn't guarantee the environment is the same everywhere. That's where Docker comes in.</p></div></div>
-<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — CI/CD Pipeline for a Java App</div><p>Set up Jenkins → Connect to GitHub → Create a pipeline that builds with Maven, runs tests, builds a Docker image, and deploys to Kubernetes on every push to main branch.</p></div>
-<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist"><li>CI = Automatically build &amp; test on every code push</li><li>CD = Automatically deploy if tests pass</li><li>Jenkinsfile defines your pipeline as code — stored in Git</li><li>Jenkins catches bugs early and eliminates manual deployments</li></ul></div>
-<div class="next-card" onclick="showModule('docker')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🐳 Docker — Containerization</div><div class="next-why">Package your entire app + its environment into a single portable container. "Works on my machine" becomes "works everywhere."</div></div><div class="next-arrow">→</div></div>
+
+<!-- ── ADVANCED FEATURES ──────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Advanced Pipeline Features</h3>
+
+<h4>Parallel Stages — Speed Up Your Pipeline</h4>
+<p>Run independent stages simultaneously instead of one at a time. Unit tests and security scans don't depend on each other — run them in parallel and cut pipeline time in half.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Jenkinsfile — Parallel Stages</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">stage</span>(<span class="str">'Quality Checks'</span>) {
+    <span class="kw">parallel</span> {
+        <span class="kw">stage</span>(<span class="str">'Unit Tests'</span>) {
+            <span class="kw">steps</span> { sh <span class="str">'mvn test'</span> }
+        }
+        <span class="kw">stage</span>(<span class="str">'Code Coverage'</span>) {
+            <span class="kw">steps</span> { sh <span class="str">'mvn jacoco:report'</span> }
+        }
+        <span class="kw">stage</span>(<span class="str">'Security Scan'</span>) {
+            <span class="kw">steps</span> { sh <span class="str">'trivy image my-app:latest'</span> }
+        }
+    }
+}</div></div>
+
+<h4>Parameters — Make Pipelines Interactive</h4>
+<div class="code-block"><div class="code-header"><span class="code-lang">Jenkinsfile — Parameters</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">pipeline</span> {
+    <span class="kw">agent</span> any
+    <span class="kw">parameters</span> {
+        <span class="kw">choice</span>(
+            name: <span class="str">'DEPLOY_ENV'</span>,
+            choices: [<span class="str">'dev'</span>, <span class="str">'staging'</span>, <span class="str">'production'</span>],
+            description: <span class="str">'Which environment to deploy to?'</span>
+        )
+        <span class="kw">booleanParam</span>(
+            name: <span class="str">'RUN_TESTS'</span>,
+            defaultValue: <span class="str">true</span>,
+            description: <span class="str">'Run tests before deploying?'</span>
+        )
+    }
+    <span class="kw">stages</span> {
+        <span class="kw">stage</span>(<span class="str">'Deploy'</span>) {
+            <span class="kw">steps</span> {
+                echo <span class="str">"Deploying to: ${params.DEPLOY_ENV}"</span>
+                sh <span class="str">"kubectl apply -f k8s/${params.DEPLOY_ENV}/"</span>
+            }
+        }
+    }
+}</div></div>
+
+<h4>When Conditions — Conditional Stage Execution</h4>
+<div class="code-block"><div class="code-header"><span class="code-lang">Jenkinsfile — When Conditions</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">stage</span>(<span class="str">'Deploy to Production'</span>) {
+    <span class="kw">when</span> {
+        branch <span class="str">'main'</span>   <span class="comment">// only deploy when pushing to main branch</span>
+    }
+    <span class="kw">steps</span> {
+        sh <span class="str">'kubectl apply -f k8s/production/'</span>
+    }
+}
+
+<span class="kw">stage</span>(<span class="str">'Deploy to Staging'</span>) {
+    <span class="kw">when</span> {
+        branch <span class="str">'develop'</span>
+    }
+    <span class="kw">steps</span> {
+        sh <span class="str">'kubectl apply -f k8s/staging/'</span>
+    }
+}</div></div>
+</div>
+
+<!-- ── AGENTS & DOCKER ────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Using Docker as a Jenkins Agent</h3>
+<p>Instead of installing tools (Java, Node, Python) on your Jenkins server, run each stage inside a Docker container with exactly the tools you need. Clean, isolated, reproducible.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Jenkinsfile — Docker Agent</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">pipeline</span> {
+    <span class="kw">agent</span> none   <span class="comment">// no default agent — each stage defines its own</span>
+
+    <span class="kw">stages</span> {
+        <span class="kw">stage</span>(<span class="str">'Build Java App'</span>) {
+            <span class="kw">agent</span> {
+                docker { image <span class="str">'maven:3.9-eclipse-temurin-17'</span> }
+            }
+            <span class="kw">steps</span> {
+                sh <span class="str">'mvn clean package'</span>
+                <span class="comment">// Maven available here, not on other stages</span>
+            }
+        }
+
+        <span class="kw">stage</span>(<span class="str">'Build Node Frontend'</span>) {
+            <span class="kw">agent</span> {
+                docker { image <span class="str">'node:18-alpine'</span> }
+            }
+            <span class="kw">steps</span> {
+                sh <span class="str">'npm install && npm run build'</span>
+            }
+        }
+    }
+}</div></div>
+</div>
+
+<!-- ── CREDENTIALS ───────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Managing Credentials Securely</h3>
+<p>Never hardcode passwords, tokens, or keys in your Jenkinsfile. Jenkins has a built-in Credentials Store — store secrets there and reference them by ID.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Add credential via CLI</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Or go to: Jenkins → Manage Jenkins → Credentials → Add Credential
+# Types available: Username/Password, Secret Text, SSH Key, Certificate</span></div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Jenkinsfile — Using Credentials</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment">// Secret text (API token)</span>
+withCredentials([string(credentialsId: <span class="str">'aws-token'</span>, variable: <span class="str">'AWS_TOKEN'</span>)]) {
+    sh <span class="str">'aws configure set aws_access_key_id $AWS_TOKEN'</span>
+}
+
+<span class="comment">// SSH key for server access</span>
+withCredentials([sshUserPrivateKey(
+    credentialsId: <span class="str">'prod-server-ssh'</span>,
+    keyFileVariable: <span class="str">'SSH_KEY'</span>
+)]) {
+    sh <span class="str">'ssh -i $SSH_KEY ubuntu@prod-server.com "docker pull myapp:latest"'</span>
+}</div></div>
+
+<div class="callout callout-warn"><div class="callout-label">⚠️ Common Mistake</div><p>Never echo or print credential variables in pipeline logs. Jenkins masks them automatically — but if you do string interpolation inside <code>sh</code> with double quotes, the value gets exposed in the log. Always use single quotes or withCredentials blocks carefully.</p></div>
+</div>
+
+<!-- ── SHARED LIBRARIES ──────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Shared Libraries — DRY Pipelines</h3>
+<p>If you have 20 microservices each with their own Jenkinsfile, maintaining them all is painful. Shared Libraries let you write pipeline logic once and reuse it across all projects.</p>
+
+<div class="arch-diagram">  GitHub Repo: jenkins-shared-library/
+  └── vars/
+      ├── buildAndPush.groovy    ← reusable step
+      └── deployToK8s.groovy     ← reusable step
+
+  Any Jenkinsfile can then call:
+  @Library('my-shared-lib') _
+  buildAndPush(image: 'myapp', tag: BUILD_NUMBER)
+  deployToK8s(env: 'production')</div>
+</div>
+
+<!-- ── INSTALL JENKINS ────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Setting Up Jenkins on EC2</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Install Jenkins on Ubuntu</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Install Java (Jenkins requires JDK 17+)</span>
+<span class="cmd">sudo apt update && sudo apt install fontconfig openjdk-17-jre -y</span>
+
+<span class="comment"># Add Jenkins repo and install</span>
+<span class="cmd">sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \</span>
+  <span class="cmd">https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key</span>
+<span class="cmd">echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \</span>
+  <span class="cmd">https://pkg.jenkins.io/debian-stable binary/ | sudo tee \</span>
+  <span class="cmd">/etc/apt/sources.list.d/jenkins.list > /dev/null</span>
+<span class="cmd">sudo apt update && sudo apt install jenkins -y</span>
+
+<span class="comment"># Start Jenkins</span>
+<span class="cmd">sudo systemctl enable jenkins && sudo systemctl start jenkins</span>
+
+<span class="comment"># Get initial admin password</span>
+<span class="cmd">sudo cat /var/lib/jenkins/secrets/initialAdminPassword</span>
+
+<span class="comment"># Access Jenkins at http://YOUR-EC2-IP:8080</span></div></div>
+</div>
+
+<!-- ── MINI PROJECT ───────────────────────────────── -->
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Full CI/CD Pipeline</div>
+<p>Build a complete pipeline from push to production:</p>
+<ol class="steps">
+  <li>Install Jenkins on an EC2 instance, install plugins: Git, Docker Pipeline, Kubernetes CLI</li>
+  <li>Store Docker Hub and GitHub credentials in Jenkins Credentials Store</li>
+  <li>Create a Jenkinsfile with stages: Checkout → Build (Maven) → Parallel (Unit Tests + Security Scan) → Docker Build & Push → Deploy to K8s</li>
+  <li>Configure a GitHub Webhook to trigger Jenkins on every push to main</li>
+  <li>Add a <code>when { branch 'main' }</code> condition so deploys only happen from main</li>
+  <li>Push a code change — watch the pipeline trigger automatically end to end</li>
+  <li>Break a test intentionally — verify the pipeline stops before deploying</li>
+</ol></div>
+
+<!-- ── SUMMARY ───────────────────────────────────── -->
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist">
+  <li>CI = auto-build and test on every push; CD = auto-deploy when tests pass</li>
+  <li>Jenkins uses a Controller + Agent model — never run builds on the Controller</li>
+  <li>Jenkinsfile defines your pipeline as code — version it in Git alongside your app</li>
+  <li>Use parallel stages to run independent checks simultaneously</li>
+  <li>Store all secrets in Jenkins Credentials Store — never hardcode in Jenkinsfile</li>
+  <li>Use Docker as agents to avoid polluting the Jenkins server with tool installations</li>
+  <li>Shared Libraries let you reuse pipeline logic across multiple projects</li>
+</ul></div>
+
+<div class="next-card" onclick="showModule('docker')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🐳 Docker — Containerization</div><div class="next-why">Jenkins automates deployment — but doesn't guarantee the same environment everywhere. Docker packages your app and its environment together. "Works on my machine" becomes "works everywhere."</div></div><div class="next-arrow">→</div></div>

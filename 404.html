@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — DevOps Buddy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#080c10;color:#c9d1d9;font-family:'Syne',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;}
+    .wrap{max-width:480px;}
+    .code{font-family:'DM Mono',monospace;font-size:96px;font-weight:800;line-height:1;background:linear-gradient(135deg,#00d4ff,#0095ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px;}
+    h1{font-size:24px;font-weight:700;color:#fff;margin-bottom:12px;}
+    p{font-size:14px;color:#6e7681;line-height:1.7;margin-bottom:32px;}
+    .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+    a.btn{padding:10px 24px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;transition:opacity .15s;}
+    a.btn:hover{opacity:.85;}
+    a.primary{background:#00d4ff;color:#000;}
+    a.secondary{background:transparent;color:#c9d1d9;border:1px solid #30363d;}
+    .terminal{background:#0e1318;border:1px solid #1e2d3d;border-radius:8px;padding:16px 20px;margin-bottom:32px;font-family:'DM Mono',monospace;font-size:12px;color:#3fb950;text-align:left;line-height:1.8;}
+    .prompt{color:#6e7681;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="code">404</div>
+    <h1>Page not found</h1>
+    <p>Looks like this page doesn't exist — or it was moved.<br>Let's get you back on track.</p>
+    <div class="terminal">
+      <div><span class="prompt">$ </span>curl devopsbuddy.in/this-page</div>
+      <div style="color:#f85149">Error 404: Not Found</div>
+      <div style="margin-top:8px"><span class="prompt">$ </span>cd / && ls modules/</div>
+      <div style="color:#58a6ff">docker  kubernetes  terraform  ansible  monitoring ...</div>
+    </div>
+    <div class="btns">
+      <a href="/" class="btn primary">← Back to Home</a>
+      <a href="https://github.com/Star-codi/devops-website/issues" target="_blank" class="btn secondary">Report an Issue</a>
+    </div>
+  </div>
+</body>
+</html>

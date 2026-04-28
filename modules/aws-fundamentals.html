@@ -214,6 +214,81 @@
 </div>
 
 <!-- ── MINI PROJECT ───────────────────────────────── -->
+<!-- ── INTERACTIVE AWS ARCHITECTURE BUILDER ──────── -->
+<div class="section">
+<h3 class="section-title">🖥️ Interactive — AWS Architecture Builder</h3>
+<p>Drag AWS services onto the canvas, wire them together, and validate your architecture. Load a preset to see how real-world setups are structured.</p>
+<div style="margin-top:16px;border-radius:10px;overflow:hidden;border:1px solid #30363d">
+<style>
+#aws-builder{--bg:#0d1117;--sur:#161b22;--sur2:#1c2128;--bdr:#30363d;--grn:#3fb950;--yel:#e3b341;--red:#f85149;--txt:#c9d1d9;--wht:#f0f6fc;--mut:#6e7681;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--txt);}
+#aws-builder *{box-sizing:border-box;margin:0;padding:0;}
+#aws-builder .ab-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--sur);border-bottom:1px solid var(--bdr);}
+#aws-builder .ab-title{font-size:14px;font-weight:600;color:var(--wht);}
+#aws-builder .ab-sub{font-size:11px;color:var(--mut);margin-top:2px;}
+#aws-builder .ab-body{display:grid;grid-template-columns:180px 1fr;min-height:440px;}
+#aws-builder .ab-panel{background:var(--sur);border-right:1px solid var(--bdr);padding:12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+#aws-builder .panel-label{font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;}
+#aws-builder .svc-btn{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--bdr);border-radius:6px;background:var(--sur2);cursor:pointer;font-size:12px;color:var(--txt);width:100%;text-align:left;transition:border-color .15s;}
+#aws-builder .svc-btn:hover{border-color:#4b5563;}
+#aws-builder .svc-icon{font-size:16px;width:22px;text-align:center;}
+#aws-builder .ab-divider{height:1px;background:var(--bdr);}
+#aws-builder .preset-btn{padding:5px 8px;border:1px solid var(--bdr);border-radius:4px;background:transparent;color:#58a6ff;font-size:10px;cursor:pointer;width:100%;text-align:left;font-family:'DM Mono',monospace;}
+#aws-builder .preset-btn:hover{background:rgba(88,166,255,.08);border-color:#58a6ff;}
+#aws-builder .ab-canvas-wrap{position:relative;overflow:hidden;}
+#aws-builder #aws-canvas{position:relative;width:100%;height:420px;background:var(--bg);background-image:radial-gradient(circle,#1e293b 1px,transparent 1px);background-size:24px 24px;}
+#aws-builder #aws-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+#aws-builder .aws-node.selected{box-shadow:0 0 0 2px #fff3,0 0 12px rgba(255,255,255,.1);}
+#aws-builder .aws-node.connecting{animation:pulse-connect .6s ease-in-out infinite;}
+@keyframes pulse-connect{0%,100%{opacity:1}50%{opacity:.6}}
+#aws-builder .ab-toolbar{display:flex;gap:6px;padding:8px 12px;background:var(--sur);border-top:1px solid var(--bdr);flex-wrap:wrap;}
+#aws-builder .tool-btn{padding:5px 12px;border-radius:5px;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Mono',monospace;}
+#aws-builder .tool-btn:hover{opacity:.85;}
+#aws-builder .tool-btn.connect{background:#3b82f6;color:#fff;}
+#aws-builder .tool-btn.del{background:var(--red);color:#fff;}
+#aws-builder .tool-btn.clear{background:var(--sur2);color:var(--txt);border:1px solid var(--bdr);}
+#aws-builder .tool-btn.validate{background:var(--grn);color:#000;}
+#aws-builder .ab-info{padding:10px 16px;font-size:12px;line-height:1.6;min-height:44px;background:var(--sur2);border-top:1px solid var(--bdr);}
+</style>
+<div id="aws-builder">
+  <div class="ab-hdr">
+    <div><div class="ab-title">🔶 AWS Architecture Builder</div><div class="ab-sub">Add services · Connect them · Validate your design</div></div>
+  </div>
+  <div class="ab-body">
+    <div class="ab-panel">
+      <div class="panel-label">Services</div>
+      <button class="svc-btn" onclick="awsAddService('ec2')"><span class="svc-icon">🖥️</span>EC2</button>
+      <button class="svc-btn" onclick="awsAddService('s3')"><span class="svc-icon">🪣</span>S3</button>
+      <button class="svc-btn" onclick="awsAddService('rds')"><span class="svc-icon">🗄️</span>RDS</button>
+      <button class="svc-btn" onclick="awsAddService('elb')"><span class="svc-icon">⚖️</span>ALB</button>
+      <button class="svc-btn" onclick="awsAddService('igw')"><span class="svc-icon">🌐</span>IGW</button>
+      <button class="svc-btn" onclick="awsAddService('lambda')"><span class="svc-icon">λ</span>Lambda</button>
+      <button class="svc-btn" onclick="awsAddService('cf')"><span class="svc-icon">🚀</span>CloudFront</button>
+      <button class="svc-btn" onclick="awsAddService('sns')"><span class="svc-icon">📢</span>SNS</button>
+      <button class="svc-btn" onclick="awsAddService('iam')"><span class="svc-icon">🔑</span>IAM</button>
+      <button class="svc-btn" onclick="awsAddService('vpc')"><span class="svc-icon">🔒</span>VPC</button>
+      <div class="ab-divider"></div>
+      <div class="panel-label">Presets</div>
+      <button class="preset-btn" onclick="awsLoadPreset('static')">🌐 Static Website</button>
+      <button class="preset-btn" onclick="awsLoadPreset('webapp')">🏗️ 3-Tier Web App</button>
+      <button class="preset-btn" onclick="awsLoadPreset('serverless')">λ Serverless API</button>
+    </div>
+    <div class="ab-canvas-wrap">
+      <svg id="aws-svg"></svg>
+      <div id="aws-canvas"></div>
+    </div>
+  </div>
+  <div class="ab-toolbar">
+    <button class="tool-btn connect"  onclick="awsConnect()">🔗 Connect</button>
+    <button class="tool-btn del"      onclick="awsDelete()">🗑 Delete</button>
+    <button class="tool-btn clear"    onclick="awsClear()">↺ Clear</button>
+    <button class="tool-btn validate" onclick="awsValidate()" style="margin-left:auto">✅ Validate</button>
+  </div>
+  <div class="ab-info" id="aws-info">Pick a preset or add services from the panel to start building.</div>
+</div>
+<script src="modules/aws-builder.js"></script>
+</div>
+</div>
+
 <div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Static Website on S3 with Monitoring</div>
 <ol class="steps">
   <li>Create an IAM user with S3 and CloudWatch permissions — configure AWS CLI with those credentials</li>
