@@ -1,0 +1,221 @@
+<div class="module-header"><div class="module-icon">⎈</div><div class="module-meta"><div class="module-tag">Module 12B — Kubernetes Packaging</div><h2 class="module-title">Helm — The Package Manager for Kubernetes</h2></div></div>
+
+<div class="section"><h3 class="section-title">Why Helm Exists</h3>
+<p>Deploying an app to Kubernetes means writing YAML — lots of it. A production app typically needs a Deployment, a Service, a ConfigMap, a Secret, an Ingress, HorizontalPodAutoscaler, and more. That's 5-10 YAML files just for one app. Now imagine deploying that app to dev, staging, and production with slightly different values in each environment.</p>
+<p>Without Helm you copy-paste YAML files and manually edit them for each environment. When something changes — a new image tag, a port number — you edit multiple files and hope you got them all. That's error-prone and doesn't scale.</p>
+<div class="callout callout-analogy"><div class="callout-label">📦 Analogy — apt / npm for Kubernetes</div><p>Think of Helm the same way you think of <code>apt install nginx</code> on Ubuntu or <code>npm install express</code> in Node.js. Instead of manually downloading binaries and configuring them, you run one command and get a working, production-grade installation. <strong>Helm does the same thing for Kubernetes applications.</strong></p></div>
+</div>
+
+<div class="section"><h3 class="section-title">Core Concepts</h3>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">Chart</div><div class="cc-desc">A Helm package. Contains all the Kubernetes YAML templates for an application, along with default configuration values.</div></div>
+  <div class="concept-card"><div class="cc-icon">🚀</div><div class="cc-title">Release</div><div class="cc-desc">A running instance of a chart in your cluster. You can install the same chart multiple times — each is a separate release with its own name.</div></div>
+  <div class="concept-card"><div class="cc-icon">⚙️</div><div class="cc-title">Values</div><div class="cc-desc">Configuration that gets injected into chart templates. Override defaults per environment (dev vs prod) without touching the templates.</div></div>
+  <div class="concept-card"><div class="cc-icon">🗄️</div><div class="cc-title">Repository</div><div class="cc-desc">A collection of charts, hosted online. Like Docker Hub for images — but for Helm charts. Artifact Hub is the main public registry.</div></div>
+</div>
+</div>
+
+<div class="section"><h3 class="section-title">Chart File Structure</h3>
+<p>When you run <code>helm create my-app</code>, Helm scaffolds this structure:</p>
+<div class="arch-diagram">my-app/
+├── Chart.yaml          # Chart metadata — name, version, description
+├── values.yaml         # Default configuration values
+├── charts/             # Dependency charts (sub-charts)
+└── templates/          # Kubernetes YAML templates
+    ├── deployment.yaml
+    ├── service.yaml
+    ├── ingress.yaml
+    ├── configmap.yaml
+    ├── _helpers.tpl    # Reusable template snippets
+    └── NOTES.txt       # Post-install instructions shown to user</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Chart.yaml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">apiVersion: v2
+name: my-app
+description: A Helm chart for my Node.js application
+type: application
+version: 0.1.0        <span class="comment"># Chart version (you bump this on changes)</span>
+appVersion: "1.0.0"   <span class="comment"># App version (the Docker image tag)</span></div></div>
+</div>
+
+<div class="section"><h3 class="section-title">values.yaml — The Heart of Helm</h3>
+<p>This is where all your configurable values live. Templates reference these with <code>{{ .Values.key }}</code>.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">values.yaml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">replicaCount: 2
+
+image:
+  repository: myregistry/my-app
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+ingress:
+  enabled: true
+  host: app.example.com
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "256Mi"
+
+env:
+  NODE_ENV: production
+  LOG_LEVEL: info</div></div>
+
+<div class="callout callout-tip"><div class="callout-label">💡 Per-environment overrides</div><p>Keep a <code>values.yaml</code> for defaults, then <code>values-dev.yaml</code>, <code>values-staging.yaml</code>, <code>values-prod.yaml</code> for overrides. Pass them with <code>-f values-prod.yaml</code> at install time. Only put the things that differ — Helm merges them.</p></div>
+</div>
+
+<div class="section"><h3 class="section-title">Templates — YAML + Go Templating</h3>
+<p>Templates are regular Kubernetes YAML files with <code>{{ }}</code> placeholders that Helm fills in from <code>values.yaml</code>.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">templates/deployment.yaml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-app          <span class="comment"># e.g. "myrelease-app"</span>
+  labels:
+    app: {{ .Chart.Name }}
+    version: {{ .Chart.AppVersion }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          env:
+            {{- range $key, $val := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}</div></div>
+</div>
+
+<div class="section"><h3 class="section-title">Essential Helm Commands</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Core Workflow</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># ── Repositories ──────────────────────────────────</span>
+<span class="cmd">helm repo add bitnami https://charts.bitnami.com/bitnami</span>
+<span class="cmd">helm repo update</span>
+<span class="cmd">helm search repo bitnami/nginx</span>
+<span class="cmd">helm search hub wordpress</span>         <span class="comment"># search Artifact Hub</span>
+
+<span class="comment"># ── Install ────────────────────────────────────────</span>
+<span class="cmd">helm install my-nginx bitnami/nginx</span>
+<span class="cmd">helm install my-app ./my-app</span>                    <span class="comment"># local chart</span>
+<span class="cmd">helm install my-app ./my-app -f values-prod.yaml</span> <span class="comment"># with overrides</span>
+<span class="cmd">helm install my-app ./my-app --set image.tag=2.0.0</span>
+
+<span class="comment"># ── View ──────────────────────────────────────────</span>
+<span class="cmd">helm list</span>                            <span class="comment"># all releases</span>
+<span class="cmd">helm status my-app</span>                   <span class="comment"># release status</span>
+<span class="cmd">helm get values my-app</span>               <span class="comment"># values used</span>
+<span class="cmd">helm get manifest my-app</span>             <span class="comment"># rendered YAML</span>
+
+<span class="comment"># ── Upgrade ───────────────────────────────────────</span>
+<span class="cmd">helm upgrade my-app ./my-app --set image.tag=2.1.0</span>
+<span class="cmd">helm upgrade --install my-app ./my-app</span>  <span class="comment"># install if not exists</span>
+
+<span class="comment"># ── Rollback ──────────────────────────────────────</span>
+<span class="cmd">helm history my-app</span>                  <span class="comment"># see revision history</span>
+<span class="cmd">helm rollback my-app 1</span>               <span class="comment"># roll back to revision 1</span>
+
+<span class="comment"># ── Debug ─────────────────────────────────────────</span>
+<span class="cmd">helm template my-app ./my-app</span>        <span class="comment"># render templates locally</span>
+<span class="cmd">helm lint ./my-app</span>                   <span class="comment"># validate chart</span>
+<span class="cmd">helm install my-app ./my-app --dry-run</span> <span class="comment"># simulate install</span>
+
+<span class="comment"># ── Uninstall ─────────────────────────────────────</span>
+<span class="cmd">helm uninstall my-app</span></div></div>
+</div>
+
+<div class="section"><h3 class="section-title">Real-World Example — Deploying PostgreSQL</h3>
+<p>Without Helm: write a Deployment, StatefulSet, Service, PVC, Secret, ConfigMap — hundreds of lines. With Helm:</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">helm repo add bitnami https://charts.bitnami.com/bitnami</span>
+<span class="cmd">helm repo update</span>
+
+<span class="cmd">helm install my-postgres bitnami/postgresql \
+  --set auth.postgresPassword=secret123 \
+  --set primary.persistence.size=20Gi \
+  --set replication.enabled=true \
+  --set replication.numSynchronousReplicas=1</span>
+
+<span class="out">NAME: my-postgres</span>
+<span class="out">LAST DEPLOYED: Mon Jan 15 09:23:11 2024</span>
+<span class="out">STATUS: deployed</span>
+<span class="out">NOTES:</span>
+<span class="out">  PostgreSQL can be accessed via port 5432 on the following DNS name:</span>
+<span class="out">  my-postgres-postgresql.default.svc.cluster.local</span></div></div>
+<p>That single command deployed a production-grade PostgreSQL with replication, persistent storage, secrets management, and health checks — all from a battle-tested chart maintained by the Bitnami team.</p>
+</div>
+
+<div class="section"><h3 class="section-title">Helm in a CI/CD Pipeline</h3>
+<div class="flow">
+  <div class="flow-box active">Code push</div><div class="flow-arrow">→</div>
+  <div class="flow-box">Docker build</div><div class="flow-arrow">→</div>
+  <div class="flow-box">Push image</div><div class="flow-arrow">→</div>
+  <div class="flow-box active">helm upgrade --install</div><div class="flow-arrow">→</div>
+  <div class="flow-box">Deployed ✓</div>
+</div>
+<div class="code-block"><div class="code-header"><span class="code-lang">Jenkinsfile / GitHub Actions step</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Build and push image</span>
+<span class="cmd">docker build -t myregistry/my-app:$GIT_SHA .</span>
+<span class="cmd">docker push myregistry/my-app:$GIT_SHA</span>
+
+<span class="comment"># Deploy with Helm — upgrades if exists, installs if new</span>
+<span class="cmd">helm upgrade --install my-app ./helm/my-app \
+  --namespace production \
+  --create-namespace \
+  --set image.tag=$GIT_SHA \
+  -f helm/my-app/values-prod.yaml \
+  --wait \
+  --timeout 5m</span></div></div>
+<div class="callout callout-tip"><div class="callout-label">💡 --wait flag</div><p><code>--wait</code> tells Helm to block until all pods are Running and Ready. Your pipeline fails fast if the deployment is broken — rather than succeeding and leaving broken pods behind.</p></div>
+</div>
+
+<div class="section"><h3 class="section-title">Helm vs Raw kubectl apply</h3>
+<table class="compare-table"><thead><tr><th></th><th>kubectl apply -f</th><th>helm install</th></tr></thead><tbody>
+<tr><td>Environment overrides</td><td>Copy-paste YAML and edit</td><td>One values file per env</td></tr>
+<tr><td>Rollback</td><td>Manually revert YAML</td><td><code>helm rollback</code></td></tr>
+<tr><td>Release history</td><td>None</td><td>Full revision history</td></tr>
+<tr><td>Dependency management</td><td>Manual</td><td><code>helm dependency update</code></td></tr>
+<tr><td>Community charts</td><td>None</td><td>Thousands on Artifact Hub</td></tr>
+<tr><td>Dry run</td><td><code>--dry-run</code></td><td><code>helm template</code> or <code>--dry-run</code></td></tr>
+</tbody></table>
+</div>
+
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Chart Your Own App</div>
+<p>Take the Docker app from Module 09 and package it as a Helm chart:</p>
+<ol class="steps">
+  <li><span class="step-num">1</span>Run <code>helm create my-node-app</code> and explore the generated structure</li>
+  <li><span class="step-num">2</span>Edit <code>values.yaml</code> — set your image repository and tag</li>
+  <li><span class="step-num">3</span>Run <code>helm template my-node-app ./my-node-app</code> to see the rendered YAML</li>
+  <li><span class="step-num">4</span>Run <code>helm lint ./my-node-app</code> to validate</li>
+  <li><span class="step-num">5</span>Install to Minikube: <code>helm install my-node-app ./my-node-app</code></li>
+  <li><span class="step-num">6</span>Upgrade with a new tag: <code>helm upgrade my-node-app ./my-node-app --set image.tag=2.0.0</code></li>
+  <li><span class="step-num">7</span>Roll back: <code>helm rollback my-node-app 1</code></li>
+</ol>
+</div>
+
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div>
+<ul class="checklist">
+  <li>Helm is the package manager for Kubernetes — it templates your YAML and manages releases</li>
+  <li>A <strong>Chart</strong> is the package, a <strong>Release</strong> is a running instance, <strong>Values</strong> are the config</li>
+  <li><code>values.yaml</code> holds defaults; override per environment with <code>-f values-prod.yaml</code></li>
+  <li><code>helm upgrade --install</code> is the standard CI/CD deploy command — idempotent and safe</li>
+  <li><code>helm rollback</code> gives instant recovery; <code>helm history</code> shows what changed and when</li>
+  <li>Use <code>helm template</code> and <code>helm lint</code> locally before deploying</li>
+</ul>
+</div>
+
+<div class="next-card" onclick="showModule('nginx')">
+  <div><div class="next-label">Up Next</div><div class="next-title">🌐 Nginx — Reverse Proxy & Load Balancing</div><div class="next-why">The web server that sits in front of every production app</div></div>
+  <div class="next-arrow">→</div>
+</div>

@@ -9,8 +9,8 @@ const MODULE_ORDER = [
   'linux', 'shell',
   'git', 'maven',
   'jenkins', 'github-actions', 'docker', 'kubernetes',
-  'terraform', 'ansible',
-  'monitoring', 'vpc',
+  'helm', 'terraform', 'ansible',
+  'nginx', 'elk', 'monitoring', 'vpc',
   'security', 'interview', 'nextsteps'
 ];
 

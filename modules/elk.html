@@ -1,0 +1,269 @@
+<div class="module-header"><div class="module-icon">🔍</div><div class="module-meta"><div class="module-tag">Module 12D — Centralised Logging</div><h2 class="module-title">ELK Stack — Elasticsearch, Logstash & Kibana</h2></div></div>
+
+<div class="section"><h3 class="section-title">Metrics vs Logs — Two Different Problems</h3>
+<p>You already know Prometheus and Grafana from the Monitoring module. Prometheus answers: <em>"How many requests per second? What's the CPU usage? How many errors in the last 5 minutes?"</em> These are <strong>metrics</strong> — numbers over time.</p>
+<p>But when something goes wrong, you need to answer: <em>"What exactly happened? Which user triggered it? What was the full error message? What was the sequence of events?"</em> That's a <strong>logs</strong> problem — and that's what the ELK Stack solves.</p>
+<div class="callout callout-analogy"><div class="callout-label">🏥 Analogy — Hospital Monitors vs Medical Records</div><p>Prometheus/Grafana = the heart rate monitor. Shows live numbers, alerts when something spikes. The ELK Stack = the patient's medical record. Captures every event — what happened, when, what the doctor said, what medication was given. You need both: the monitor to know <em>something is wrong</em>, the record to understand <em>what and why</em>.</p></div>
+</div>
+
+<div class="section"><h3 class="section-title">The Three Components</h3>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🔎</div><div class="cc-title">Elasticsearch</div><div class="cc-desc">The database and search engine. Stores all your logs as JSON documents. Allows full-text search across billions of log lines in milliseconds.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔧</div><div class="cc-title">Logstash</div><div class="cc-desc">The pipeline. Ingests logs from any source, parses and transforms them (extract fields, drop noise, add metadata), then sends them to Elasticsearch.</div></div>
+  <div class="concept-card"><div class="cc-icon">📊</div><div class="cc-title">Kibana</div><div class="cc-desc">The dashboard. A web UI to search, filter, and visualise your logs. Build dashboards showing error rates, user activity, service health — from log data.</div></div>
+</div>
+<p>In modern stacks you'll also see <strong>Beats</strong> (lightweight log shippers installed on each server) and <strong>Logstash</strong> is sometimes replaced with <strong>Fluentd</strong> or <strong>Fluent Bit</strong> in Kubernetes environments.</p>
+</div>
+
+<div class="section"><h3 class="section-title">How Logs Flow Through the Stack</h3>
+<div class="arch-diagram">Your Apps & Servers                 ELK Stack
+┌──────────────────┐
+│  App Server 1     │──Filebeat──┐
+│  (Node.js logs)   │            │
+└──────────────────┘            │    ┌───────────┐    ┌──────────────┐    ┌────────┐
+                                ├───▶│ Logstash  │───▶│Elasticsearch │───▶│ Kibana │
+┌──────────────────┐            │    │(parse &   │    │(store &      │    │(search │
+│  App Server 2     │──Filebeat──┤    │ transform)│    │ index logs)  │    │& viz)  │
+│  (Python logs)    │            │    └───────────┘    └──────────────┘    └────────┘
+└──────────────────┘            │
+                                │
+┌──────────────────┐            │
+│  Nginx Server     │──Filebeat──┘
+│  (access logs)    │
+└──────────────────┘
+
+1. Filebeat tails log files and ships them
+2. Logstash parses raw text into structured JSON
+3. Elasticsearch indexes and stores the JSON
+4. Kibana lets you search, filter, and visualise</div>
+</div>
+
+<div class="section"><h3 class="section-title">Running ELK with Docker Compose</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">docker-compose.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">version: '3.8'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    environment:
+      - discovery.type=single-node         <span class="comment"># single node (dev only)</span>
+      - xpack.security.enabled=false       <span class="comment"># disable auth for dev</span>
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m    <span class="comment"># limit heap size</span>
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+      - "5044:5044"   <span class="comment"># Beats input</span>
+      - "5000:5000"   <span class="comment"># TCP input</span>
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    ports:
+      - "5601:5601"   <span class="comment"># Web UI</span>
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.11.0
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/log:/var/log:ro               <span class="comment"># mount host logs</span>
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      - logstash
+
+volumes:
+  esdata:</div></div>
+</div>
+
+<div class="section"><h3 class="section-title">Logstash Pipeline — Parsing Raw Logs</h3>
+<p>The pipeline file has three sections: <strong>input</strong> (where logs come from), <strong>filter</strong> (parse and transform), <strong>output</strong> (where to send them).</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">logstash/pipeline/main.conf</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># ── INPUT ─────────────────────────────────────────</span>
+input {
+  beats {
+    port => 5044           <span class="comment"># receive from Filebeat</span>
+  }
+  tcp {
+    port => 5000           <span class="comment"># receive raw TCP (apps can log directly)</span>
+    codec => json
+  }
+}
+
+<span class="comment"># ── FILTER ────────────────────────────────────────</span>
+filter {
+  <span class="comment"># Parse Nginx access log format</span>
+  if [fields][service] == "nginx" {
+    grok {
+      match => {
+        "message" => '%{IPORHOST:client_ip} - - \[%{HTTPDATE:timestamp}\] "%{WORD:method} %{URIPATHPARAM:path} HTTP/%{NUMBER:http_version}" %{NUMBER:status_code} %{NUMBER:bytes}'
+      }
+    }
+    mutate {
+      convert => { "status_code" => "integer" }
+      convert => { "bytes" => "integer" }
+    }
+  }
+
+  <span class="comment"># Parse JSON app logs (if your app logs JSON)</span>
+  if [fields][service] == "app" {
+    json {
+      source => "message"
+    }
+  }
+
+  <span class="comment"># Add environment tag</span>
+  mutate {
+    add_field => { "environment" => "production" }
+    remove_field => ["host", "agent"]
+  }
+
+  <span class="comment"># Drop health check logs (noise)</span>
+  if [path] == "/health" {
+    drop { }
+  }
+}
+
+<span class="comment"># ── OUTPUT ────────────────────────────────────────</span>
+output {
+  elasticsearch {
+    hosts => ["http://elasticsearch:9200"]
+    index => "logs-%{[fields][service]}-%{+YYYY.MM.dd}"
+    <span class="comment"># Creates indices like: logs-nginx-2024.01.15</span>
+  }
+}</div></div>
+</div>
+
+<div class="section"><h3 class="section-title">Filebeat — Shipping Logs from Servers</h3>
+<p>Filebeat is a lightweight agent installed on each server. It tails log files and ships them to Logstash (or directly to Elasticsearch).</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">filebeat.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/nginx/access.log
+      - /var/log/nginx/error.log
+    fields:
+      service: nginx           <span class="comment"># tag so Logstash knows which parser to use</span>
+    fields_under_root: true
+
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/myapp/*.log
+    fields:
+      service: app
+    fields_under_root: true
+    multiline:                 <span class="comment"># handle multi-line stack traces</span>
+      pattern: '^\['
+      negate: true
+      match: after
+
+  <span class="comment"># Auto-discover Docker container logs</span>
+  - type: container
+    paths:
+      - /var/lib/docker/containers/*/*.log
+
+output.logstash:
+  hosts: ["logstash:5044"]</div></div>
+</div>
+
+<div class="section"><h3 class="section-title">Kibana — Querying and Dashboards</h3>
+<p>Once logs are in Elasticsearch, Kibana lets you search them with KQL (Kibana Query Language).</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">KQL — Kibana Query Language Examples</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Find all errors in the last hour</span>
+status_code >= 500
+
+<span class="comment"># Find errors for a specific user</span>
+status_code >= 500 AND user_id: "usr_123"
+
+<span class="comment"># Full text search</span>
+"NullPointerException"
+
+<span class="comment"># Find slow requests (response time > 2 seconds)</span>
+response_time > 2000 AND service: "api"
+
+<span class="comment"># Exclude noise</span>
+NOT path: "/health" AND NOT path: "/metrics"
+
+<span class="comment"># Find all 404s for a specific endpoint</span>
+status_code: 404 AND path: "/api/users/*"</div></div>
+
+<p>Beyond search, Kibana lets you build dashboards — line charts of error rates over time, pie charts of status code distribution, geo maps of where traffic is coming from. All from your log data.</p>
+<div class="callout callout-tip"><div class="callout-label">💡 Log what matters</div><p>Structure your application logs as JSON from day one. Instead of <code>console.log("User 123 logged in")</code>, do <code>logger.info({ event: "login", userId: "123", ip: "1.2.3.4", duration_ms: 45 })</code>. Structured logs are searchable, filterable, and alertable. Unstructured logs are a wall of text.</p></div>
+</div>
+
+<div class="section"><h3 class="section-title">Elasticsearch Basics</h3>
+<p>Elasticsearch is a REST API at heart. You can interact with it directly using HTTP:</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Elasticsearch REST API</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Check cluster health</span>
+<span class="cmd">curl http://localhost:9200/_cluster/health</span>
+<span class="out">{"status":"green","number_of_nodes":1,"active_shards":12}</span>
+
+<span class="comment"># List all indices</span>
+<span class="cmd">curl http://localhost:9200/_cat/indices?v</span>
+<span class="out">health index                  docs.count store.size</span>
+<span class="out">green  logs-nginx-2024.01.15  142033     48.2mb</span>
+<span class="out">green  logs-app-2024.01.15    89204      31.8mb</span>
+
+<span class="comment"># Search — find all 500 errors</span>
+<span class="cmd">curl -X GET "localhost:9200/logs-*/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "range": {
+      "status_code": { "gte": 500 }
+    }
+  },
+  "size": 10,
+  "sort": [{ "@timestamp": "desc" }]
+}'</span>
+
+<span class="comment"># Delete old indices (housekeeping)</span>
+<span class="cmd">curl -X DELETE "localhost:9200/logs-nginx-2024.01.01"</span></div></div>
+</div>
+
+<div class="section"><h3 class="section-title">ELK vs Prometheus — When to Use Which</h3>
+<table class="compare-table"><thead><tr><th></th><th>Prometheus + Grafana</th><th>ELK Stack</th></tr></thead><tbody>
+<tr><td>Data type</td><td>Time-series metrics (numbers)</td><td>Log events (text + structured)</td></tr>
+<tr><td>Question it answers</td><td>"How many?" "How fast?" "How much?"</td><td>"What happened?" "Which user?" "Full trace?"</td></tr>
+<tr><td>Retention</td><td>Days to weeks</td><td>Weeks to months</td></tr>
+<tr><td>Storage cost</td><td>Low (numbers)</td><td>High (raw text)</td></tr>
+<tr><td>Best for</td><td>Alerting on thresholds</td><td>Debugging incidents</td></tr>
+<tr><td>Use together?</td><td colspan="2" style="text-align:center">✅ Yes — metrics tell you something's wrong, logs tell you why</td></tr>
+</tbody></table>
+</div>
+
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Log Pipeline</div>
+<ol class="steps">
+  <li><span class="step-num">1</span>Spin up the ELK Docker Compose stack above</li>
+  <li><span class="step-num">2</span>Open Kibana at <code>http://localhost:5601</code></li>
+  <li><span class="step-num">3</span>Configure Filebeat to ship your Nginx logs (or app logs)</li>
+  <li><span class="step-num">4</span>Create a Kibana index pattern for <code>logs-*</code></li>
+  <li><span class="step-num">5</span>Use the Discover tab to search for 404 errors</li>
+  <li><span class="step-num">6</span>Build a dashboard with: error rate over time, top URLs by traffic, status code distribution</li>
+  <li><span class="step-num">7</span>Trigger an error in your app and find it in Kibana within seconds</li>
+</ol>
+</div>
+
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div>
+<ul class="checklist">
+  <li><strong>Elasticsearch</strong> stores and indexes logs as searchable JSON documents</li>
+  <li><strong>Logstash</strong> ingests, parses, and transforms raw log text into structured data</li>
+  <li><strong>Kibana</strong> provides the web UI for search, filtering, and dashboards</li>
+  <li><strong>Filebeat</strong> is the lightweight agent that tails log files and ships them</li>
+  <li>Logstash pipelines have three sections: <strong>input → filter → output</strong></li>
+  <li>Use <code>grok</code> to parse unstructured text logs; prefer structured JSON logs from your app</li>
+  <li>ELK solves logs; Prometheus solves metrics — you need both in production</li>
+  <li>Name indices with dates (<code>logs-app-YYYY.MM.dd</code>) for easy rotation and deletion</li>
+</ul>
+</div>
+
+<div class="next-card" onclick="showModule('security')">
+  <div><div class="next-label">Up Next</div><div class="next-title">🔐 DevSecOps Basics</div><div class="next-why">Security integrated into every stage of the pipeline</div></div>
+  <div class="next-arrow">→</div>
+</div>

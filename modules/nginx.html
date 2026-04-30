@@ -1,0 +1,245 @@
+<div class="module-header"><div class="module-icon">🌐</div><div class="module-meta"><div class="module-tag">Module 12C — Web Server & Proxy</div><h2 class="module-title">Nginx — Reverse Proxy, Load Balancer & Web Server</h2></div></div>
+
+<div class="section"><h3 class="section-title">What Nginx Actually Does</h3>
+<p>Nginx (pronounced "engine-x") is the most widely deployed web server in the world. But calling it just a "web server" undersells it. In DevOps, you use Nginx primarily as a <strong>reverse proxy</strong> and <strong>load balancer</strong> — the traffic cop that sits in front of all your backend services.</p>
+<div class="callout callout-analogy"><div class="callout-label">🏨 Analogy — Hotel Receptionist</div><p>Imagine a hotel with 10 floors of rooms (your backend services). Guests (HTTP requests) don't wander the building looking for their room. They go to the receptionist (Nginx) who checks their request and directs them: "Room 301 is Node.js on port 3000, Room 405 is the Python API on port 5000, the conference room is the static website." The guest never knows what's behind the desk. That's a reverse proxy.</p></div>
+</div>
+
+<div class="section"><h3 class="section-title">Forward Proxy vs Reverse Proxy</h3>
+<table class="compare-table"><thead><tr><th></th><th>Forward Proxy</th><th>Reverse Proxy (Nginx)</th></tr></thead><tbody>
+<tr><td>Sits between</td><td>Client ↔ Internet</td><td>Internet ↔ Backend servers</td></div>
+<tr><td>Client knows</td><td>It's using a proxy</td><td>Nothing — talks to Nginx directly</td></tr>
+<tr><td>Use case</td><td>Bypass geo-restrictions, corporate filtering</td><td>Load balancing, SSL termination, caching</td></tr>
+<tr><td>Example</td><td>VPN, Squid</td><td>Nginx, HAProxy, Traefik</td></tr>
+</tbody></table>
+<div class="arch-diagram">  WITHOUT NGINX                    WITH NGINX (Reverse Proxy)
+
+  Client → :3000 (Node.js)         Client → :443 (Nginx)
+  Client → :5000 (Python)                        ↓
+  Client → :8080 (Java)            Nginx → :3000  /api/users
+                                   Nginx → :5000  /api/orders
+  3 ports exposed                  Nginx → :8080  /api/payments
+  No SSL                           Nginx → /       static files
+  No load balancing
+                                   1 port exposed, SSL, load balanced</div>
+</div>
+
+<div class="section"><h3 class="section-title">Installing & Basic Config</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Install</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Ubuntu / Debian</span>
+<span class="cmd">sudo apt update && sudo apt install nginx -y</span>
+<span class="cmd">sudo systemctl start nginx</span>
+<span class="cmd">sudo systemctl enable nginx</span>       <span class="comment"># start on boot</span>
+<span class="cmd">sudo systemctl status nginx</span>
+
+<span class="comment"># Test config before reloading (always do this!)</span>
+<span class="cmd">sudo nginx -t</span>
+<span class="out">nginx: the configuration file /etc/nginx/nginx.conf syntax is ok</span>
+<span class="out">nginx: configuration file /etc/nginx/nginx.conf test is successful</span>
+
+<span class="comment"># Reload config without downtime</span>
+<span class="cmd">sudo nginx -s reload</span></div></div>
+
+<p>Nginx config lives in <code>/etc/nginx/</code>. The key files:</p>
+<div class="arch-diagram">/etc/nginx/
+├── nginx.conf              # Main config — worker processes, logging
+├── sites-available/        # Config files for each site (disabled)
+│   └── myapp.conf
+├── sites-enabled/          # Symlinks to active sites
+│   └── myapp.conf → ../sites-available/myapp.conf
+└── conf.d/                 # Alternative — drop .conf files here</div>
+</div>
+
+<div class="section"><h3 class="section-title">Reverse Proxy — The Most Common Pattern</h3>
+<p>Your Node.js app runs on port 3000 internally. Nginx listens on port 80/443 and forwards traffic to it. Users only ever talk to Nginx.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">/etc/nginx/sites-available/myapp.conf</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">server {
+    listen 80;
+    server_name app.example.com;
+
+    <span class="comment"># Redirect HTTP → HTTPS</span>
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name app.example.com;
+
+    <span class="comment"># SSL certificates (from Let's Encrypt)</span>
+    ssl_certificate     /etc/letsencrypt/live/app.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/app.example.com/privkey.pem;
+
+    <span class="comment"># Reverse proxy to your Node.js app</span>
+    location / {
+        proxy_pass         http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade $http_upgrade;
+        proxy_set_header   Connection 'upgrade';
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    <span class="comment"># Serve static files directly (faster than Node.js)</span>
+    location /static/ {
+        root /var/www/myapp;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+}</div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Enable site</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="cmd">sudo ln -s /etc/nginx/sites-available/myapp.conf /etc/nginx/sites-enabled/</span>
+<span class="cmd">sudo nginx -t && sudo nginx -s reload</span></div></div>
+</div>
+
+<div class="section"><h3 class="section-title">Load Balancing</h3>
+<p>Running multiple instances of your app for redundancy and scale? Nginx distributes traffic across them.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">nginx.conf — Load Balancer</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Define the pool of backend servers</span>
+upstream myapp_servers {
+    <span class="comment"># Round-robin by default — each request goes to next server</span>
+    server 10.0.0.1:3000;
+    server 10.0.0.2:3000;
+    server 10.0.0.3:3000;
+
+    <span class="comment"># Or: least_conn — send to server with fewest active connections</span>
+    <span class="comment"># least_conn;</span>
+
+    <span class="comment"># Or: ip_hash — same client always hits same server (session sticky)</span>
+    <span class="comment"># ip_hash;</span>
+
+    <span class="comment"># Weight — server 1 gets 3x more traffic</span>
+    <span class="comment"># server 10.0.0.1:3000 weight=3;</span>
+    <span class="comment"># server 10.0.0.2:3000 weight=1;</span>
+
+    <span class="comment"># Health check — mark server down after 3 failures</span>
+    server 10.0.0.1:3000 max_fails=3 fail_timeout=30s;
+    server 10.0.0.2:3000 max_fails=3 fail_timeout=30s;
+
+    <span class="comment"># Hot standby — only used if all others are down</span>
+    server 10.0.0.4:3000 backup;
+}
+
+server {
+    listen 80;
+    location / {
+        proxy_pass http://myapp_servers;
+    }
+}</div></div>
+<div class="arch-diagram">         ┌─────────────────┐
+         │   Client (you)  │
+         └────────┬────────┘
+                  │ HTTPS :443
+         ┌────────▼────────┐
+         │     Nginx        │  ← single entry point
+         │  Load Balancer   │
+         └──┬─────┬─────┬──┘
+            │     │     │  round-robin / least_conn / ip_hash
+   ┌────────▼┐ ┌──▼────┐ ┌▼────────┐
+   │ App :3000│ │App:3000│ │App:3000│
+   │ Server 1 │ │Server 2│ │Server 3│
+   └──────────┘ └────────┘ └────────┘</div>
+</div>
+
+<div class="section"><h3 class="section-title">Rate Limiting</h3>
+<p>Protect your API from abuse and DDoS attacks by limiting how many requests a client can make.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">nginx.conf — Rate Limiting</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Define a rate limit zone — 10 req/sec per IP, 10MB memory</span>
+limit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/s;
+
+server {
+    location /api/ {
+        <span class="comment"># Apply limit — allow burst of 20 before rejecting</span>
+        limit_req zone=api_limit burst=20 nodelay;
+        limit_req_status 429;
+
+        proxy_pass http://localhost:3000;
+    }
+
+    <span class="comment"># Stricter limit for login endpoint</span>
+    location /api/auth/login {
+        limit_req zone=api_limit burst=5 nodelay;
+        proxy_pass http://localhost:3000;
+    }
+}</div></div>
+</div>
+
+<div class="section"><h3 class="section-title">Nginx in Docker (Real-World Pattern)</h3>
+<p>In containerised environments, Nginx runs as a sidecar or as the entry-point container in a Docker Compose stack.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">docker-compose.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">version: '3.8'
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./certs:/etc/nginx/certs
+    depends_on:
+      - api
+      - frontend
+
+  api:
+    build: ./api
+    expose:
+      - "3000"          <span class="comment"># only accessible to nginx, not the host</span>
+
+  frontend:
+    build: ./frontend
+    expose:
+      - "8080"</div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">nginx.conf (for Docker Compose)</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">upstream api { server api:3000; }        <span class="comment"># Docker service name = hostname</span>
+upstream frontend { server frontend:8080; }
+
+server {
+    listen 80;
+
+    location /api/ {
+        proxy_pass http://api;
+    }
+
+    location / {
+        proxy_pass http://frontend;
+    }
+}</div></div>
+</div>
+
+<div class="section"><h3 class="section-title">Key Nginx Directives Cheatsheet</h3>
+<table class="compare-table"><thead><tr><th>Directive</th><th>What it does</th><th>Example</th></tr></thead><tbody>
+<tr><td><code>listen</code></td><td>Port to listen on</td><td><code>listen 443 ssl</code></td></tr>
+<tr><td><code>server_name</code></td><td>Domain name(s) for this block</td><td><code>server_name app.example.com</code></td></tr>
+<tr><td><code>location</code></td><td>Match URL paths</td><td><code>location /api/ { ... }</code></td></tr>
+<tr><td><code>proxy_pass</code></td><td>Forward to backend</td><td><code>proxy_pass http://localhost:3000</code></td></tr>
+<tr><td><code>root</code></td><td>Serve static files from path</td><td><code>root /var/www/html</code></td></tr>
+<tr><td><code>upstream</code></td><td>Define server pool</td><td><code>upstream app { server 10.0.0.1:3000; }</code></td></tr>
+<tr><td><code>return</code></td><td>Redirect or respond</td><td><code>return 301 https://$host$request_uri</code></td></tr>
+<tr><td><code>expires</code></td><td>Cache-Control header</td><td><code>expires 30d</code></td></tr>
+<tr><td><code>limit_req</code></td><td>Apply rate limit</td><td><code>limit_req zone=api burst=20</code></td></tr>
+<tr><td><code>gzip on</code></td><td>Compress responses</td><td><code>gzip on; gzip_types text/html application/json</code></td></tr>
+</tbody></table>
+</div>
+
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Full Stack Proxy</div>
+<ol class="steps">
+  <li><span class="step-num">1</span>Spin up two Node.js services on ports 3001 and 3002 (or use Docker)</li>
+  <li><span class="step-num">2</span>Configure Nginx to load balance between them on port 80</li>
+  <li><span class="step-num">3</span>Add rate limiting — max 5 req/sec per IP on <code>/api/</code></li>
+  <li><span class="step-num">4</span>Add a <code>/static/</code> location that serves files directly from disk</li>
+  <li><span class="step-num">5</span>Test with <code>curl -I http://localhost</code> — verify <code>Server: nginx</code> header</li>
+  <li><span class="step-num">6</span>Kill one backend — verify Nginx still serves traffic from the other</li>
+</ol>
+</div>
+
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div>
+<ul class="checklist">
+  <li>Nginx acts as a <strong>reverse proxy</strong> — clients talk to Nginx, not your backends directly</li>
+  <li>Load balancing strategies: round-robin (default), least_conn, ip_hash, weighted</li>
+  <li>Always run <code>nginx -t</code> before reloading — catches config errors without downtime</li>
+  <li><code>nginx -s reload</code> reloads config with zero dropped connections</li>
+  <li>In Docker, use service names (e.g. <code>proxy_pass http://api</code>) — Docker DNS resolves them</li>
+  <li>Rate limiting with <code>limit_req_zone</code> protects APIs from abuse and DDoS</li>
+  <li>Always redirect HTTP → HTTPS with <code>return 301</code> in the port 80 block</li>
+</ul>
+</div>
+
+<div class="next-card" onclick="showModule('elk')">
+  <div><div class="next-label">Up Next</div><div class="next-title">🔍 ELK Stack — Centralised Logging</div><div class="next-why">When Prometheus tracks metrics, ELK tracks logs</div></div>
+  <div class="next-arrow">→</div>
+</div>
