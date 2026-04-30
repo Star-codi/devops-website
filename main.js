@@ -8,7 +8,7 @@ const MODULE_ORDER = [
   'cloud', 'aws-fundamentals', 'aws-deepdive',
   'linux', 'shell',
   'git', 'maven',
-  'jenkins', 'docker', 'kubernetes',
+  'jenkins', 'github-actions', 'docker', 'kubernetes',
   'terraform', 'ansible',
   'monitoring', 'vpc',
   'security', 'interview', 'nextsteps'

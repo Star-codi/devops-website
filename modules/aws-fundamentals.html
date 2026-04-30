@@ -214,8 +214,17 @@
 </div>
 
 <!-- ── MINI PROJECT ───────────────────────────────── -->
-<!-- ── INTERACTIVE AWS ARCHITECTURE BUILDER ──────── -->
-<div class="section">
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Static Website on S3 with Monitoring</div>
+<ol class="steps">
+  <li>Create an IAM user with S3 and CloudWatch permissions — configure AWS CLI with those credentials</li>
+  <li>Create an S3 bucket and enable static website hosting</li>
+  <li>Upload your portfolio HTML/CSS files with <code>aws s3 sync</code></li>
+  <li>Set a bucket policy to allow public read access</li>
+  <li>Create a CloudWatch alarm on S3 bucket size (BucketSizeBytes) that alerts when over 50MB</li>
+  <li>Launch a t2.micro EC2, SSH in, install Nginx, and set up a CloudWatch CPU alarm at 80%</li>
+</ol></div>
+
+<!-- ── SUMMARY ───────────────────────────────────── -->
 <div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist">
   <li>AWS regions = physical locations; AZs = isolated data centres within a region</li>
   <li>IAM — always use least privilege; use Roles for services, never embed access keys in code</li>

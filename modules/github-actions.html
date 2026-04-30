@@ -1,0 +1,463 @@
+<div class="module-header">
+  <div class="module-icon">⚡</div>
+  <div class="module-meta">
+    <div class="module-tag">Module 08.5 — CI/CD</div>
+    <h2 class="module-title">GitHub Actions — Modern CI/CD</h2>
+  </div>
+</div>
+
+<!-- ── WHY GITHUB ACTIONS ─────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Jenkins vs GitHub Actions — Why the Shift?</h3>
+<p>Jenkins has been the CI/CD standard for years — but it requires you to manage a server, install plugins, and maintain infrastructure. GitHub Actions is built directly into GitHub. No server to manage, no plugins to install, no separate UI to learn. Push code → pipeline runs. That's it.</p>
+
+<div class="compare-table">
+<table>
+  <tr><th>Aspect</th><th>🤖 Jenkins</th><th>⚡ GitHub Actions</th></tr>
+  <tr><td>Setup</td><td>Install on a server, configure plugins</td><td>Zero setup — just add a .yml file</td></tr>
+  <tr><td>Infrastructure</td><td>You manage the server</td><td>GitHub manages runners for you</td></tr>
+  <tr><td>Cost</td><td>Server costs + maintenance time</td><td>Free for public repos, 2000 min/month free for private</td></tr>
+  <tr><td>Config</td><td>Jenkinsfile (Groovy)</td><td>YAML in .github/workflows/</td></tr>
+  <tr><td>Marketplace</td><td>1000+ plugins</td><td>20,000+ community actions</td></tr>
+  <tr><td>Integration</td><td>GitHub webhook needed</td><td>Native GitHub integration</td></tr>
+  <tr><td>Learning curve</td><td>Steep</td><td>Moderate — YAML based</td></tr>
+</table>
+</div>
+
+<div class="callout callout-tip"><div class="callout-label">💡 Real World</div><p>Most startups and modern tech companies use GitHub Actions. Jenkins is still common in large enterprises with legacy setups. As a DevOps engineer you need to know both — but GitHub Actions is becoming the default for new projects.</p></div>
+</div>
+
+<!-- ── CORE CONCEPTS ──────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Core Concepts</h3>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">Workflow</div><div class="cc-desc">A YAML file in <code>.github/workflows/</code>. Defines the entire automation — when it runs, what jobs it contains, and what each job does.</div></div>
+  <div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-title">Event (Trigger)</div><div class="cc-desc">What starts the workflow — a push, a PR, a schedule, a manual trigger, or an external event. One workflow can have multiple triggers.</div></div>
+  <div class="concept-card"><div class="cc-icon">💼</div><div class="cc-title">Job</div><div class="cc-desc">A set of steps that run on the same runner. Jobs run in parallel by default. Use <code>needs:</code> to run them sequentially.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔢</div><div class="cc-title">Step</div><div class="cc-desc">A single task inside a job — either a shell command (<code>run:</code>) or a community action (<code>uses:</code>). Steps run sequentially within a job.</div></div>
+  <div class="concept-card"><div class="cc-icon">🖥️</div><div class="cc-title">Runner</div><div class="cc-desc">The virtual machine that executes jobs. GitHub provides Ubuntu, Windows, and macOS runners for free. You can also host your own runner.</div></div>
+  <div class="concept-card"><div class="cc-icon">🧩</div><div class="cc-title">Action</div><div class="cc-desc">A reusable unit of code from the GitHub Marketplace. <code>actions/checkout</code>, <code>actions/setup-node</code>, <code>docker/build-push-action</code> — use these instead of writing everything from scratch.</div></div>
+</div>
+</div>
+
+<!-- ── WORKFLOW ANATOMY ───────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Anatomy of a Workflow File</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">.github/workflows/ci.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Workflow name — shows in GitHub Actions tab</span>
+<span class="kw">name</span>: CI Pipeline
+
+<span class="comment"># ── Triggers ─────────────────────────────────────</span>
+<span class="kw">on</span>:
+  <span class="kw">push</span>:
+    <span class="kw">branches</span>: [main, develop]     <span class="comment"># run on push to these branches</span>
+  <span class="kw">pull_request</span>:
+    <span class="kw">branches</span>: [main]              <span class="comment"># run on PRs targeting main</span>
+  <span class="kw">workflow_dispatch</span>:              <span class="comment"># allow manual trigger from GitHub UI</span>
+
+<span class="comment"># ── Jobs ─────────────────────────────────────────</span>
+<span class="kw">jobs</span>:
+
+  <span class="kw">build</span>:
+    <span class="kw">name</span>: Build & Test
+    <span class="kw">runs-on</span>: ubuntu-latest        <span class="comment"># runner OS</span>
+
+    <span class="kw">steps</span>:
+      <span class="comment"># Step 1 — Checkout your code</span>
+      - <span class="kw">name</span>: Checkout code
+        <span class="kw">uses</span>: actions/checkout@v4   <span class="comment"># community action</span>
+
+      <span class="comment"># Step 2 — Set up Node.js</span>
+      - <span class="kw">name</span>: Setup Node.js
+        <span class="kw">uses</span>: actions/setup-node@v4
+        <span class="kw">with</span>:
+          <span class="kw">node-version</span>: <span class="str">'20'</span>
+
+      <span class="comment"># Step 3 — Install dependencies</span>
+      - <span class="kw">name</span>: Install dependencies
+        <span class="kw">run</span>: npm ci                 <span class="comment"># shell command</span>
+
+      <span class="comment"># Step 4 — Run tests</span>
+      - <span class="kw">name</span>: Run tests
+        <span class="kw">run</span>: npm test
+
+      <span class="comment"># Step 5 — Build</span>
+      - <span class="kw">name</span>: Build
+        <span class="kw">run</span>: npm run build</div></div>
+</div>
+
+<!-- ── TRIGGERS ──────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Triggers — When Does the Workflow Run?</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">YAML — All common trigger types</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">on</span>:
+  <span class="comment"># Push to specific branches or tags</span>
+  <span class="kw">push</span>:
+    <span class="kw">branches</span>: [main, <span class="str">'release/*'</span>]
+    <span class="kw">tags</span>: [<span class="str">'v*'</span>]                  <span class="comment"># triggers on v1.0, v2.3 etc</span>
+    <span class="kw">paths</span>:
+      - <span class="str">'src/**'</span>                  <span class="comment"># only if files in src/ changed</span>
+
+  <span class="comment"># Pull request events</span>
+  <span class="kw">pull_request</span>:
+    <span class="kw">branches</span>: [main]
+    <span class="kw">types</span>: [opened, synchronize, reopened]
+
+  <span class="comment"># Scheduled — cron syntax</span>
+  <span class="kw">schedule</span>:
+    - <span class="kw">cron</span>: <span class="str">'0 2 * * *'</span>           <span class="comment"># every day at 2am UTC</span>
+
+  <span class="comment"># Manual trigger — button in GitHub UI</span>
+  <span class="kw">workflow_dispatch</span>:
+    <span class="kw">inputs</span>:
+      <span class="kw">environment</span>:
+        <span class="kw">description</span>: <span class="str">'Deploy to'</span>
+        <span class="kw">required</span>: true
+        <span class="kw">default</span>: <span class="str">'staging'</span>
+        <span class="kw">type</span>: choice
+        <span class="kw">options</span>: [staging, production]
+
+  <span class="comment"># Triggered by another workflow</span>
+  <span class="kw">workflow_call</span>:</div></div>
+</div>
+
+<!-- ── REAL WORKFLOWS ─────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Real Workflows — Copy & Use</h3>
+
+<h4>Node.js CI — Test, Build, Coverage</h4>
+<div class="code-block"><div class="code-header"><span class="code-lang">.github/workflows/node-ci.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">name</span>: Node.js CI
+
+<span class="kw">on</span>:
+  <span class="kw">push</span>:
+    <span class="kw">branches</span>: [main]
+  <span class="kw">pull_request</span>:
+    <span class="kw">branches</span>: [main]
+
+<span class="kw">jobs</span>:
+  <span class="kw">test</span>:
+    <span class="kw">runs-on</span>: ubuntu-latest
+    <span class="kw">steps</span>:
+      - <span class="kw">uses</span>: actions/checkout@v4
+      - <span class="kw">uses</span>: actions/setup-node@v4
+        <span class="kw">with</span>:
+          <span class="kw">node-version</span>: <span class="str">'20'</span>
+          <span class="kw">cache</span>: <span class="str">'npm'</span>             <span class="comment"># cache node_modules automatically</span>
+      - <span class="kw">run</span>: npm ci
+      - <span class="kw">run</span>: npm test -- --coverage
+      - <span class="kw">name</span>: Upload coverage
+        <span class="kw">uses</span>: codecov/codecov-action@v4</div></div>
+
+<h4>Java / Maven CI</h4>
+<div class="code-block"><div class="code-header"><span class="code-lang">.github/workflows/maven-ci.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">name</span>: Java CI
+
+<span class="kw">on</span>:
+  <span class="kw">push</span>:
+    <span class="kw">branches</span>: [main]
+
+<span class="kw">jobs</span>:
+  <span class="kw">build</span>:
+    <span class="kw">runs-on</span>: ubuntu-latest
+    <span class="kw">steps</span>:
+      - <span class="kw">uses</span>: actions/checkout@v4
+      - <span class="kw">name</span>: Set up JDK 17
+        <span class="kw">uses</span>: actions/setup-java@v4
+        <span class="kw">with</span>:
+          <span class="kw">java-version</span>: <span class="str">'17'</span>
+          <span class="kw">distribution</span>: <span class="str">'temurin'</span>
+          <span class="kw">cache</span>: <span class="str">'maven'</span>
+      - <span class="kw">name</span>: Build with Maven
+        <span class="kw">run</span>: mvn clean package -DskipTests
+      - <span class="kw">name</span>: Run tests
+        <span class="kw">run</span>: mvn test
+      - <span class="kw">name</span>: Upload JAR artifact
+        <span class="kw">uses</span>: actions/upload-artifact@v4
+        <span class="kw">with</span>:
+          <span class="kw">name</span>: app-jar
+          <span class="kw">path</span>: target/*.jar</div></div>
+
+<h4>Docker Build, Scan & Push to Docker Hub</h4>
+<div class="code-block"><div class="code-header"><span class="code-lang">.github/workflows/docker.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">name</span>: Docker Build & Push
+
+<span class="kw">on</span>:
+  <span class="kw">push</span>:
+    <span class="kw">tags</span>: [<span class="str">'v*'</span>]                  <span class="comment"># only on version tags</span>
+
+<span class="kw">jobs</span>:
+  <span class="kw">docker</span>:
+    <span class="kw">runs-on</span>: ubuntu-latest
+    <span class="kw">steps</span>:
+      - <span class="kw">uses</span>: actions/checkout@v4
+
+      <span class="comment"># Login to Docker Hub using secrets</span>
+      - <span class="kw">name</span>: Login to Docker Hub
+        <span class="kw">uses</span>: docker/login-action@v3
+        <span class="kw">with</span>:
+          <span class="kw">username</span>: ${{ secrets.DOCKERHUB_USERNAME }}
+          <span class="kw">password</span>: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      <span class="comment"># Build and push with cache</span>
+      - <span class="kw">name</span>: Build & push
+        <span class="kw">uses</span>: docker/build-push-action@v5
+        <span class="kw">with</span>:
+          <span class="kw">context</span>: .
+          <span class="kw">push</span>: true
+          <span class="kw">tags</span>: ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.ref_name }}
+          <span class="kw">cache-from</span>: type=gha
+          <span class="kw">cache-to</span>: type=gha,mode=max
+
+      <span class="comment"># Scan image for vulnerabilities</span>
+      - <span class="kw">name</span>: Scan with Trivy
+        <span class="kw">uses</span>: aquasecurity/trivy-action@master
+        <span class="kw">with</span>:
+          <span class="kw">image-ref</span>: ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.ref_name }}
+          <span class="kw">severity</span>: <span class="str">'HIGH,CRITICAL'</span>
+          <span class="kw">exit-code</span>: <span class="str">'1'</span>           <span class="comment"># fail if vulnerabilities found</span></div></div>
+</div>
+
+<!-- ── SECRETS ───────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Secrets & Environment Variables</h3>
+<p>Never hardcode passwords or API keys in your workflow files. GitHub has a built-in secrets manager — go to <strong>Repository → Settings → Secrets and variables → Actions</strong> to add them.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">YAML — Using secrets and env vars</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">jobs</span>:
+  <span class="kw">deploy</span>:
+    <span class="kw">runs-on</span>: ubuntu-latest
+
+    <span class="comment"># Environment-level variables (non-sensitive)</span>
+    <span class="kw">env</span>:
+      NODE_ENV: production
+      APP_PORT: <span class="str">'3000'</span>
+
+    <span class="kw">steps</span>:
+      - <span class="kw">uses</span>: actions/checkout@v4
+
+      <span class="comment"># Use secrets with ${{ secrets.SECRET_NAME }}</span>
+      - <span class="kw">name</span>: Configure AWS credentials
+        <span class="kw">uses</span>: aws-actions/configure-aws-credentials@v4
+        <span class="kw">with</span>:
+          <span class="kw">aws-access-key-id</span>: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          <span class="kw">aws-secret-access-key</span>: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          <span class="kw">aws-region</span>: ap-south-1
+
+      <span class="comment"># Secrets are masked in logs — never printed even with echo</span>
+      - <span class="kw">name</span>: Deploy
+        <span class="kw">run</span>: |
+          echo "Deploying to $NODE_ENV"
+          aws s3 sync ./dist s3://my-bucket</div></div>
+
+<div class="callout callout-warn"><div class="callout-label">⚠️ GitHub Context Variables</div><p>GitHub automatically provides useful variables: <code>${{ github.sha }}</code> (commit hash), <code>${{ github.ref_name }}</code> (branch/tag name), <code>${{ github.actor }}</code> (who triggered), <code>${{ github.repository }}</code> (repo name). Use these instead of hardcoding values.</p></div>
+</div>
+
+<!-- ── MATRIX BUILDS ─────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Matrix Builds — Test Across Multiple Versions</h3>
+<p>Matrix strategy runs the same job multiple times with different configurations simultaneously. Perfect for testing across Node versions, OS types, or environments.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">YAML — Matrix build</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">jobs</span>:
+  <span class="kw">test</span>:
+    <span class="kw">runs-on</span>: ${{ matrix.os }}
+    <span class="kw">strategy</span>:
+      <span class="kw">matrix</span>:
+        <span class="kw">os</span>: [ubuntu-latest, windows-latest, macos-latest]
+        <span class="kw">node</span>: [18, 20, 22]
+      <span class="kw">fail-fast</span>: false           <span class="comment"># don't cancel all if one fails</span>
+
+    <span class="kw">steps</span>:
+      - <span class="kw">uses</span>: actions/checkout@v4
+      - <span class="kw">uses</span>: actions/setup-node@v4
+        <span class="kw">with</span>:
+          <span class="kw">node-version</span>: ${{ matrix.node }}
+      - <span class="kw">run</span>: npm ci && npm test
+
+<span class="comment"># This creates 9 parallel jobs:
+# ubuntu + node 18 | ubuntu + node 20 | ubuntu + node 22
+# windows + node 18 | windows + node 20 | windows + node 22
+# macos + node 18  | macos + node 20  | macos + node 22</span></div></div>
+</div>
+
+<!-- ── JOB DEPENDENCIES ──────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Job Dependencies & Full CI/CD Pipeline</h3>
+<p>Jobs run in parallel by default. Use <code>needs:</code> to create a dependency chain — this is how you build a full CI/CD pipeline.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">.github/workflows/full-pipeline.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">name</span>: Full CI/CD Pipeline
+
+<span class="kw">on</span>:
+  <span class="kw">push</span>:
+    <span class="kw">branches</span>: [main]
+
+<span class="kw">jobs</span>:
+
+  <span class="comment"># Job 1 — Run tests</span>
+  <span class="kw">test</span>:
+    <span class="kw">runs-on</span>: ubuntu-latest
+    <span class="kw">steps</span>:
+      - <span class="kw">uses</span>: actions/checkout@v4
+      - <span class="kw">uses</span>: actions/setup-node@v4
+        <span class="kw">with</span>: { node-version: <span class="str">'20'</span>, cache: <span class="str">'npm'</span> }
+      - <span class="kw">run</span>: npm ci && npm test
+
+  <span class="comment"># Job 2 — Build Docker image (only if tests pass)</span>
+  <span class="kw">build</span>:
+    <span class="kw">needs</span>: test               <span class="comment"># waits for test job</span>
+    <span class="kw">runs-on</span>: ubuntu-latest
+    <span class="kw">steps</span>:
+      - <span class="kw">uses</span>: actions/checkout@v4
+      - <span class="kw">uses</span>: docker/login-action@v3
+        <span class="kw">with</span>:
+          <span class="kw">username</span>: ${{ secrets.DOCKERHUB_USERNAME }}
+          <span class="kw">password</span>: ${{ secrets.DOCKERHUB_TOKEN }}
+      - <span class="kw">uses</span>: docker/build-push-action@v5
+        <span class="kw">with</span>:
+          <span class="kw">push</span>: true
+          <span class="kw">tags</span>: myapp:${{ github.sha }}
+
+  <span class="comment"># Job 3 — Deploy to staging (only if build passes)</span>
+  <span class="kw">deploy-staging</span>:
+    <span class="kw">needs</span>: build
+    <span class="kw">runs-on</span>: ubuntu-latest
+    <span class="kw">environment</span>: staging       <span class="comment"># uses environment-level secrets</span>
+    <span class="kw">steps</span>:
+      - <span class="kw">uses</span>: actions/checkout@v4
+      - <span class="kw">name</span>: Deploy to K8s
+        <span class="kw">run</span>: |
+          kubectl set image deployment/my-app \
+            my-app=myapp:${{ github.sha }}
+
+  <span class="comment"># Job 4 — Deploy to production (manual approval required)</span>
+  <span class="kw">deploy-production</span>:
+    <span class="kw">needs</span>: deploy-staging
+    <span class="kw">runs-on</span>: ubuntu-latest
+    <span class="kw">environment</span>: production    <span class="comment"># GitHub will pause and wait for approval</span>
+    <span class="kw">steps</span>:
+      - <span class="kw">name</span>: Deploy to production
+        <span class="kw">run</span>: echo "Deploying to production..."</div></div>
+
+<div class="callout callout-tip"><div class="callout-label">💡 Environment Protection Rules</div><p>Go to <strong>Settings → Environments → production → Required reviewers</strong> to add approvers. GitHub will pause the workflow and send a notification before running the production deployment — no code goes to prod without a human sign-off.</p></div>
+</div>
+
+<!-- ── CACHING ────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Caching — Speed Up Your Workflows</h3>
+<p>Without caching, every run downloads all dependencies from scratch. With caching, unchanged dependencies are restored from cache — cutting build times from minutes to seconds.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">YAML — Manual cache with actions/cache</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">steps</span>:
+  - <span class="kw">uses</span>: actions/checkout@v4
+
+  <span class="comment"># Cache node_modules</span>
+  - <span class="kw">name</span>: Cache node modules
+    <span class="kw">uses</span>: actions/cache@v4
+    <span class="kw">with</span>:
+      <span class="kw">path</span>: ~/.npm
+      <span class="kw">key</span>: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      <span class="kw">restore-keys</span>: |
+        ${{ runner.os }}-node-
+
+  <span class="comment"># Cache Maven dependencies</span>
+  - <span class="kw">name</span>: Cache Maven packages
+    <span class="kw">uses</span>: actions/cache@v4
+    <span class="kw">with</span>:
+      <span class="kw">path</span>: ~/.m2
+      <span class="kw">key</span>: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+
+<span class="comment"># Key tip: hashFiles() generates a unique key from your lockfile
+# Cache is invalidated only when lockfile changes — perfect!</span></div></div>
+</div>
+
+<!-- ── REUSABLE WORKFLOWS ─────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Reusable Workflows — DRY Pipelines</h3>
+<p>If you have 10 microservices each with their own workflow, you don't want to copy-paste the same pipeline 10 times. Reusable workflows let you define a workflow once and call it from any other workflow.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">.github/workflows/reusable-deploy.yml — Define once</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">name</span>: Reusable Deploy
+
+<span class="kw">on</span>:
+  <span class="kw">workflow_call</span>:                <span class="comment"># makes this workflow reusable</span>
+    <span class="kw">inputs</span>:
+      <span class="kw">environment</span>:
+        <span class="kw">required</span>: true
+        <span class="kw">type</span>: string
+      <span class="kw">image-tag</span>:
+        <span class="kw">required</span>: true
+        <span class="kw">type</span>: string
+    <span class="kw">secrets</span>:
+      <span class="kw">KUBE_CONFIG</span>:
+        <span class="kw">required</span>: true
+
+<span class="kw">jobs</span>:
+  <span class="kw">deploy</span>:
+    <span class="kw">runs-on</span>: ubuntu-latest
+    <span class="kw">steps</span>:
+      - <span class="kw">name</span>: Deploy to ${{ inputs.environment }}
+        <span class="kw">run</span>: |
+          echo ${{ secrets.KUBE_CONFIG }} | base64 -d > kubeconfig
+          kubectl set image deployment/app app=${{ inputs.image-tag }}</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">.github/workflows/main-pipeline.yml — Call it</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="kw">jobs</span>:
+  <span class="kw">deploy</span>:
+    <span class="kw">uses</span>: ./.github/workflows/reusable-deploy.yml
+    <span class="kw">with</span>:
+      <span class="kw">environment</span>: production
+      <span class="kw">image-tag</span>: myapp:${{ github.sha }}
+    <span class="kw">secrets</span>:
+      <span class="kw">KUBE_CONFIG</span>: ${{ secrets.KUBE_CONFIG }}</div></div>
+</div>
+
+<!-- ── PRACTICAL TIPS ─────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Practical Tips</h3>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-title">Always pin action versions</div><div class="cc-desc">Use <code>actions/checkout@v4</code> not <code>@main</code>. Unpinned actions can break your pipeline when the action author pushes changes.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔒</div><div class="cc-title">Limit permissions</div><div class="cc-desc">Add <code>permissions: read-all</code> at the top and only grant what each job needs. This follows least-privilege — a compromised action can't push code or delete branches.</div></div>
+  <div class="concept-card"><div class="cc-icon">💾</div><div class="cc-title">Use cache for everything</div><div class="cc-desc">Cache npm, Maven, pip, Docker layers. The difference between a 30-second build and a 5-minute build is usually caching.</div></div>
+  <div class="concept-card"><div class="cc-icon">🏃</div><div class="cc-title">Self-hosted runners</div><div class="cc-desc">For private repos with heavy usage, set up your own runner on EC2. Free minutes run out fast. Self-hosted runners also let you access private VPC resources.</div></div>
+  <div class="concept-card"><div class="cc-icon">🧪</div><div class="cc-title">act — test locally</div><div class="cc-desc"><code>act</code> is a CLI tool that runs GitHub Actions workflows locally using Docker. Essential for debugging — no need to push and wait to see if your YAML works.</div></div>
+  <div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">Path filters</div><div class="cc-desc">Use <code>paths:</code> in triggers so workflows only run when relevant files change. Frontend workflow shouldn't run when you only changed backend code.</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Test workflows locally with act</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Install act</span>
+<span class="cmd">brew install act</span>             <span class="comment"># Mac</span>
+<span class="cmd">curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash</span>
+
+<span class="comment"># Run all workflows locally</span>
+<span class="cmd">act</span>
+
+<span class="comment"># Run a specific event</span>
+<span class="cmd">act push</span>
+<span class="cmd">act pull_request</span>
+
+<span class="comment"># Run a specific job</span>
+<span class="cmd">act -j build</span>
+
+<span class="comment"># Pass secrets</span>
+<span class="cmd">act -s DOCKERHUB_TOKEN=mytoken</span></div></div>
+</div>
+
+<!-- ── MINI PROJECT ───────────────────────────────── -->
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project — Full CI/CD with GitHub Actions</div>
+<p>Build a complete pipeline for your DevOps Buddy or any project:</p>
+<ol class="steps">
+  <li>Create <code>.github/workflows/ci.yml</code> — on every push to main: checkout → install → test → build</li>
+  <li>Add a Docker job that builds and pushes to Docker Hub using secrets — only on version tags</li>
+  <li>Add a matrix build that tests on Node 18, 20, and 22 simultaneously</li>
+  <li>Set up a <code>production</code> environment with a required reviewer — so deploys need approval</li>
+  <li>Add caching for node_modules using <code>actions/cache</code> — compare build times before and after</li>
+  <li>Install <code>act</code> and run your workflow locally without pushing to GitHub</li>
+</ol>
+</div>
+
+<!-- ── SUMMARY ───────────────────────────────────── -->
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist">
+  <li>GitHub Actions is CI/CD built into GitHub — no server to manage, just YAML files</li>
+  <li>Workflows live in <code>.github/workflows/</code> and trigger on events (push, PR, schedule, manual)</li>
+  <li>Jobs run in parallel by default — use <code>needs:</code> for sequential pipelines</li>
+  <li>Use <code>secrets.</code> for credentials — never hardcode passwords in workflow files</li>
+  <li>Matrix builds run the same job across multiple OS/versions simultaneously</li>
+  <li>Cache dependencies with <code>actions/cache</code> — biggest single performance improvement</li>
+  <li>Reusable workflows prevent copy-pasting pipelines across microservices</li>
+  <li>Use environment protection rules for production — always require human approval</li>
+  <li>Pin action versions and limit permissions — security basics for every workflow</li>
+  <li>Test locally with <code>act</code> before pushing</li>
+</ul></div>
+
+<div class="next-card" onclick="showModule('docker')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🐳 Docker — Containerization</div><div class="next-why">Your pipeline builds the app — Docker packages it so it runs identically everywhere.</div></div><div class="next-arrow">→</div></div>
