@@ -1,0 +1,41 @@
+<div class="module-header"><div class="module-icon">⚡</div><div class="module-meta"><div class="module-tag">Module 15 — AWS Deep Dive</div><h2 class="module-title">Lambda, RDS, DynamoDB & More</h2></div></div>
+<div class="section">
+<h3 class="section-title">AWS Lambda — Serverless Computing</h3>
+<p>AWS Lambda lets you run code without provisioning or managing servers. You upload your function, define when it triggers, and AWS handles everything else. You pay only for the compute time you use — down to the millisecond.</p>
+</div>
+<div class="callout callout-analogy"><div class="callout-label">💡 Analogy — Electricity</div><p>Running a traditional server is like buying a generator and running it 24/7. Lambda is like using the electrical grid — you only pay for the watts you actually use. When no one's using your function, it costs nothing.</p></div>
+<div class="section">
+<div class="concept-card"><div class="cc-icon">🔔</div><div class="cc-title">Push-Based (Sync)</div><div class="cc-desc">Event source triggers Lambda andwaitsfor a response. Used when the caller needs an instant result. Example: API Gateway calling a Lambda function to return a response to a user.</div></div>
+<div class="concept-card"><div class="cc-icon">📤</div><div class="cc-title">Push-Based (Async)</div><div class="cc-desc">Event source fires anddoesn't wait. Events are queued and retried on failure. Useful for background processing. Example: S3 upload triggers a Lambda to resize an image.</div></div>
+<div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">Pull-Based (Streams)</div><div class="cc-desc">Lambdapollsthe event source for new data. Processes in batches. AWS manages the polling and scaling. Example: Lambda reading from a DynamoDB stream or SQS queue.</div></div>
+<div class="concept-card"><div class="cc-icon">🕐</div><div class="cc-title">Canary Functions</div><div class="cc-desc">A scheduled Lambda that monitors a website by visiting it — like a synthetic health check. Can alert you if a page is down or returns unexpected content.</div></div>
+</div>
+<div class="section">
+<h3 class="section-title">Amazon SNS — Simple Notification Service</h3>
+<p>SNS is a messaging service under the Application Integration category. It's used to send notifications to many subscribers at once. The key components are topics (a channel) and subscriptions (who receives from that channel).</p>
+<h4 style="font-family:'Syne',sans-serif;color:var(--heading);margin:16px 0 8px;">📢 Topics</h4>
+<p>A topic is a communication channel. Publishers send messages to the topic. Think of it like a broadcast announcement system — one message sent to the topic reaches all subscribers.</p>
+<h4 style="font-family:'Syne',sans-serif;color:var(--heading);margin:16px 0 8px;">📬 Subscriptions</h4>
+<p>Subscribers choose how to receive notifications: via email, SMS, HTTP endpoint, Lambda, SQS , or mobile push. One topic can have millions of subscribers.</p>
+</div>
+<div class="section">
+<h3 class="section-title">CloudWatch — AWS Monitoring</h3>
+<p>Amazon CloudWatch is used to monitor AWS resources and applications. It falls under the Management & Governance category.</p>
+<div class="concept-card"><div class="cc-icon">📊</div><div class="cc-title">Metrics</div><div class="cc-desc">Every AWS resource publishes metrics automatically. EC2 gives you CPU usage, network I/O, disk I/O. You can also create custom metrics from your application code.</div></div>
+<div class="concept-card"><div class="cc-icon">📈</div><div class="cc-title">Dashboards</div><div class="cc-desc">View multiple metrics in one place. AWS provides automated dashboards for common services, and you can build your own custom dashboards combining any metrics.</div></div>
+<div class="concept-card"><div class="cc-icon">🔔</div><div class="cc-title">Alarms</div><div class="cc-desc">Set thresholds and get notified. Three states:OK,ALARM, andINSUFFICIENT_DATA. An alarm triggers actions: send SNS notification, scale EC2, or stop an instance.</div></div>
+<div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-title">Events / EventBridge</div><div class="cc-desc">Captures changes in your AWS environment (e.g., EC2 state changes) and triggers targets like Lambda, SNS, or SQS based on rules. Great for automated responses to events.</div></div>
+</div>
+<div class="section">
+<h3 class="section-title">RDS vs DynamoDB — Which Database to Use?</h3>
+<table class="compare-table"><thead><tr><th>Feature</th><th>🗄️ Amazon RDS</th><th>⚡ Amazon DynamoDB</th></tr></thead><tbody><tr><td>Type</td><td>Relational (SQL) — tables with rows and columns</td><td>NoSQL — key-value and document-based</td></tr><tr><td>Engines</td><td>MySQL, PostgreSQL, Oracle, MariaDB, SQL Server, Aurora</td><td>DynamoDB only (proprietary)</td></tr><tr><td>Schema</td><td>Fixed schema — define columns upfront</td><td>Schema-less — each item can have different attributes</td></tr><tr><td>Scaling</td><td>Vertical (bigger instance) + read replicas</td><td>Automatic, horizontal, to millions of req/sec</td></tr><tr><td>Latency</td><td>Low (milliseconds)</td><td>Ultra-low (single-digit milliseconds)</td></tr><tr><td>Best for</td><td>Complex queries, relationships, financial data</td><td>Real-time apps, gaming, IoT, mobile backends</td></tr><tr><td>Multi-region</td><td>Multi-AZ for HA</td><td>Global Tables — multi-region replication built-in</td></tr></tbody></table>
+</div>
+<div class="callout callout-tip"><div class="callout-label">✅ Rule of Thumb</div><p>If your data has complex relationships and you need SQL queries (JOINs, transactions) → use RDS . If you need massive scale, flexible schema, and single-digit ms latency with simple access patterns → use DynamoDB .</p></div>
+<div class="next-card" onclick="showModule('ansible')">
+  <div class="next-text">
+    <div class="next-label">Up Next</div>
+    <div class="next-title">Ansible</div>
+    <div class="next-why">Continue your DevOps journey →</div>
+  </div>
+  <div class="next-arrow">→</div>
+</div>
