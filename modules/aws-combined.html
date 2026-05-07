@@ -1,0 +1,586 @@
+<div class="module-header"><div class="module-icon">🔶</div><div class="module-meta"><div class="module-tag">Module 1 — Cloud & AWS</div><h2 class="module-title">Cloud Computing & AWS — Complete Guide</h2></div></div>
+
+<!-- ── WHY CLOUD ─────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">The Problem: Traditional Servers</h3>
+<p>Imagine you want to launch a website. In the old world (<strong>on-premise</strong> infrastructure), here's what you had to do:</p>
+<ul class="steps"><li><span class="step-num">1</span>Buy expensive physical servers (₹5–50 lakhs)</li><li><span class="step-num">2</span>Set up a data center room with cooling and power backup</li><li><span class="step-num">3</span>Hire people to manage it 24/7</li><li><span class="step-num">4</span>Wait weeks or months before going live</li><li><span class="step-num">5</span>If traffic spikes, your site crashes — you can't add more servers instantly</li></ul>
+</div>
+
+<div class="callout callout-analogy"><div class="callout-label">🏨 Analogy — Hotel vs Airbnb</div><p>Traditional servers are like <strong>building your own hotel</strong> every time you travel. Cloud computing is like <strong>Airbnb or OYO</strong> — you book only when you need, pay only for what you use, scale up for a holiday weekend and down after. No ownership headaches. No maintenance worries.</p></div>
+
+<div class="section">
+<h3 class="section-title">What is Cloud Computing?</h3>
+<p><strong>Cloud computing</strong> means renting computing resources (servers, storage, databases, networking) over the internet from a provider instead of owning physical hardware. You pay only for what you use, like an electricity bill.</p>
+<div class="concept-grid">
+<div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-title">On-Demand</div><div class="cc-desc">Get a server in 60 seconds. No procurement process.</div></div>
+<div class="concept-card"><div class="cc-icon">📈</div><div class="cc-title">Scalable</div><div class="cc-desc">Handle 10 users or 10 million users with the same ease.</div></div>
+<div class="concept-card"><div class="cc-icon">💳</div><div class="cc-title">Pay-as-you-go</div><div class="cc-desc">Pay only for resources you actually use, by the hour.</div></div>
+<div class="concept-card"><div class="cc-icon">🌍</div><div class="cc-title">Global</div><div class="cc-desc">Deploy your app close to users worldwide in minutes.</div></div>
+</div>
+</div>
+
+<div class="section">
+<h3 class="section-title">On-Premise vs Cloud — Side by Side</h3>
+<table class="compare-table"><thead><tr><th>Factor</th><th>Traditional (On-Premise)</th><th>Cloud Computing</th></tr></thead><tbody><tr><td>Setup Time</td><td><span class="badge-bad">Weeks to months</span></td><td><span class="badge-good">Minutes</span></td></tr><tr><td>Cost</td><td><span class="badge-bad">High upfront capital</span></td><td><span class="badge-good">Pay as you use</span></td></tr><tr><td>Scaling</td><td><span class="badge-bad">Buy new hardware</span></td><td><span class="badge-good">Click of a button</span></td></tr><tr><td>Maintenance</td><td><span class="badge-bad">Your team's problem</span></td><td><span class="badge-good">Provider handles it</span></td></tr><tr><td>Disaster Recovery</td><td><span class="badge-bad">Expensive backup systems</span></td><td><span class="badge-good">Built-in redundancy</span></td></tr></tbody></table>
+</div>
+
+<div class="section">
+<h3 class="section-title">Types of Cloud Services — IaaS, PaaS, SaaS</h3>
+<div class="arch-diagram">  🏗️  IaaS — Infrastructure as a Service
+       You manage: OS, Runtime, Apps, Data
+       Provider manages: Servers, Storage, Networking
+       Example: AWS EC2 (rent a virtual machine)
+
+  🔧  PaaS — Platform as a Service
+       You manage: Apps, Data only
+       Provider manages: OS, Runtime, Middleware, Servers
+       Example: AWS Elastic Beanstalk, Heroku
+
+  📦  SaaS — Software as a Service
+       You just USE the software
+       Provider manages: Everything
+       Example: Gmail, Salesforce, Zoom</div>
+</div>
+
+<!-- ── AWS INTRO ──────────────────────────────────── -->
+<div class="section"><h3 class="section-title">What is AWS?</h3><p><strong>Amazon Web Services (AWS)</strong> is the world's most popular cloud platform — used by Netflix, Airbnb, NASA, and millions of startups and enterprises. AWS has 200+ services. As a DevOps engineer you need to master around 10 core ones — this module covers them all.</p></div>
+
+<div class="callout callout-analogy"><div class="callout-label">🏙️ Analogy — Renting vs Building</div><p>Building your own data centre is like buying land, constructing a building, installing generators, cooling systems, security guards — before a single line of code runs. AWS is like moving into a serviced office — power, cooling, security, networking are already handled. You just bring your code and start.</p></div>
+
+<!-- ── GLOBAL INFRA ────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">AWS Global Infrastructure — Regions, AZs & Edge Locations</h3>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🌍</div><div class="cc-title">Regions</div><div class="cc-desc">Physical locations around the world — e.g. <code>ap-south-1</code> = Mumbai, <code>us-east-1</code> = Virginia. Each region is completely independent. Choose a region close to your users for lower latency.</div></div>
+  <div class="concept-card"><div class="cc-icon">🏢</div><div class="cc-title">Availability Zones (AZs)</div><div class="cc-desc">Each region has 2–6 AZs. An AZ is one or more data centres with independent power, cooling, and networking. Deploy across multiple AZs for high availability.</div></div>
+  <div class="concept-card"><div class="cc-icon">🌐</div><div class="cc-title">Edge Locations</div><div class="cc-desc">Hundreds of smaller locations used by CloudFront (CDN) to cache and deliver content close to end users. Reduces latency globally.</div></div>
+  <div class="concept-card"><div class="cc-icon">🆓</div><div class="cc-title">Free Tier</div><div class="cc-desc">AWS gives new accounts 12 months of free usage — t2.micro EC2, 5GB S3, 750hrs RDS. Perfect for practicing everything in this module.</div></div>
+</div>
+
+<div class="arch-diagram">  AWS Region: ap-south-1 (Mumbai)
+  ┌─────────────────────────────────────────────────┐
+  │  AZ: ap-south-1a       AZ: ap-south-1b          │
+  │  ┌──────────────┐      ┌──────────────┐         │
+  │  │ Data Centre  │      │ Data Centre  │         │
+  │  │  EC2, RDS    │      │  EC2, RDS    │         │
+  │  └──────────────┘      └──────────────┘         │
+  │  Deploy across both AZs = High Availability     │
+  └─────────────────────────────────────────────────┘</div>
+</div>
+
+<!-- ── IAM ────────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">IAM — Identity & Access Management</h3>
+<p>IAM controls <strong>who</strong> can do <strong>what</strong> on <strong>which resources</strong>. It's the first thing you configure in any AWS account. Never use the root account for day-to-day work.</p>
+
+<div class="callout callout-analogy"><div class="callout-label">🔑 Analogy — Office ID Cards</div><p>An office has different access cards: the security guard can enter the lobby, the developer can access the server room, the manager can access everything. IAM works the same way — each person or service gets exactly the permissions they need, nothing more.</p></div>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">👤</div><div class="cc-title">Users</div><div class="cc-desc">A person or application with credentials (password or access keys). Always give users only the permissions they need — principle of least privilege.</div></div>
+  <div class="concept-card"><div class="cc-icon">👥</div><div class="cc-title">Groups</div><div class="cc-desc">Collection of users. Attach policies to groups, not individual users. e.g. Developers group, DevOps group, ReadOnly group.</div></div>
+  <div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">Policies</div><div class="cc-desc">JSON documents defining what actions are allowed or denied on which resources. AWS provides managed policies — you can also write custom ones.</div></div>
+  <div class="concept-card"><div class="cc-icon">🎭</div><div class="cc-title">Roles</div><div class="cc-desc">Like a user but for AWS services — an EC2 instance that needs to access S3 assumes an IAM Role. No permanent credentials embedded in code.</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">IAM Policy — Allow S3 Read Only</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">{
+  <span class="str">"Version"</span>: <span class="str">"2012-10-17"</span>,
+  <span class="str">"Statement"</span>: [
+    {
+      <span class="str">"Effect"</span>: <span class="str">"Allow"</span>,
+      <span class="str">"Action"</span>: [
+        <span class="str">"s3:GetObject"</span>,
+        <span class="str">"s3:ListBucket"</span>
+      ],
+      <span class="str">"Resource"</span>: [
+        <span class="str">"arn:aws:s3:::my-bucket"</span>,
+        <span class="str">"arn:aws:s3:::my-bucket/*"</span>
+      ]
+    }
+  ]
+}</div></div>
+
+<div class="callout callout-warn"><div class="callout-label">⚠️ IAM Best Practices</div><p>Never use root account credentials in code or CLI. Never share access keys. Always enable MFA on root and admin accounts. Use IAM Roles for EC2/Lambda instead of embedding access keys in your code.</p></div>
+</div>
+
+<!-- ── EC2 ─────────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">EC2 — Elastic Compute Cloud (Virtual Servers)</h3>
+<p>EC2 is a virtual server in the cloud. You choose the OS, CPU, RAM, storage, and networking. Launch one in under a minute and connect via SSH.</p>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">📦</div><div class="cc-title">Instance Types</div><div class="cc-desc">t2.micro (free tier, 1vCPU, 1GB RAM) → t3.medium → c5.xlarge (compute-optimised) → r5.2xlarge (memory-optimised). Choose based on workload.</div></div>
+  <div class="concept-card"><div class="cc-icon">💿</div><div class="cc-title">AMI</div><div class="cc-desc">Amazon Machine Image — a snapshot/template of an OS. Use official AWS AMIs (Amazon Linux, Ubuntu) or create your own with pre-installed software.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔑</div><div class="cc-title">Key Pairs</div><div class="cc-desc">SSH key pair for secure access. AWS stores the public key, you keep the private key (.pem file). Never lose it — you can't regenerate it.</div></div>
+  <div class="concept-card"><div class="cc-icon">💾</div><div class="cc-title">EBS Volumes</div><div class="cc-desc">Elastic Block Storage — persistent disk for EC2. Data survives instance stop/restart but not termination (unless configured to retain).</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Launch & Connect to EC2</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Launch a free-tier EC2 (Ubuntu)</span>
+<span class="cmd">aws ec2 run-instances \</span>
+  <span class="cmd">--image-id ami-0c55b159cbfafe1f0 \</span>
+  <span class="cmd">--instance-type t2.micro \</span>
+  <span class="cmd">--key-name my-keypair \</span>
+  <span class="cmd">--security-group-ids sg-12345678 \</span>
+  <span class="cmd">--subnet-id subnet-12345678</span>
+
+<span class="comment"># Get the public IP</span>
+<span class="cmd">aws ec2 describe-instances \</span>
+  <span class="cmd">--query 'Reservations[*].Instances[*].PublicIpAddress' \</span>
+  <span class="cmd">--output text</span>
+
+<span class="comment"># SSH into the server</span>
+<span class="cmd">ssh -i "my-keypair.pem" ubuntu@YOUR-PUBLIC-IP</span>
+
+<span class="comment"># Stop / Start / Terminate</span>
+<span class="cmd">aws ec2 stop-instances --instance-ids i-1234567890abcdef0</span>
+<span class="cmd">aws ec2 start-instances --instance-ids i-1234567890abcdef0</span>
+<span class="cmd">aws ec2 terminate-instances --instance-ids i-1234567890abcdef0</span></div></div>
+</div>
+
+<!-- ── VPC (FULL DEEP DIVE) ───────────────────────── -->
+<div class="section">
+<h3 class="section-title">VPC — Virtual Private Cloud (Your Private Network)</h3>
+<p>A VPC is your own isolated private network inside AWS. Every EC2 instance, RDS database, and Lambda function lives inside a VPC. You control the IP ranges, subnets, routing, and security.</p>
+
+<div class="callout callout-analogy"><div class="callout-label">🏘️ Analogy — Gated Housing Society</div><p>Think of a VPC like a gated housing society. The entire society is your VPC. Inside, there are different blocks (subnets) — some face the main road and are accessible to visitors (public subnet), while others are deep inside, accessible only to residents (private subnet). The main gate is your Internet Gateway. The security guards are your Security Groups and NACLs.</p></div>
+
+<div class="svg-diagram">
+<svg font-family="'DM Mono', monospace" viewbox="0 0 780 400" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#111827" height="400" width="780"></rect>
+<defs>
+<marker id="varr" markerheight="6" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#00d4aa"></path></marker>
+<marker id="varr2" markerheight="6" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#ff6b35"></path></marker>
+</defs>
+<ellipse cx="390" cy="35" fill="#0a0e1a" rx="80" ry="22" stroke="#fbbf24" stroke-width="1.5"></ellipse>
+<text fill="#fbbf24" font-size="14" text-anchor="middle" x="390" y="31">🌐</text>
+<text fill="#fbbf24" font-size="9" text-anchor="middle" x="390" y="47">INTERNET</text>
+<rect fill="#0a0e1a" height="40" rx="6" stroke="#fbbf24" stroke-width="1.5" width="120" x="330" y="72"></rect>
+<text fill="#fbbf24" font-size="11" text-anchor="middle" x="390" y="88">🚪</text>
+<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="390" y="103">Internet Gateway</text>
+<path d="M390,57 L390,71" marker-end="url(#varr)" stroke="#fbbf24" stroke-width="1.5"></path>
+<rect fill="none" height="255" rx="12" stroke="#1e2d45" stroke-dasharray="6,4" stroke-width="2" width="720" x="30" y="125"></rect>
+<text fill="#64748b" font-size="10" font-weight="bold" x="55" y="147">VPC  10.0.0.0/16</text>
+<rect fill="#0a0e1a" height="35" rx="6" stroke="#00d4aa" stroke-width="1.5" width="120" x="330" y="128"></rect>
+<text fill="#00d4aa" font-size="10" text-anchor="middle" x="390" y="143">📋 Route Table</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="390" y="156">0.0.0.0/0 → IGW</text>
+<path d="M390,112 L390,127" marker-end="url(#varr)" stroke="#00d4aa" stroke-width="1.5"></path>
+<rect fill="rgba(0,212,170,0.04)" height="185" rx="8" stroke="#00d4aa" stroke-width="1.5" width="300" x="50" y="175"></rect>
+<text fill="#00d4aa" font-size="10" font-weight="bold" text-anchor="middle" x="200" y="196">🟢 Public Subnet  10.0.1.0/24</text>
+<rect fill="#0a0e1a" height="65" rx="6" stroke="#00d4aa" stroke-width="1.5" width="115" x="75" y="208"></rect>
+<text fill="#00d4aa" font-size="18" text-anchor="middle" x="132" y="228">🖥️</text>
+<text fill="#e2e8f0" font-size="9" font-weight="bold" text-anchor="middle" x="132" y="246">EC2 (Web)</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="132" y="258">10.0.1.10</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="132" y="270">Public IP ✓</text>
+<rect fill="#0a0e1a" height="65" rx="6" stroke="#fbbf24" stroke-width="1.5" width="115" x="210" y="208"></rect>
+<text fill="#fbbf24" font-size="18" text-anchor="middle" x="268" y="228">🔄</text>
+<text fill="#e2e8f0" font-size="9" font-weight="bold" text-anchor="middle" x="268" y="246">NAT Gateway</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="268" y="258">Outbound only</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="268" y="270">for private subnet</text>
+<rect fill="none" height="58" rx="6" stroke="#7c3aed" stroke-dasharray="4,3" stroke-width="1" width="265" x="60" y="290"></rect>
+<text fill="#7c3aed" font-size="8" text-anchor="middle" x="193" y="308">🛡️ Security Group — port 80, 443 open</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="193" y="320">Stateful: allow in → auto allow response out</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="193" y="334">Instance-level firewall (ALLOW only)</text>
+<rect fill="rgba(255,107,53,0.04)" height="185" rx="8" stroke="#ff6b35" stroke-width="1.5" width="300" x="420" y="175"></rect>
+<text fill="#ff6b35" font-size="10" font-weight="bold" text-anchor="middle" x="570" y="196">🔴 Private Subnet  10.0.2.0/24</text>
+<rect fill="#0a0e1a" height="65" rx="6" stroke="#ff6b35" stroke-width="1.5" width="115" x="440" y="208"></rect>
+<text fill="#ff6b35" font-size="18" text-anchor="middle" x="498" y="228">🗄️</text>
+<text fill="#e2e8f0" font-size="9" font-weight="bold" text-anchor="middle" x="498" y="246">RDS Database</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="498" y="258">10.0.2.10</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="498" y="270">No Public IP</text>
+<rect fill="#0a0e1a" height="65" rx="6" stroke="#ff6b35" stroke-width="1.5" width="115" x="580" y="208"></rect>
+<text fill="#ff6b35" font-size="18" text-anchor="middle" x="638" y="228">⚙️</text>
+<text fill="#e2e8f0" font-size="9" font-weight="bold" text-anchor="middle" x="638" y="246">App Server</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="638" y="258">10.0.2.20</text>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="638" y="270">No Public IP</text>
+<rect fill="none" height="58" rx="6" stroke="#7c3aed" stroke-dasharray="4,3" stroke-width="1" width="275" x="428" y="290"></rect>
+<text fill="#7c3aed" font-size="8" text-anchor="middle" x="566" y="308">🛡️ NACL — subnet-level firewall</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="566" y="320">Stateless: must allow IN and OUT separately</text>
+<text fill="#64748b" font-size="7" text-anchor="middle" x="566" y="334">Supports both ALLOW and DENY rules</text>
+<path d="M268,175 L268,157 L390,157 L390,165" marker-end="url(#varr)" stroke="#fbbf24" stroke-dasharray="4,3" stroke-width="1.5"></path>
+<path d="M190,240 L440,240" marker-end="url(#varr)" stroke="#64748b" stroke-dasharray="3,3" stroke-width="1"></path>
+<text fill="#64748b" font-size="8" text-anchor="middle" x="315" y="235">internal traffic</text>
+</svg>
+<div class="diagram-caption">A typical 2-tier AWS VPC — public subnet (web servers + NAT) and private subnet (database + app servers)</div>
+</div>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🔲</div><div class="cc-title">Subnet</div><div class="cc-desc">A segment of VPC IP address ranges. Each subnet lives in one AZ. Public subnets face the internet; private subnets don't.</div></div>
+  <div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">Route Table</div><div class="cc-desc">Rules that decide where network traffic goes. To reach the internet from a public subnet, add route: <code>0.0.0.0/0 → IGW</code>.</div></div>
+  <div class="concept-card"><div class="cc-icon">🚪</div><div class="cc-title">Internet Gateway (IGW)</div><div class="cc-desc">The bridge between your VPC and the internet. Attach to VPC, reference in route table to enable public subnet traffic.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">NAT Gateway</div><div class="cc-desc">Allows private subnet resources to reach the internet (e.g. to download packages) WITHOUT being reachable from outside. Outbound only.</div></div>
+  <div class="concept-card"><div class="cc-icon">🛡️</div><div class="cc-title">Security Group</div><div class="cc-desc">Virtual firewall at the <strong>instance level</strong>. Stateful — allow traffic in and the response is automatically allowed out. ALLOW rules only.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔐</div><div class="cc-title">NACL</div><div class="cc-desc">Firewall at the <strong>subnet level</strong>. Stateless — must define both inbound AND outbound explicitly. Supports ALLOW and DENY. Evaluated by rule number.</div></div>
+</div>
+
+<div class="section">
+<h3 class="section-title">Security Group vs NACL</h3>
+<table class="compare-table">
+<tr><th>Feature</th><th>🛡️ Security Group</th><th>🔐 NACL</th></tr>
+<tr><td>Applied at</td><td>Instance level</td><td>Subnet level</td></tr>
+<tr><td>State</td><td>Stateful — auto-allow responses</td><td>Stateless — define both directions</td></tr>
+<tr><td>Rules</td><td>ALLOW only</td><td>ALLOW and DENY</td></tr>
+<tr><td>Rule evaluation</td><td>All rules together</td><td>By number (lowest first)</td></tr>
+<tr><td>Default</td><td>Deny all inbound, allow all outbound</td><td>Allow all inbound and outbound</td></tr>
+<tr><td>Use case</td><td>Control access to individual EC2s</td><td>Block IPs at subnet boundary</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h3 class="section-title">CIDR & IP Addressing in AWS</h3>
+<div class="info-box">
+<div class="info-box-item"><h4>📐 CIDR Notation</h4><p>CIDR defines a network using IP + prefix.<br/><br/><code>10.0.0.0/16</code> = 65,536 IPs<br/><code>10.0.1.0/24</code> = 256 IPs<br/><code>10.0.1.0/28</code> = 16 IPs<br/><br/>Formula: 2^(32 - prefix) = total IPs</p></div>
+<div class="info-box-item"><h4>🔒 Private IP Ranges</h4><p>Internal-only ranges not routable on the public internet:<br/><br/><code>10.0.0.0/8</code><br/><code>172.16.0.0/12</code><br/><code>192.168.0.0/16</code><br/><br/>AWS uses these for your VPC CIDR blocks.</p></div>
+<div class="info-box-item"><h4>⚡ Elastic IP</h4><p>By default, EC2 public IPs change every restart. An <strong>Elastic IP</strong> is a static public IP you reserve — it stays the same even after stop/start. Charged if not attached to a running instance.</p></div>
+</div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Build a VPC from CLI</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Create VPC</span>
+<span class="cmd">aws ec2 create-vpc --cidr-block 10.0.0.0/16</span>
+<span class="comment"># Create public + private subnets</span>
+<span class="cmd">aws ec2 create-subnet --vpc-id vpc-xxx --cidr-block 10.0.1.0/24</span>
+<span class="cmd">aws ec2 create-subnet --vpc-id vpc-xxx --cidr-block 10.0.2.0/24</span>
+<span class="comment"># Attach Internet Gateway</span>
+<span class="cmd">aws ec2 create-internet-gateway</span>
+<span class="cmd">aws ec2 attach-internet-gateway --vpc-id vpc-xxx --internet-gateway-id igw-xxx</span>
+<span class="comment"># Route public subnet → internet</span>
+<span class="cmd">aws ec2 create-route-table --vpc-id vpc-xxx</span>
+<span class="cmd">aws ec2 create-route --route-table-id rtb-xxx --destination-cidr-block 0.0.0.0/0 --gateway-id igw-xxx</span>
+<span class="cmd">aws ec2 associate-route-table --route-table-id rtb-xxx --subnet-id subnet-public-xxx</span>
+<span class="comment"># Security group: open port 80 + 443</span>
+<span class="cmd">aws ec2 create-security-group --group-name web-sg --description "Web SG" --vpc-id vpc-xxx</span>
+<span class="cmd">aws ec2 authorize-security-group-ingress --group-id sg-xxx --protocol tcp --port 80 --cidr 0.0.0.0/0</span></div></div>
+</div>
+
+<!-- ── S3 ─────────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">S3 — Simple Storage Service (Infinite Object Storage)</h3>
+<p>S3 is object storage — an infinite hard drive in the cloud. Store files, images, videos, backups, logs, static websites — anything. Files live in <strong>buckets</strong>. A single object can be up to 5 TB. Bucket names must be globally unique. S3 guarantees <strong>11 nines (99.999999999%) durability</strong> across all storage classes.</p>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — S3 Operations</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Create a bucket</span>
+<span class="cmd">aws s3 mb s3://my-devops-bucket --region ap-south-1</span>
+<span class="comment"># Upload a file / sync entire folder</span>
+<span class="cmd">aws s3 cp index.html s3://my-devops-bucket/</span>
+<span class="cmd">aws s3 sync ./website s3://my-devops-bucket/</span>
+<span class="comment"># Download + list</span>
+<span class="cmd">aws s3 cp s3://my-devops-bucket/index.html ./</span>
+<span class="cmd">aws s3 ls s3://my-devops-bucket</span>
+<span class="comment"># Enable static website hosting</span>
+<span class="cmd">aws s3 website s3://my-devops-bucket \</span>
+  <span class="cmd">--index-document index.html \</span>
+  <span class="cmd">--error-document error.html</span>
+<span class="comment"># Force delete bucket with all contents</span>
+<span class="cmd">aws s3 rb s3://my-bucket --force</span></div></div>
+
+<h3 class="section-title" style="margin-top:24px;">S3 Storage Classes — Choose by Access Frequency</h3>
+<table class="compare-table"><thead><tr><th>Class</th><th>Access</th><th>Retrieval</th><th>Cost</th><th>Best For</th></tr></thead><tbody>
+<tr><td><span class="badge-good">Standard</span></td><td>Frequent</td><td>Instant, no fee</td><td>Highest</td><td>Websites, active data</td></tr>
+<tr><td>Standard-IA</td><td>Infrequent</td><td>Instant, fee applies</td><td>Lower storage</td><td>Backups, DR</td></tr>
+<tr><td>One Zone-IA</td><td>Infrequent</td><td>Instant, fee applies</td><td>20% cheaper than Std-IA</td><td>Re-creatable data (1 AZ risk)</td></tr>
+<tr><td><span class="badge-good">Intelligent-Tiering</span></td><td>Unknown</td><td>Instant</td><td>Auto-optimised</td><td>Data lakes, ML datasets</td></tr>
+<tr><td>Glacier Instant</td><td>Rare</td><td>Milliseconds</td><td>Low</td><td>Medical archives</td></tr>
+<tr><td>Glacier Flexible</td><td>Rare</td><td>1 min – 12 hrs</td><td>Lower</td><td>Long-term backups</td></tr>
+<tr><td><span class="badge-bad">Deep Archive</span></td><td>Very rare</td><td>12 – 48 hrs</td><td>Lowest</td><td>Legal/financial records 7+ years</td></tr>
+</tbody></table>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">S3 Lifecycle Policy — Auto-Transition Between Classes</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">{
+  <span class="str">"Rules"</span>: [{
+    <span class="str">"ID"</span>: <span class="str">"auto-archive-logs"</span>,
+    <span class="str">"Status"</span>: <span class="str">"Enabled"</span>,
+    <span class="str">"Filter"</span>: { <span class="str">"Prefix"</span>: <span class="str">"logs/"</span> },
+    <span class="str">"Transitions"</span>: [
+      { <span class="str">"Days"</span>: 30,  <span class="str">"StorageClass"</span>: <span class="str">"STANDARD_IA"</span> },
+      { <span class="str">"Days"</span>: 90,  <span class="str">"StorageClass"</span>: <span class="str">"GLACIER_FLEXIBLE"</span> },
+      { <span class="str">"Days"</span>: 365, <span class="str">"StorageClass"</span>: <span class="str">"DEEP_ARCHIVE"</span> }
+    ],
+    <span class="str">"Expiration"</span>: { <span class="str">"Days"</span>: 2555 }  <span class="comment">// delete after 7 years</span>
+  }]
+}</div></div>
+<div class="callout callout-tip"><div class="callout-label">💡 Cost-Saving Tip</div><p>Use Lifecycle Policies to move data automatically: Standard (30 days) → Standard-IA (60 days) → Glacier Flexible (90+ days). This can cut storage costs by <strong>60–90%</strong> for older data without losing anything.</p></div>
+</div>
+
+<!-- ── CLOUDWATCH ─────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">CloudWatch — Monitoring & Alerting</h3>
+<p>CloudWatch is AWS's built-in monitoring service. Every AWS service automatically publishes metrics to it. You set alarms, create dashboards, and trigger automated actions based on thresholds.</p>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">📊</div><div class="cc-title">Metrics</div><div class="cc-desc">EC2 publishes CPU, network, disk metrics every minute. RDS publishes connections, storage, query time. Push custom metrics from your own application.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔔</div><div class="cc-title">Alarms</div><div class="cc-desc">Set thresholds and get notified. States: OK, ALARM, INSUFFICIENT_DATA. Actions: send SNS, trigger Auto Scaling, stop/reboot an instance.</div></div>
+  <div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">Logs</div><div class="cc-desc">Centralise all application and system logs. Lambda, EC2, RDS stream logs directly to CloudWatch Logs.</div></div>
+  <div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-title">EventBridge</div><div class="cc-desc">React to events automatically. EC2 instance state changes → trigger Lambda → send Slack notification.</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Create a CloudWatch Alarm</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Alert when EC2 CPU > 80% for 2 consecutive 5-minute periods</span>
+<span class="cmd">aws cloudwatch put-metric-alarm \</span>
+  <span class="cmd">--alarm-name "high-cpu" \</span>
+  <span class="cmd">--metric-name CPUUtilization \</span>
+  <span class="cmd">--namespace AWS/EC2 \</span>
+  <span class="cmd">--statistic Average \</span>
+  <span class="cmd">--period 300 \</span>
+  <span class="cmd">--evaluation-periods 2 \</span>
+  <span class="cmd">--threshold 80 \</span>
+  <span class="cmd">--comparison-operator GreaterThanThreshold \</span>
+  <span class="cmd">--dimensions Name=InstanceId,Value=i-1234567890abcdef0 \</span>
+  <span class="cmd">--alarm-actions arn:aws:sns:ap-south-1:123456:my-alerts</span></div></div>
+</div>
+
+<!-- ── AWS CLI ─────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">AWS CLI — Command the Cloud</h3>
+<p>The AWS CLI lets you interact with every AWS service from the terminal — no browser needed. Essential for automation, scripting, and CI/CD pipelines.</p>
+<div class="callout callout-analogy"><div class="callout-label">🎮 Analogy</div><p>The AWS Console is like using a touchscreen menu at a restaurant — intuitive but slow. The AWS CLI is like calling the kitchen directly — faster, scriptable, and you can automate the same order 1000 times with a loop.</p></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — AWS CLI Setup</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Install on Ubuntu</span>
+<span class="cmd">curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"</span>
+<span class="cmd">unzip awscliv2.zip && sudo ./aws/install</span>
+
+<span class="comment"># Configure with IAM credentials</span>
+<span class="cmd">aws configure</span>
+<span class="out">AWS Access Key ID: AKIAIOSFODNN7EXAMPLE</span>
+<span class="out">AWS Secret Access Key: wJalrXUtnFEMI/K7MDENG...</span>
+<span class="out">Default region name: ap-south-1</span>
+<span class="out">Default output format: json</span>
+
+<span class="comment"># Verify which account you're connected to</span>
+<span class="cmd">aws sts get-caller-identity</span>
+<span class="out">{ "Account": "123456789012", "UserId": "AIDAIOSFODNN7EXAMPLE" }</span>
+
+<span class="comment"># Use profiles for multiple AWS accounts</span>
+<span class="cmd">aws configure --profile production</span>
+<span class="cmd">aws s3 ls --profile production</span></div></div>
+<div class="callout callout-tip"><div class="callout-label">💡 Useful CLI Tricks</div><p>Use <code>--output table</code> for readable output, <code>--query</code> to filter JSON results, and <code>--dry-run</code> to test commands without executing them. For scripts, <code>--output text</code> is easiest to parse.</p></div>
+</div>
+
+<!-- ── RDS ────────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">RDS — Managed Relational Databases</h3>
+<p><strong>Amazon RDS</strong> manages your database for you — patching, backups, replication, and failover are automated. Supported engines: MySQL, PostgreSQL, MariaDB, Oracle, SQL Server, and Amazon Aurora.</p>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">Multi-AZ</div><div class="cc-desc">RDS automatically maintains a standby replica in a different AZ. If the primary fails, RDS fails over in ~60 seconds. Zero data loss.</div></div>
+  <div class="concept-card"><div class="cc-icon">📖</div><div class="cc-title">Read Replicas</div><div class="cc-desc">Offload read traffic to one or more read replicas. Improves performance for read-heavy workloads. Can be in different regions.</div></div>
+  <div class="concept-card"><div class="cc-icon">💾</div><div class="cc-title">Automated Backups</div><div class="cc-desc">RDS takes daily snapshots and transaction logs. Restore to any point in time within your retention window (up to 35 days).</div></div>
+  <div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-title">Aurora</div><div class="cc-desc">AWS's own MySQL/PostgreSQL-compatible engine. Up to 5x faster than standard MySQL. Storage auto-scales to 128TB.</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Create RDS Instance</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Create a PostgreSQL RDS instance in private subnet</span>
+<span class="cmd">aws rds create-db-instance \</span>
+  <span class="cmd">--db-instance-identifier my-postgres-db \</span>
+  <span class="cmd">--db-instance-class db.t3.micro \</span>
+  <span class="cmd">--engine postgres \</span>
+  <span class="cmd">--master-username admin \</span>
+  <span class="cmd">--master-user-password MySecurePass123 \</span>
+  <span class="cmd">--allocated-storage 20 \</span>
+  <span class="cmd">--multi-az \</span>
+  <span class="cmd">--no-publicly-accessible \</span>
+  <span class="cmd">--db-subnet-group-name my-db-subnet-group</span>
+
+<span class="comment"># Get the endpoint</span>
+<span class="cmd">aws rds describe-db-instances \</span>
+  <span class="cmd">--query 'DBInstances[*].Endpoint.Address'</span></div></div>
+
+<div class="callout callout-warn"><div class="callout-label">⚠️ Always put RDS in a Private Subnet</div><p>Never set <code>--publicly-accessible true</code> on a production database. Place RDS in a private subnet — only EC2 instances and Lambda functions inside the same VPC should reach it.</p></div>
+</div>
+
+<!-- ── LAMBDA ──────────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Lambda — Serverless Functions</h3>
+<p>Lambda lets you run code without provisioning or managing servers. Upload your function, define a trigger, and AWS handles everything. Pay only per invocation and execution duration — zero cost when idle.</p>
+
+<div class="callout callout-analogy"><div class="callout-label">💡 Analogy — Pay-Per-Use Electricity</div><p>Running a server 24/7 is like buying a generator and running it constantly — even at 3am when no one uses it. Lambda is like the electrical grid — you only pay for the exact milliseconds your code actually runs.</p></div>
+
+<div class="arch-diagram">  TRIGGERS                  LAMBDA               OUTPUTS
+  ┌────────────┐            ┌──────────┐          ┌────────────┐
+  │ API Gateway│──────────► │          │ ────────► │  DynamoDB  │
+  │ S3 Event   │──────────► │    λ     │ ────────► │  SNS Alert │
+  │ Schedule   │──────────► │          │ ────────► │  S3 Write  │
+  │ SQS Queue  │──────────► │ Your code│ ────────► │  RDS Query │
+  └────────────┘            └──────────┘          └────────────┘
+                            Pay only when running</div>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🔔</div><div class="cc-title">Push-Based (Sync)</div><div class="cc-desc">Event source triggers Lambda and <strong>waits</strong> for a response. Used when the caller needs an instant result. Example: API Gateway → Lambda → response to user.</div></div>
+  <div class="concept-card"><div class="cc-icon">📤</div><div class="cc-title">Push-Based (Async)</div><div class="cc-desc">Event source fires and <strong>doesn't wait</strong>. Events are queued and retried on failure. Example: S3 upload triggers Lambda to resize an image.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">Pull-Based (Streams)</div><div class="cc-desc">Lambda <strong>polls</strong> the event source for new data. Processes in batches. Example: Lambda reading from a DynamoDB stream or SQS queue.</div></div>
+  <div class="concept-card"><div class="cc-icon">🕐</div><div class="cc-title">Canary Functions</div><div class="cc-desc">A scheduled Lambda that monitors a website — like a synthetic health check. Alerts if a page is down or returns unexpected content.</div></div>
+</div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">Terminal — Deploy Lambda</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Zip your function code</span>
+<span class="cmd">zip function.zip lambda_function.py</span>
+
+<span class="comment"># Create Lambda function</span>
+<span class="cmd">aws lambda create-function \</span>
+  <span class="cmd">--function-name my-image-processor \</span>
+  <span class="cmd">--runtime python3.11 \</span>
+  <span class="cmd">--role arn:aws:iam::123456789012:role/lambda-role \</span>
+  <span class="cmd">--handler lambda_function.lambda_handler \</span>
+  <span class="cmd">--zip-file fileb://function.zip \</span>
+  <span class="cmd">--timeout 30 \</span>
+  <span class="cmd">--memory-size 256</span>
+
+<span class="comment"># Invoke manually for testing</span>
+<span class="cmd">aws lambda invoke \</span>
+  <span class="cmd">--function-name my-image-processor \</span>
+  <span class="cmd">--payload '{"test": "event"}' \</span>
+  <span class="cmd">response.json</span>
+
+<span class="comment"># View Lambda logs in CloudWatch</span>
+<span class="cmd">aws logs tail /aws/lambda/my-image-processor --follow</span></div></div>
+</div>
+
+<!-- ── DYNAMODB ───────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">DynamoDB — Serverless NoSQL Database</h3>
+<p>DynamoDB is a fully managed NoSQL database. Scales automatically to handle millions of requests per second with single-digit millisecond latency. No connections to configure, no servers to manage.</p>
+
+<div class="compare-table">
+<table>
+  <tr><th>Feature</th><th>🗄️ RDS</th><th>⚡ DynamoDB</th></tr>
+  <tr><td>Type</td><td>Relational (SQL)</td><td>NoSQL (key-value + document)</td></tr>
+  <tr><td>Schema</td><td>Fixed — define columns upfront</td><td>Flexible — each item can differ</td></tr>
+  <tr><td>Scaling</td><td>Vertical + read replicas</td><td>Auto horizontal to millions req/sec</td></tr>
+  <tr><td>Latency</td><td>Milliseconds</td><td>Single-digit milliseconds</td></tr>
+  <tr><td>Best for</td><td>Financial data, complex SQL queries</td><td>Real-time apps, gaming, IoT, mobile</td></tr>
+</table>
+</div>
+
+<div class="callout callout-tip"><div class="callout-label">✅ Rule of Thumb</div><p>Need complex SQL queries, JOINs, transactions? → <strong>Use RDS</strong>. Need massive scale, flexible schema, ultra-low latency with simple key-based access? → <strong>Use DynamoDB</strong>.</p></div>
+</div>
+
+<!-- ── ELB & AUTO SCALING ─────────────────────────── -->
+<div class="section">
+<h3 class="section-title">ELB & Auto Scaling — High Availability at Scale</h3>
+<p><strong>Elastic Load Balancer (ELB)</strong> distributes traffic across multiple instances. <strong>Auto Scaling</strong> automatically adds or removes instances based on demand.</p>
+
+<div class="arch-diagram">  USERS
+    ↓
+  [Application Load Balancer]  ← distributes traffic
+    ↓         ↓         ↓
+  [EC2-1]   [EC2-2]   [EC2-3]  ← Auto Scaling Group (2–20 instances)
+
+  Auto Scaling watches CloudWatch metrics:
+  CPU > 70% → add instances
+  CPU < 30% → remove instances</div>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">⚖️</div><div class="cc-title">Application LB (ALB)</div><div class="cc-desc">Layer 7 (HTTP/HTTPS). Routes based on URL path, hostname, or headers. Best for web apps and microservices. Supports WebSockets and HTTP/2.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔌</div><div class="cc-title">Network LB (NLB)</div><div class="cc-desc">Layer 4 (TCP/UDP). Extremely low latency, millions of requests/sec. Use for high-performance, non-HTTP traffic — databases, gaming, IoT.</div></div>
+  <div class="concept-card"><div class="cc-icon">📈</div><div class="cc-title">Auto Scaling Groups</div><div class="cc-desc">Define min, max, and desired instance count. Scaling policies trigger based on CloudWatch alarms. New instances launch from a Launch Template.</div></div>
+  <div class="concept-card"><div class="cc-icon">🎯</div><div class="cc-title">Target Tracking</div><div class="cc-desc">Simplest scaling policy — set a target metric (e.g. 60% CPU) and Auto Scaling maintains it automatically.</div></div>
+</div>
+</div>
+
+<!-- ── SNS & SQS ──────────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">SNS & SQS — Messaging & Decoupling</h3>
+
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">📢</div><div class="cc-title">SNS — Simple Notification Service</div><div class="cc-desc">Pub/Sub messaging. Publish one message to a Topic and it fans out to all subscribers (email, SMS, Lambda, SQS, HTTP). For alerts and broadcasting events.</div></div>
+  <div class="concept-card"><div class="cc-icon">📬</div><div class="cc-title">SQS — Simple Queue Service</div><div class="cc-desc">Message queue. Producer puts messages in, consumer reads them. Decouples services — producer doesn't wait for consumer. Messages stored up to 14 days.</div></div>
+</div>
+
+<div class="arch-diagram">  SNS Fan-out:
+  S3 Upload → SNS Topic → Email notification
+                        → Lambda (resize image)
+                        → SQS (process later)
+
+  SQS Decoupling:
+  Web App → SQS Queue → Lambda Worker → Database
+  (producer doesn't wait — queue buffers the load)</div>
+</div>
+
+<!-- ── HYBRID CLOUD ───────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">Hybrid Cloud: VPN vs Direct Connect</h3>
+<table class="compare-table">
+<tr><th>Feature</th><th>🔒 AWS VPN</th><th>⚡ AWS Direct Connect</th></tr>
+<tr><td>Connection</td><td>Over public internet (encrypted)</td><td>Private dedicated physical line</td></tr>
+<tr><td>Speed</td><td>Variable (depends on internet)</td><td>Consistent, high speed</td></tr>
+<tr><td>Cost</td><td>Lower</td><td>Higher (physical line)</td></tr>
+<tr><td>Setup time</td><td>Minutes</td><td>Weeks</td></tr>
+<tr><td>Best for</td><td>Small/dev workloads, quick setup</td><td>Production, high throughput, compliance</td></tr>
+</table>
+</div>
+
+<!-- ── INTERVIEW Q&A ──────────────────────────────── -->
+<div class="section">
+<h3 class="section-title">🎯 AWS Interview Questions — Entry to Advanced</h3>
+<p>Questions curated from <strong>bregman-arie/devops-exercises</strong> — one of the most referenced DevOps interview repos on GitHub. These are grouped by difficulty.</p>
+
+<h4 style="font-family:'Syne',sans-serif;color:var(--accent);margin:20px 0 10px;font-size:0.85rem;letter-spacing:0.08em;">ENTRY LEVEL — Semi-Hard</h4>
+
+<div class="callout callout-tip"><div class="callout-label">Q: True or False? When creating an AWS account, root is the recommended account for daily use.</div><p><strong>False.</strong> The root account has unrestricted access to everything. AWS strongly recommends you create IAM users immediately and lock away the root credentials. Enable MFA on root and never use it for day-to-day work — not even for the CLI.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: An IAM user can't access an S3 bucket. What could be wrong?</div><p>Several reasons: (1) No policy is attached to the user or their group granting S3 access. (2) There's an explicit <code>Deny</code> on a policy which overrides allows. (3) A bucket policy on the S3 side denies the user's ARN. (4) The user is missing <code>s3:ListBucket</code> or <code>s3:GetObject</code> in their policy. Fix by attaching the correct managed or custom policy and checking both identity-based and resource-based policies.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: What's the difference between an IAM Role and an IAM User?</div><p>A <strong>User</strong> is a permanent identity for a person or application — it has long-term credentials (password or access keys). A <strong>Role</strong> is a temporary identity that can be <em>assumed</em> by AWS services, users, or external identities. Roles have no permanent credentials — they issue short-lived session tokens. Use Roles for EC2, Lambda, and cross-account access instead of embedding access keys.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: A subnet must reside in one Availability Zone — True or False?</div><p><strong>True.</strong> A subnet is tied to exactly one AZ. For high availability, create separate subnets in at least two AZs and spread your EC2 instances across them. If one AZ goes down, the other subnet stays up.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: What happens to an EC2 instance's public IP when you stop and restart it?</div><p>By default, the public IP <strong>changes</strong> on every stop/start cycle. If you need a static public IP (e.g. for a DNS A record), allocate an <strong>Elastic IP</strong> and associate it with the instance. Note: Elastic IPs are free when attached to a running instance but incur charges if unattached.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: What is the difference between stopping and terminating an EC2 instance?</div><p><strong>Stopping</strong> is like shutting down your laptop — the instance is off but still exists, data on EBS volumes is preserved, and you can start it again. <strong>Terminating</strong> is permanent deletion — the instance is gone and any EBS volumes set to "delete on termination" are also gone. Always confirm before terminating production instances.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: What is an AMI and why would you create a custom one?</div><p>An <strong>AMI (Amazon Machine Image)</strong> is a pre-packaged OS + software snapshot you use to launch EC2 instances. You create a custom AMI when you want new instances to start with your software pre-installed (e.g. Nginx, your app, custom config). This speeds up Auto Scaling — instances launch ready-to-serve instead of running bootstrap scripts every time.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: What is the difference between ALB and NLB?</div><p><strong>ALB (Application Load Balancer)</strong> operates at Layer 7 (HTTP/HTTPS) and can route based on URL path, headers, or host — great for microservices where <code>/api</code> goes to one service and <code>/auth</code> goes to another. <strong>NLB (Network Load Balancer)</strong> operates at Layer 4 (TCP/UDP) — it's much faster and can handle millions of requests per second at ultra-low latency. Use NLB for non-HTTP traffic or when you need static IPs.</p></div>
+
+<h4 style="font-family:'Syne',sans-serif;color:var(--accent);margin:24px 0 10px;font-size:0.85rem;letter-spacing:0.08em;">ADVANCED LEVEL</h4>
+
+<div class="callout callout-tip"><div class="callout-label">Q: Each AWS region is completely isolated from other regions — True or False? Why does this matter?</div><p><strong>True.</strong> Regions don't share compute, storage, or networking by default. This is by design for fault isolation — a disaster in one region doesn't affect another. It also has compliance implications: data stored in <code>ap-south-1</code> (Mumbai) stays in India unless you explicitly replicate it, which matters for GDPR, data residency laws, and SOC 2 audits. For global apps, you architect for multi-region using Route 53 + S3 Cross-Region Replication + RDS Global Clusters.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: True or False? Route 53 Multi-Value is a substitute for ELB.</div><p><strong>False.</strong> Route 53 Multi-Value is <em>client-side</em> load balancing — it returns multiple IPs and the client picks one. ELB is <em>server-side</em> — it sits in front of your instances, handles health checks, and routes at the TCP/HTTP level. ELB also integrates with Auto Scaling and supports sticky sessions. Multi-Value can complement ELB but cannot replace it for production workloads.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: What are DynamoDB Global Tables and when would you use them?</div><p><strong>Global Tables</strong> provide multi-region, multi-active replication for DynamoDB. Any write to any region is automatically replicated to all other regions in seconds. Use this when you need: (1) low-latency reads for users worldwide, (2) a disaster recovery strategy with near-zero RPO, or (3) compliance requiring data copies in multiple regions. Unlike RDS Multi-AZ (which is single-region active/standby), DynamoDB Global Tables are truly multi-region active/active.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: How does an S3 Lifecycle Policy work, and when would you write a custom one vs use Intelligent-Tiering?</div><p><strong>Lifecycle Policies</strong> are rules you define — "move to Standard-IA after 30 days, Glacier after 90 days, delete after 7 years." They're deterministic and cost nothing extra per object. <strong>Intelligent-Tiering</strong> monitors access patterns automatically and moves objects between tiers — but charges a small monitoring fee per object (~$0.0025/1000 objects/month). Use Lifecycle Policies when you <em>know</em> your access patterns (e.g. logs you'll never read after 30 days). Use Intelligent-Tiering when access patterns are unpredictable (e.g. user-uploaded data where some files become popular and some don't).</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: What is Lambda cold start and how do you mitigate it?</div><p>A <strong>cold start</strong> happens when Lambda needs to spin up a new execution environment for your function — downloading the code, initialising the runtime, and running initialisation code outside the handler. This can add 100ms–3s of latency. Mitigations: (1) <strong>Provisioned Concurrency</strong> — pre-warms a specified number of Lambda environments so they're always ready. (2) Keep Lambda warm with a scheduled CloudWatch event that pings the function every few minutes. (3) Reduce package size — smaller deployment packages initialise faster. (4) Use Lambda SnapStart for Java functions.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: You're designing a system where an S3 upload must trigger image resizing AND send an email AND write a DB record — how do you architect this?</div><p>Use the <strong>SNS fan-out pattern</strong>: S3 sends an event to an SNS Topic on upload. Three subscribers listen to that topic: (1) a Lambda function that resizes the image and writes it to a processed bucket, (2) another Lambda (or SES) that sends the email notification, (3) an SQS queue that a Lambda worker polls to write the DB record. This way: all three operations run in parallel, each service is decoupled, any one failure doesn't block the others, and SQS provides a retry buffer for the DB write if the database is temporarily unavailable.</p></div>
+
+<div class="callout callout-tip"><div class="callout-label">Q: What is the difference between VPC Peering and VPC Transit Gateway?</div><p><strong>VPC Peering</strong> creates a direct, private network connection between exactly two VPCs — traffic routes through AWS's backbone, not the public internet. It's non-transitive: if VPC-A peers with VPC-B and VPC-B peers with VPC-C, VPC-A cannot reach VPC-C through VPC-B. <strong>Transit Gateway</strong> is a regional hub that connects multiple VPCs and on-premise networks in a hub-and-spoke model. With TGW, you manage one set of route tables instead of a mesh of peering connections. Use VPC Peering for simple 2-VPC connectivity; use Transit Gateway when you have 5+ VPCs or need transitive routing.</p></div>
+</div>
+
+<!-- ── MINI PROJECTS ───────────────────────────────── -->
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project 1 — Static Website + Monitoring</div>
+<ol class="steps">
+  <li>Create an IAM user with S3 and CloudWatch permissions — configure AWS CLI</li>
+  <li>Create an S3 bucket, enable static website hosting</li>
+  <li>Upload portfolio HTML/CSS with <code>aws s3 sync</code></li>
+  <li>Set a bucket policy to allow public read access</li>
+  <li>Create a CloudWatch alarm on S3 bucket size (alerts when over 50MB)</li>
+  <li>Launch a t2.micro EC2, SSH in, install Nginx, set up a CPU alarm at 80%</li>
+</ol></div>
+
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project 2 — Serverless Image Pipeline</div>
+<ol class="steps">
+  <li>Create two S3 buckets: <code>uploads-bucket</code> and <code>processed-bucket</code></li>
+  <li>Create a Lambda (Python) triggered on S3 uploads — copies file to processed bucket</li>
+  <li>Create an SNS topic — subscribe your email to it</li>
+  <li>Update Lambda to publish a message to SNS after processing</li>
+  <li>Set a Lifecycle Policy on uploads bucket — move objects to Standard-IA after 30 days</li>
+  <li>Add a CloudWatch alarm that fires if Lambda errors > 0</li>
+  <li>Upload a test file — verify email arrives and file appears in processed bucket</li>
+</ol></div>
+
+<div class="callout callout-project"><div class="callout-label">🚀 Mini Project 3 — Full CLI VPC + EC2 Workflow</div>
+<p>Without touching the AWS Console: create a VPC + subnet + IGW → launch an EC2 inside it → upload a file to S3 → SSH into the EC2 → download the file from S3 → clean up everything. This is exactly the kind of automation you'd put in a bash script or CI/CD pipeline.</p></div>
+
+<!-- ── SUMMARY ───────────────────────────────────── -->
+<div class="callout callout-tip"><div class="callout-label">✅ Module Summary</div><ul class="checklist">
+  <li>Cloud computing = renting infrastructure on-demand; IaaS/PaaS/SaaS are the three service models</li>
+  <li>AWS Regions are independent geographic locations; each Region has 2–6 Availability Zones</li>
+  <li>IAM — always least privilege; use Roles for services, never embed access keys in code</li>
+  <li>EC2 — virtual servers; choose instance type by workload; access via SSH + key pair</li>
+  <li>VPC — your private network; public subnets for web servers, private subnets for databases; Security Groups (instance) vs NACLs (subnet)</li>
+  <li>S3 — unlimited object storage; use Lifecycle Policies to cut costs by auto-archiving to Glacier</li>
+  <li>CloudWatch — metrics, alarms, and logs for all AWS resources; always set CPU and cost alarms</li>
+  <li>AWS CLI — essential for automation; configure profiles for multiple accounts</li>
+  <li>RDS — managed relational DB; always Multi-AZ + private subnet in production</li>
+  <li>Lambda — serverless functions; pay per invocation; event-driven with SNS/SQS/S3 triggers</li>
+  <li>ELB — ALB for HTTP routing, NLB for TCP/high-performance; pair with Auto Scaling Groups</li>
+  <li>SNS for fan-out broadcasts; SQS for decoupling services with reliable message queues</li>
+</ul></div>
+
+<div class="next-card" onclick="showModule('linux')"><div class="next-text"><div class="next-label">Next Module →</div><div class="next-title">🐧 Linux Basics</div><div class="next-why">All cloud servers run Linux. Master the command line to configure, deploy, and troubleshoot them effectively.</div></div><div class="next-arrow">→</div></div>

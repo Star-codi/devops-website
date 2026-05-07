@@ -5,13 +5,12 @@
 const MODULE_ORDER = [
   'home',
   'devopslife', 'networking', 'yaml',
-  'cloud', 'aws-fundamentals', 'aws-deepdive',
+  'aws-combined',
   'linux', 'shell',
   'git', 'maven',
   'jenkins', 'github-actions', 'docker', 'kubernetes', 'helm',
   'terraform', 'ansible',
   'monitoring', 'elk', 'nginx',
-  'vpc', 's3', 'aws-cli', 'lambda',
   'security', 'interview', 'nextsteps'
 ];
 
