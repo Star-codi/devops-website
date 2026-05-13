@@ -27,6 +27,9 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 .nav-item:hover::before{opacity:1}
 .nav-item.active{color:var(--cyan);border-left-color:var(--cyan);text-shadow:0 0 10px rgba(0,245,212,.3)}
 .nav-item.active::before{opacity:1}
+.nav-item.visited .nav-check{display:inline-flex}
+.nav-check{display:none;align-items:center;justify-content:center;margin-left:auto;width:14px;height:14px;border-radius:50%;background:rgba(0,245,212,.15);color:var(--cyan);font-size:.55rem;flex-shrink:0;line-height:1}
+.nav-item.visited .nav-num{display:none}
 .nav-item .nav-icon{font-size:.88rem;width:17px;text-align:center;flex-shrink:0}
 .nav-item .nav-num{font-family:var(--font-mono);font-size:.52rem;color:var(--muted);margin-left:auto;letter-spacing:.08em}
 

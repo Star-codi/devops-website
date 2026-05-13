@@ -38,7 +38,34 @@ const MODULE_ORDER = [
 
 const moduleCache = {};
 let currentModule = 'home';
-const visitedModules = new Set(); // progress = unique modules visited
+
+// ── Visited state — persisted in localStorage ──────────────────────────────
+const STORAGE_KEY = 'devopsbuddy_visited';
+
+function loadVisited() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch { return new Set(); }
+}
+
+function saveVisited(set) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...set])); } catch {}
+}
+
+const visitedModules = loadVisited();
+
+function markNavVisited(id) {
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if ((n.getAttribute('onclick') || '').includes(`'${id}'`)) {
+      n.classList.add('visited');
+    }
+  });
+}
+
+function restoreVisitedMarks() {
+  visitedModules.forEach(id => markNavVisited(id));
+}
 
 async function loadModule(id) {
   if (moduleCache[id]) return moduleCache[id];
@@ -106,7 +133,11 @@ async function showModule(id) {
     }
   });
 
-  if (id !== 'home') visitedModules.add(id);
+  if (id !== 'home') {
+    visitedModules.add(id);
+    saveVisited(visitedModules);
+    markNavVisited(id);
+  }
   const trackable = MODULE_ORDER.filter(m => m !== 'home');
   const pct = Math.round((visitedModules.size / trackable.length) * 100);
   document.getElementById('progress-fill').style.width = pct + '%';
@@ -126,6 +157,7 @@ function toggleSidebar() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  restoreVisitedMarks();
   const hash = window.location.hash.replace('#', '') || 'home';
   showModule(hash);
 });
