@@ -38,6 +38,7 @@ const MODULE_ORDER = [
 
 const moduleCache = {};
 let currentModule = 'home';
+const visitedModules = new Set(); // progress = unique modules visited
 
 async function loadModule(id) {
   if (moduleCache[id]) return moduleCache[id];
@@ -105,8 +106,9 @@ async function showModule(id) {
     }
   });
 
-  const idx = MODULE_ORDER.indexOf(id);
-  const pct = idx <= 0 ? 0 : Math.round((idx / (MODULE_ORDER.length - 1)) * 100);
+  if (id !== 'home') visitedModules.add(id);
+  const trackable = MODULE_ORDER.filter(m => m !== 'home');
+  const pct = Math.round((visitedModules.size / trackable.length) * 100);
   document.getElementById('progress-fill').style.width = pct + '%';
   document.getElementById('progress-pct').textContent = pct + '%';
 

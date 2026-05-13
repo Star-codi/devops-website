@@ -150,3 +150,5 @@ eksctl delete cluster --name my-cluster
 aws eks describe-cluster --name my-cluster --region ap-south-1</div></div>
 <div class="callout callout-tip"><div class="callout-label">💰 Cost tip</div><p>EKS control plane costs ~$0.10/hour per cluster (~$72/month). Add EC2 node costs on top. For learning, create the cluster, practice, then <strong>delete it</strong>. Use <code>eksctl delete cluster</code> — it cleans up all AWS resources including VPC, security groups, and node groups.</p></div>
 </div>
+
+<div class="next-card" onclick="showModule('helm')"><div class="next-text"><div class="next-label">Next →</div><div class="next-title">⎈ Helm</div><div class="next-why">Your cluster is running on EKS — now learn Helm to package and deploy applications to Kubernetes using reusable, versioned charts instead of raw YAML files.</div></div><div class="next-arrow">→</div></div>
