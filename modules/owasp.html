@@ -1,0 +1,156 @@
+<div class="module-header"><div class="module-icon">🛡️</div><div class="module-meta"><div class="module-tag">Module 22 — Security Testing in CI/CD</div><h2 class="module-title">OWASP — Security Testing for DevSecOps</h2></div></div>
+
+<div class="section"><h3 class="section-title">What is OWASP?</h3>
+<p>OWASP (Open Worldwide Application Security Project) is a non-profit foundation that produces free, open security resources. In DevOps, two OWASP tools are critical: the <strong>OWASP Top 10</strong> (the most dangerous web vulnerabilities) and <strong>OWASP ZAP</strong> (an automated security scanner you embed in CI/CD).</p>
+<div class="callout callout-analogy"><div class="callout-label">🔒 Analogy — Security checklist before launch</div><p>Before an airplane takes off, pilots go through a safety checklist — not because they expect failure, but because missing one item can be catastrophic. OWASP gives you the security checklist for web applications. ZAP automates running that checklist on every build.</p></div>
+</div>
+
+<div class="section"><h3 class="section-title">OWASP Top 10 — 2021</h3>
+<p>These are the 10 most critical web application security risks, ranked by frequency, exploitability, and impact:</p>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🔓</div><div class="cc-title">A01 — Broken Access Control</div><div class="cc-desc">Users can access resources they shouldn't. Example: changing <code>?user_id=123</code> to <code>?user_id=124</code> to view another user's data. #1 vulnerability in 2021.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔐</div><div class="cc-title">A02 — Cryptographic Failures</div><div class="cc-desc">Sensitive data exposed due to weak or missing encryption — passwords stored in plain text, HTTP instead of HTTPS, outdated TLS versions.</div></div>
+  <div class="concept-card"><div class="cc-icon">💉</div><div class="cc-title">A03 — Injection</div><div class="cc-desc">Attacker sends hostile data as part of a command. SQL injection: <code>'; DROP TABLE users;--</code>. Also covers OS injection, LDAP injection, XSS.</div></div>
+  <div class="concept-card"><div class="cc-icon">🏗️</div><div class="cc-title">A04 — Insecure Design</div><div class="cc-desc">Security flaws baked into the architecture — no rate limiting on login, no account lockout, no separation of privilege by design.</div></div>
+  <div class="concept-card"><div class="cc-icon">⚙️</div><div class="cc-title">A05 — Security Misconfiguration</div><div class="cc-desc">Default passwords, open cloud storage buckets (S3), verbose error messages exposing stack traces, unnecessary features enabled.</div></div>
+  <div class="concept-card"><div class="cc-icon">📦</div><div class="cc-title">A06 — Vulnerable Components</div><div class="cc-desc">Using libraries/frameworks with known CVEs — Log4Shell, Spring4Shell. Keep dependencies updated; scan with tools like Trivy, Snyk.</div></div>
+  <div class="concept-card"><div class="cc-icon">🎟️</div><div class="cc-title">A07 — Auth Failures</div><div class="cc-desc">Broken authentication — weak passwords allowed, no MFA, session tokens not invalidated on logout, credential stuffing not blocked.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">A08 — Data Integrity Failures</div><div class="cc-desc">Code and data without integrity verification — insecure deserialization, unverified CI/CD pipeline updates, unsigned software packages.</div></div>
+  <div class="concept-card"><div class="cc-icon">📋</div><div class="cc-title">A09 — Logging Failures</div><div class="cc-desc">No logging of login failures, no audit trail of sensitive actions, logs stored insecurely, no alerting on suspicious activity.</div></div>
+  <div class="concept-card"><div class="cc-icon">🌐</div><div class="cc-title">A10 — SSRF</div><div class="cc-desc">Server-Side Request Forgery — attacker tricks your server into making requests to internal services. Used to access AWS metadata endpoints, internal APIs.</div></div>
+</div>
+</div>
+
+<div class="section"><h3 class="section-title">OWASP ZAP — Automated Scanner</h3>
+<p>ZAP (Zed Attack Proxy) is OWASP's flagship security testing tool. It acts as a proxy between your browser/test suite and your app, intercepting and analysing all traffic for vulnerabilities.</p>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🕷️</div><div class="cc-title">Spider / Crawler</div><div class="cc-desc">Automatically discovers all pages, forms, and endpoints in your app by following links and analysing JavaScript.</div></div>
+  <div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-title">Active Scan</div><div class="cc-desc">Actively attacks the app — sends malicious payloads to test for XSS, SQLi, path traversal, and more. Use only on test environments.</div></div>
+  <div class="concept-card"><div class="cc-icon">👁️</div><div class="cc-title">Passive Scan</div><div class="cc-desc">Passively analyses traffic without sending attacks — safe on any environment. Finds missing security headers, cookies without Secure flag, etc.</div></div>
+  <div class="concept-card"><div class="cc-icon">🤖</div><div class="cc-title">Automation Framework</div><div class="cc-desc">YAML-based config for CI/CD integration. Define scan rules, thresholds, and report formats — run headlessly in Jenkins or GitHub Actions.</div></div>
+</div>
+</div>
+
+<div class="section"><h3 class="section-title">ZAP in Jenkins CI/CD Pipeline</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">Jenkinsfile — DAST with ZAP</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">pipeline {
+  agent any
+  stages {
+    stage('Build & Deploy to Staging') {
+      steps {
+        sh 'docker-compose up -d'
+        sh 'sleep 15'   <span class="comment">// wait for app to start</span>
+      }
+    }
+
+    stage('OWASP ZAP Security Scan') {
+      steps {
+        script {
+          sh '''
+            docker run --rm \
+              --network host \
+              -v $(pwd)/zap-reports:/zap/wrk \
+              ghcr.io/zaproxy/zaproxy:stable \
+              zap-baseline.py \
+                -t http://localhost:8080 \
+                -r zap-report.html \
+                -x zap-report.xml \
+                -J zap-report.json \
+                -I   <span class="comment">// don't fail on warnings, only errors</span>
+          '''
+        }
+      }
+      post {
+        always {
+          publishHTML([
+            reportDir: 'zap-reports',
+            reportFiles: 'zap-report.html',
+            reportName: 'ZAP Security Report'
+          ])
+        }
+      }
+    }
+
+    stage('Deploy to Production') {
+      when {
+        expression { currentBuild.result == null }  <span class="comment">// only if ZAP passed</span>
+      }
+      steps {
+        sh 'kubectl apply -f k8s/production/'
+      }
+    }
+  }
+}</div></div>
+</div>
+
+<div class="section"><h3 class="section-title">ZAP Scan Types</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">bash — ZAP scan commands</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Baseline scan — passive only, safe for prod-like environments (~2 min)</span>
+docker run --rm ghcr.io/zaproxy/zaproxy:stable \
+  zap-baseline.py -t https://your-app.com -r report.html
+
+<span class="comment"># Full scan — active attack, use ONLY on test/staging (~15-60 min)</span>
+docker run --rm ghcr.io/zaproxy/zaproxy:stable \
+  zap-full-scan.py -t https://staging.your-app.com -r report.html
+
+<span class="comment"># API scan — for REST APIs using OpenAPI/Swagger spec</span>
+docker run --rm ghcr.io/zaproxy/zaproxy:stable \
+  zap-api-scan.py \
+    -t https://your-app.com/api/swagger.json \
+    -f openapi \
+    -r report.html</div></div>
+</div>
+
+<div class="section"><h3 class="section-title">Dependency Scanning — OWASP Dependency-Check</h3>
+<p>Dependency-Check scans your project's libraries against the NVD (National Vulnerability Database) for known CVEs. Run it in CI to catch vulnerable packages before they ship.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">Jenkinsfile — Dependency-Check stage</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">stage('Dependency Security Scan') {
+  steps {
+    dependencyCheck(
+      additionalArguments: '''
+        --scan ./
+        --format HTML
+        --format XML
+        --out dependency-check-report
+        --failOnCVSS 7        <span class="comment">// fail pipeline if CVSS score >= 7</span>
+      ''',
+      odcInstallation: 'OWASP-DC'
+    )
+    dependencyCheckPublisher(
+      pattern: 'dependency-check-report/dependency-check-report.xml'
+    )
+  }
+}</div></div>
+<div class="callout callout-tip"><div class="callout-label">🔍 Alternatives to Dependency-Check</div><p><strong>Trivy</strong> (by Aqua Security) is increasingly preferred in Kubernetes environments — it scans container images, filesystems, and Git repos for CVEs in one tool. Run <code>trivy image your-app:latest</code> in CI alongside ZAP for full coverage.</p></div>
+</div>
+
+<div class="section"><h3 class="section-title">DevSecOps Pipeline — Full Security Flow</h3>
+<div class="arch-diagram">Code Commit
+     │
+     ▼
+┌─────────────┐
+│  SAST       │  ← SonarQube (static code analysis)
+│  (build)    │     finds bugs + security hotspots in source
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  SCA        │  ← OWASP Dependency-Check / Trivy
+│  (build)    │     scans third-party libraries for CVEs
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  Container  │  ← Trivy image scan
+│  Scan       │     checks Docker image layers for CVEs
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  DAST       │  ← OWASP ZAP
+│  (staging)  │     attacks running app to find runtime vulns
+└──────┬──────┘
+       │
+     PASS ✅
+       │
+       ▼
+  Production Deploy</div>
+<div class="callout callout-tip"><div class="callout-label">📌 SAST vs DAST — Key difference</div><p><strong>SAST</strong> (Static Application Security Testing) — analyses source code without running it. Fast, catches issues early, but can't find runtime issues. SonarQube is a SAST tool.<br><br><strong>DAST</strong> (Dynamic Application Security Testing) — attacks a running app. Slower, needs a live environment, but finds real exploitable vulnerabilities. ZAP is a DAST tool. Use both.</p></div>
+</div>

@@ -1,57 +1,44 @@
 // ─────────────────────────────────────────────
-//  DevOps Zero to Hero — main.js
+//  DevOps Buddy — main.js
 // ─────────────────────────────────────────────
 
 const MODULE_ORDER = [
   'home',
+
+  // Module 0 — Before You Begin
   'devopslife', 'networking', 'yaml',
-  'aws-combined',
+
+  // Module 1 — Linux & Scripting
   'linux', 'shell',
+
+  // Module 2 — Code & Version Control
   'git', 'maven',
-  'jenkins', 'github-actions', 'docker', 'kubernetes', 'helm',
+
+  // Module 3 — Cloud Foundation
+  'cloud', 'aws-fundamentals', 'aws-deepdive',
+
+  // Module 4 — Containers & Orchestration
+  'docker', 'kubernetes', 'eks', 'helm',
+
+  // Module 5 — CI/CD & GitOps
+  'jenkins', 'github-actions', 'argocd',
+
+  // Module 6 — IaC & Config Management
   'terraform', 'ansible',
-  'monitoring', 'elk', 'nginx',
-  'security', 'interview', 'nextsteps'
+
+  // Module 7 — Networking & Observability
+  'vpc', 'nginx', 'elk', 'monitoring',
+
+  // Module 8 — Security
+  'sonarqube', 'owasp', 'security',
+
+  // Module 9 — Career
+  'interview', 'nextsteps'
 ];
 
 const moduleCache = {};
 let currentModule = 'home';
 
-// ── localStorage progress ──────────────────────
-const STORAGE_KEY = 'devops_visited';
-
-function getVisited() {
-  try {
-    return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
-  } catch { return new Set(); }
-}
-
-function markVisited(id) {
-  const visited = getVisited();
-  visited.add(id);
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...visited])); } catch {}
-  updateProgress(visited);
-}
-
-function updateProgress(visited) {
-  if (!visited) visited = getVisited();
-  const content = MODULE_ORDER.filter(m => m !== 'home');
-  const done = content.filter(m => visited.has(m)).length;
-  const pct = Math.round((done / content.length) * 100);
-  document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('progress-pct').textContent = pct + '%';
-}
-
-function resetProgress() {
-  if (confirm('Reset your progress? This will clear all visited modules.')) {
-    try { localStorage.removeItem(STORAGE_KEY); } catch {}
-    updateProgress(new Set());
-    // Update nav completion dots
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('completed'));
-  }
-}
-
-// ── Module loading ─────────────────────────────
 async function loadModule(id) {
   if (moduleCache[id]) return moduleCache[id];
   try {
@@ -62,19 +49,27 @@ async function loadModule(id) {
     return html;
   } catch (err) {
     console.error(err);
-    return `<p style="color:red;padding:40px">Could not load module "${id}". Check that modules/${id}.html exists.</p>`;
+    return `<p style="color:red;padding:40px">Could not load module "${id}".</p>`;
   }
 }
 
+/**
+ * Re-execute scripts injected via innerHTML.
+ * For inline scripts: clone and replace.
+ * For external scripts (src=): create new script tag and append —
+ * this triggers the browser to fetch and execute the file.
+ */
 function runInjectedScripts(container) {
   container.querySelectorAll('script').forEach(old => {
     const s = document.createElement('script');
     Array.from(old.attributes).forEach(a => s.setAttribute(a.name, a.value));
     if (old.src) {
+      // External script — append to head so it loads fresh
       s.src = old.src;
       old.remove();
       document.head.appendChild(s);
     } else {
+      // Inline script — replace in place
       s.textContent = old.textContent;
       old.parentNode.replaceChild(s, old);
     }
@@ -103,7 +98,6 @@ async function showModule(id) {
   section.classList.add('visible');
   currentModule = id;
 
-  // Update nav active state
   document.querySelectorAll('.nav-item').forEach(n => {
     n.classList.remove('active');
     if ((n.getAttribute('onclick') || '').includes(`'${id}'`)) {
@@ -111,18 +105,10 @@ async function showModule(id) {
     }
   });
 
-  // Track progress (skip home)
-  if (id !== 'home') {
-    markVisited(id);
-    // Add completion dot to nav item
-    document.querySelectorAll('.nav-item').forEach(n => {
-      if ((n.getAttribute('onclick') || '').includes(`'${id}'`)) {
-        n.classList.add('completed');
-      }
-    });
-  } else {
-    updateProgress();
-  }
+  const idx = MODULE_ORDER.indexOf(id);
+  const pct = idx <= 0 ? 0 : Math.round((idx / (MODULE_ORDER.length - 1)) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -133,58 +119,15 @@ async function showModule(id) {
   history.pushState({ module: id }, '', `#${id}`);
 }
 
-// ── Sidebar toggle ─────────────────────────────
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
 }
 
-// ── Search / Filter ────────────────────────────
-function filterNav(query) {
-  const q = query.toLowerCase().trim();
-  const nav = document.getElementById('sidebar-nav');
-  const empty = document.getElementById('search-empty');
-  const items = nav.querySelectorAll('.nav-item');
-  const labels = nav.querySelectorAll('.nav-section-label');
-  let anyVisible = false;
-
-  if (!q) {
-    items.forEach(el => el.style.display = '');
-    labels.forEach(el => el.style.display = '');
-    empty.style.display = 'none';
-    return;
-  }
-
-  // Hide all section labels first
-  labels.forEach(el => el.style.display = 'none');
-
-  items.forEach(el => {
-    const text = (el.textContent + ' ' + (el.dataset.search || '')).toLowerCase();
-    const match = text.includes(q);
-    el.style.display = match ? '' : 'none';
-    if (match) anyVisible = true;
-  });
-
-  empty.style.display = anyVisible ? 'none' : 'block';
-}
-
-// ── Init ───────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  // Restore visited markers on nav
-  const visited = getVisited();
-  document.querySelectorAll('.nav-item').forEach(n => {
-    const onclick = n.getAttribute('onclick') || '';
-    const m = onclick.match(/'([^']+)'/);
-    if (m && visited.has(m[1])) {
-      n.classList.add('completed');
-    }
-  });
-
-  // Load initial module from URL hash or default home
-  const hash = location.hash.replace('#', '');
-  const startModule = (hash && MODULE_ORDER.includes(hash)) ? hash : 'home';
-  showModule(startModule);
+  const hash = window.location.hash.replace('#', '') || 'home';
+  showModule(hash);
 });
 
-window.addEventListener('popstate', e => {
-  if (e.state && e.state.module) showModule(e.state.module);
+window.addEventListener('popstate', (e) => {
+  showModule(e.state?.module || 'home');
 });

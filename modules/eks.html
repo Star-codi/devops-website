@@ -1,0 +1,152 @@
+<div class="module-header"><div class="module-icon">☸️</div><div class="module-meta"><div class="module-tag">Module 11 — Managed Kubernetes on AWS</div><h2 class="module-title">Amazon EKS — Elastic Kubernetes Service</h2></div></div>
+
+<div class="section"><h3 class="section-title">Why EKS?</h3>
+<p>Running Kubernetes yourself means managing the control plane — the API server, etcd, scheduler, controller manager. That's complex, requires high availability setup, and needs constant patching. EKS offloads all of that to AWS.</p>
+<div class="callout callout-analogy"><div class="callout-label">🏢 Analogy — Renting a managed office</div><p>Self-managed Kubernetes is buying a building and maintaining everything — plumbing, electricity, security. EKS is renting a fully managed office space. AWS handles the building (control plane). You just bring your furniture and staff (workloads and nodes).</p></div>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🔧</div><div class="cc-title">Managed Control Plane</div><div class="cc-desc">AWS runs and scales your API server and etcd across multiple AZs. No control plane VMs to patch or manage. 99.95% SLA.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔗</div><div class="cc-title">AWS Integration</div><div class="cc-desc">Native integration with IAM, VPC, ALB, EBS, EFS, ECR, CloudWatch, and Secrets Manager — no third-party plugins needed.</div></div>
+  <div class="concept-card"><div class="cc-icon">🛡️</div><div class="cc-title">Security</div><div class="cc-desc">IAM Roles for Service Accounts (IRSA) lets pods assume IAM roles without storing credentials. Envelope encryption for Kubernetes secrets.</div></div>
+  <div class="concept-card"><div class="cc-icon">📈</div><div class="cc-title">Node Flexibility</div><div class="cc-desc">Mix managed node groups, self-managed nodes, and AWS Fargate (serverless pods) in the same cluster.</div></div>
+</div>
+</div>
+
+<div class="section"><h3 class="section-title">EKS Architecture</h3>
+<div class="arch-diagram">┌──────────────────────────────────────────────────────┐
+│                    AWS Account                       │
+│                                                      │
+│  ┌─────────────────────────────────────────────────┐ │
+│  │         EKS Control Plane (AWS Managed)         │ │
+│  │   API Server │ etcd │ Scheduler │ Controllers   │ │
+│  └──────────────────────┬──────────────────────────┘ │
+│                         │                            │
+│  ┌──────────────────────▼──────────────────────────┐ │
+│  │              Your VPC                           │ │
+│  │                                                 │ │
+│  │  ┌─────────────┐  ┌─────────────┐              │ │
+│  │  │  Node Group │  │  Node Group │  (EC2 or     │ │
+│  │  │  (AZ-1a)    │  │  (AZ-1b)    │   Fargate)   │ │
+│  │  │  Pod Pod Pod│  │  Pod Pod Pod│              │ │
+│  │  └─────────────┘  └─────────────┘              │ │
+│  │                                                 │ │
+│  │  ALB (Ingress) │ EBS (PVC) │ ECR (Images)      │ │
+│  └─────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────┘</div>
+</div>
+
+<div class="section"><h3 class="section-title">Creating an EKS Cluster</h3>
+<p>The easiest way to create and manage EKS clusters is <strong>eksctl</strong> — a CLI tool purpose-built for EKS.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">bash — Install eksctl</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Install eksctl (Linux/macOS)</span>
+curl --silent --location \
+  "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" \
+  | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">cluster.yaml — eksctl config</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: my-cluster
+  region: ap-south-1     <span class="comment"># Mumbai — closest to India</span>
+  version: "1.29"
+
+managedNodeGroups:
+  - name: ng-general
+    instanceType: t3.medium
+    minSize: 2
+    maxSize: 5
+    desiredCapacity: 2
+    volumeSize: 20
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        albIngress: true
+        cloudWatch: true</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">bash — Create cluster</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># Create cluster (~15 mins)</span>
+eksctl create cluster -f cluster.yaml
+
+<span class="comment"># Update kubeconfig to connect kubectl</span>
+aws eks update-kubeconfig --region ap-south-1 --name my-cluster
+
+<span class="comment"># Verify</span>
+kubectl get nodes</div></div>
+</div>
+
+<div class="section"><h3 class="section-title">Node Groups — EC2 vs Fargate</h3>
+<div class="concept-grid">
+  <div class="concept-card"><div class="cc-icon">🖥️</div><div class="cc-title">Managed Node Groups</div><div class="cc-desc">EC2 instances managed by AWS — auto-patching, auto-scaling, auto-replacement of unhealthy nodes. Best for predictable, consistent workloads.</div></div>
+  <div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-title">Fargate Profiles</div><div class="cc-desc">Serverless — no EC2 to manage. AWS runs each pod on isolated compute. Pay per pod CPU/memory. Best for batch jobs and variable workloads.</div></div>
+  <div class="concept-card"><div class="cc-icon">🎛️</div><div class="cc-title">Self-Managed Nodes</div><div class="cc-desc">You manage the EC2 instances yourself. Full control over AMI, configuration, GPU instances. Best when you need custom OS or hardware.</div></div>
+  <div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-title">Karpenter</div><div class="cc-desc">Open-source node autoscaler by AWS. Faster than Cluster Autoscaler — provisions nodes in seconds based on exact pod requirements.</div></div>
+</div>
+</div>
+
+<div class="section"><h3 class="section-title">IAM Roles for Service Accounts (IRSA)</h3>
+<p>IRSA is how pods in EKS securely access AWS services without hardcoding credentials. A pod assumes an IAM role via Kubernetes service account annotation.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">bash — Create IRSA for S3 access</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># 1. Create IAM OIDC provider for your cluster</span>
+eksctl utils associate-iam-oidc-provider \
+  --cluster my-cluster --approve
+
+<span class="comment"># 2. Create IAM service account with S3 policy</span>
+eksctl create iamserviceaccount \
+  --cluster my-cluster \
+  --namespace default \
+  --name s3-reader \
+  --attach-policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess \
+  --approve</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">pod.yaml — use the service account</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">apiVersion: v1
+kind: Pod
+metadata:
+  name: s3-reader
+spec:
+  serviceAccountName: s3-reader   <span class="comment"># linked to IAM role</span>
+  containers:
+  - name: app
+    image: amazon/aws-cli
+    command: ["aws", "s3", "ls"]   <span class="comment"># works without credentials!</span></div></div>
+</div>
+
+<div class="section"><h3 class="section-title">AWS Load Balancer Controller</h3>
+<p>To expose your apps via an AWS Application Load Balancer (ALB), install the AWS Load Balancer Controller. It provisions ALBs automatically when you create Kubernetes Ingress objects.</p>
+<div class="code-block"><div class="code-header"><span class="code-lang">ingress.yaml — creates an ALB automatically</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body">apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-app-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  rules:
+  - host: api.myapp.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: my-app-service
+            port:
+              number: 80</div></div>
+</div>
+
+<div class="section"><h3 class="section-title">Useful EKS Commands</h3>
+<div class="code-block"><div class="code-header"><span class="code-lang">bash — Day-to-day EKS operations</span><div class="code-dots"><span></span><span></span><span></span></div></div><div class="code-body"><span class="comment"># List clusters</span>
+eksctl get cluster
+
+<span class="comment"># Scale a node group</span>
+eksctl scale nodegroup --cluster my-cluster \
+  --name ng-general --nodes 4
+
+<span class="comment"># Upgrade cluster version</span>
+eksctl upgrade cluster --name my-cluster --version 1.30 --approve
+
+<span class="comment"># Delete cluster (removes all AWS resources)</span>
+eksctl delete cluster --name my-cluster
+
+<span class="comment"># View cluster info</span>
+aws eks describe-cluster --name my-cluster --region ap-south-1</div></div>
+<div class="callout callout-tip"><div class="callout-label">💰 Cost tip</div><p>EKS control plane costs ~$0.10/hour per cluster (~$72/month). Add EC2 node costs on top. For learning, create the cluster, practice, then <strong>delete it</strong>. Use <code>eksctl delete cluster</code> — it cleans up all AWS resources including VPC, security groups, and node groups.</p></div>
+</div>

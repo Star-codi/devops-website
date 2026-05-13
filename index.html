@@ -14,7 +14,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DevOps Zero to Hero — Learn DevOps from Scratch</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -26,56 +27,58 @@
     <h1>DevOps Zero to Hero</h1>
     <p>// your complete learning path</p>
   </div>
-
-  <div class="sidebar-search">
-    <input type="text" id="search-input" placeholder="🔍 Search modules..." oninput="filterNav(this.value)" autocomplete="off">
-  </div>
-
-  <nav class="sidebar-nav" id="sidebar-nav">
+  <nav class="sidebar-nav">
     <div class="nav-section-label">Start Here</div>
-    <a class="nav-item active" onclick="showModule('home')" data-search="home start"><span class="nav-icon">🏠</span> Home</a>
+    <a class="nav-item active" onclick="showModule('home')"><span class="nav-icon">🏠</span> Home</a>
 
     <div class="nav-section-label">Module 0 — Before You Begin</div>
-    <a class="nav-item" onclick="showModule('devopslife')" data-search="devops lifecycle cicd overview"><span class="nav-icon">🔄</span> DevOps Lifecycle <span class="nav-num">0.1</span></a>
-    <a class="nav-item" onclick="showModule('networking')" data-search="networking tcp ip dns http ports"><span class="nav-icon">🌐</span> Networking Basics <span class="nav-num">0.2</span></a>
-    <a class="nav-item" onclick="showModule('yaml')" data-search="yaml config files indentation"><span class="nav-icon">📝</span> YAML &amp; Config Files <span class="nav-num">0.3</span></a>
+    <a class="nav-item" onclick="showModule('devopslife')"><span class="nav-icon">🔄</span> DevOps Lifecycle <span class="nav-num">0.1</span></a>
+    <a class="nav-item" onclick="showModule('networking')"><span class="nav-icon">🌐</span> Networking Basics <span class="nav-num">0.2</span></a>
+    <a class="nav-item" onclick="showModule('yaml')"><span class="nav-icon">📝</span> YAML & Config Files <span class="nav-num">0.3</span></a>
 
-    <div class="nav-section-label">Module 1 — Cloud &amp; AWS</div>
-    <a class="nav-item" onclick="showModule('aws-combined')" data-search="cloud computing aws ec2 s3 iam vpc rds lambda cloudwatch cli dynamodb elb sns sqs iaas paas saas interview"><span class="nav-icon">🔶</span> Cloud &amp; AWS — Complete Guide <span class="nav-num">01</span></a>
+    <div class="nav-section-label">Module 1 — Linux & Scripting</div>
+    <a class="nav-item" onclick="showModule('linux')"><span class="nav-icon">🐧</span> Linux Basics <span class="nav-num">01</span></a>
+    <a class="nav-item" onclick="showModule('shell')"><span class="nav-icon">⚡</span> Shell Scripting <span class="nav-num">02</span></a>
 
-    <div class="nav-section-label">Module 2 — Linux &amp; Scripting</div>
-    <a class="nav-item" onclick="showModule('linux')" data-search="linux bash commands chmod permissions users filesystem"><span class="nav-icon">🐧</span> Linux Basics <span class="nav-num">02</span></a>
-    <a class="nav-item" onclick="showModule('shell')" data-search="shell scripting bash automation loops functions"><span class="nav-icon">⚡</span> Shell Scripting <span class="nav-num">03</span></a>
+    <div class="nav-section-label">Module 2 — Code & Version Control</div>
+    <a class="nav-item" onclick="showModule('git')"><span class="nav-icon">🌿</span> Git & GitHub <span class="nav-num">03</span></a>
+    <a class="nav-item" onclick="showModule('maven')"><span class="nav-icon">🔨</span> Maven <span class="nav-num">04</span></a>
 
-    <div class="nav-section-label">Module 3 — Code &amp; Build</div>
-    <a class="nav-item" onclick="showModule('git')" data-search="git github version control branching merge pull request"><span class="nav-icon">🌿</span> Git &amp; GitHub <span class="nav-num">04</span></a>
-    <a class="nav-item" onclick="showModule('maven')" data-search="maven build java pom xml dependencies lifecycle"><span class="nav-icon">🔨</span> Maven <span class="nav-num">05</span></a>
+    <div class="nav-section-label">Module 3 — Cloud Foundation</div>
+    <a class="nav-item" onclick="showModule('cloud')"><span class="nav-icon">☁️</span> Why Cloud Computing <span class="nav-num">05</span></a>
+    <a class="nav-item" onclick="showModule('aws-fundamentals')"><span class="nav-icon">🔶</span> AWS Fundamentals <span class="nav-num">06</span></a>
+    <a class="nav-item" onclick="showModule('aws-deepdive')"><span class="nav-icon">🔶</span> AWS Deep Dive <span class="nav-num">07</span></a>
 
-    <div class="nav-section-label">Module 4 — CI/CD &amp; Containers</div>
-    <a class="nav-item" onclick="showModule('jenkins')" data-search="jenkins cicd pipeline automation build deploy continuous integration"><span class="nav-icon">🤖</span> Jenkins <span class="nav-num">06</span></a>
-    <a class="nav-item" onclick="showModule('github-actions')" data-search="github actions cicd workflow yaml automation"><span class="nav-icon">⚡</span> GitHub Actions <span class="nav-num">07.5</span></a>
-    <a class="nav-item" onclick="showModule('docker')" data-search="docker container image dockerfile compose registry hub"><span class="nav-icon">🐳</span> Docker <span class="nav-num">08</span></a>
-    <a class="nav-item" onclick="showModule('kubernetes')" data-search="kubernetes k8s pods deployments services scaling orchestration"><span class="nav-icon">☸️</span> Kubernetes <span class="nav-num">09</span></a>
-    <a class="nav-item" onclick="showModule('helm')" data-search="helm charts kubernetes package manager"><span class="nav-icon">⎈</span> Helm <span class="nav-num">10</span></a>
+    <div class="nav-section-label">Module 4 — Containers & Orchestration</div>
+    <a class="nav-item" onclick="showModule('docker')"><span class="nav-icon">🐳</span> Docker <span class="nav-num">08</span></a>
+    <a class="nav-item" onclick="showModule('kubernetes')"><span class="nav-icon">☸️</span> Kubernetes <span class="nav-num">09</span></a>
+    <a class="nav-item" onclick="showModule('eks')"><span class="nav-icon">☸️</span> Amazon EKS <span class="nav-num">10</span></a>
+    <a class="nav-item" onclick="showModule('helm')"><span class="nav-icon">⎈</span> Helm <span class="nav-num">11</span></a>
 
-    <div class="nav-section-label">Module 5 — IaC &amp; Config Management</div>
-    <a class="nav-item" onclick="showModule('terraform')" data-search="terraform infrastructure code iac aws provision resource"><span class="nav-icon">🏗️</span> Terraform <span class="nav-num">11</span></a>
-    <a class="nav-item" onclick="showModule('ansible')" data-search="ansible playbook automation configuration management"><span class="nav-icon">⚙️</span> Ansible <span class="nav-num">12</span></a>
+    <div class="nav-section-label">Module 5 — CI/CD & GitOps</div>
+    <a class="nav-item" onclick="showModule('jenkins')"><span class="nav-icon">🤖</span> Jenkins <span class="nav-num">12</span></a>
+    <a class="nav-item" onclick="showModule('github-actions')"><span class="nav-icon">⚡</span> GitHub Actions <span class="nav-num">13</span></a>
+    <a class="nav-item" onclick="showModule('argocd')"><span class="nav-icon">🔁</span> ArgoCD <span class="nav-num">14</span></a>
 
-    <div class="nav-section-label">Module 6 — Monitoring &amp; Observability</div>
-    <a class="nav-item" onclick="showModule('monitoring')" data-search="prometheus grafana metrics monitoring alerting dashboards"><span class="nav-icon">📊</span> Prometheus &amp; Grafana <span class="nav-num">13</span></a>
-    <a class="nav-item" onclick="showModule('elk')" data-search="elk elasticsearch logstash kibana logging"><span class="nav-icon">🔍</span> ELK Stack <span class="nav-num">14</span></a>
-    <a class="nav-item" onclick="showModule('nginx')" data-search="nginx web server reverse proxy load balancer"><span class="nav-icon">🌐</span> Nginx <span class="nav-num">15</span></a>
+    <div class="nav-section-label">Module 6 — IaC & Config Management</div>
+    <a class="nav-item" onclick="showModule('terraform')"><span class="nav-icon">🏗️</span> Terraform <span class="nav-num">15</span></a>
+    <a class="nav-item" onclick="showModule('ansible')"><span class="nav-icon">⚙️</span> Ansible <span class="nav-num">16</span></a>
 
+    <div class="nav-section-label">Module 7 — Networking & Observability</div>
+    <a class="nav-item" onclick="showModule('vpc')"><span class="nav-icon">🔒</span> VPC & Networking <span class="nav-num">17</span></a>
+    <a class="nav-item" onclick="showModule('nginx')"><span class="nav-icon">🌐</span> Nginx <span class="nav-num">18</span></a>
+    <a class="nav-item" onclick="showModule('elk')"><span class="nav-icon">🔍</span> ELK Stack <span class="nav-num">19</span></a>
+    <a class="nav-item" onclick="showModule('monitoring')"><span class="nav-icon">📊</span> Prometheus & Grafana <span class="nav-num">20</span></a>
 
+    <div class="nav-section-label">Module 8 — Security</div>
+    <a class="nav-item" onclick="showModule('sonarqube')"><span class="nav-icon">🔍</span> SonarQube <span class="nav-num">21</span></a>
+    <a class="nav-item" onclick="showModule('owasp')"><span class="nav-icon">🛡️</span> OWASP & ZAP <span class="nav-num">22</span></a>
+    <a class="nav-item" onclick="showModule('security')"><span class="nav-icon">🔐</span> DevSecOps Basics <span class="nav-num">23</span></a>
 
-    <div class="nav-section-label">Module 7 — Career</div>
-    <a class="nav-item" onclick="showModule('security')" data-search="devsecops security iam secrets scanning https tls"><span class="nav-icon">🔐</span> DevSecOps Basics <span class="nav-num">16</span></a>
-    <a class="nav-item" onclick="showModule('interview')" data-search="interview prep questions aws docker kubernetes git linux devops"><span class="nav-icon">🎯</span> Interview Prep <span class="nav-num">17</span></a>
-    <a class="nav-item" onclick="showModule('nextsteps')" data-search="next steps certifications argocd istio career roadmap cka"><span class="nav-icon">🚀</span> What's Next <span class="nav-num">18</span></a>
+    <div class="nav-section-label">Module 9 — Career</div>
+    <a class="nav-item" onclick="showModule('interview')"><span class="nav-icon">🎯</span> Interview Prep <span class="nav-num">24</span></a>
+    <a class="nav-item" onclick="showModule('nextsteps')"><span class="nav-icon">🚀</span> What's Next <span class="nav-num">25</span></a>
   </nav>
-
-  <div id="search-empty" style="display:none;padding:16px 20px;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);">No modules found</div>
 </aside>
 
 <main id="main">
@@ -84,9 +87,9 @@
     <h2>Master <span class="hl">DevOps</span> from<br><span class="hl2">absolute scratch</span></h2>
     <p>A structured, beginner-friendly journey through cloud computing, automation, containers, and monitoring — explained with real-world analogies and hands-on examples.</p>
     <div class="hero-stats">
-      <div class="stat"><div class="stat-num">27</div><div class="stat-label">Modules</div></div>
-      <div class="stat"><div class="stat-num">100+</div><div class="stat-label">Code Examples</div></div>
-      <div class="stat"><div class="stat-num">15+</div><div class="stat-label">Mini Projects</div></div>
+      <div class="stat"><div class="stat-num">26</div><div class="stat-label">Modules</div></div>
+      <div class="stat"><div class="stat-num">150+</div><div class="stat-label">Hands-on Examples</div></div>
+      <div class="stat"><div class="stat-num">20</div><div class="stat-label">Mini Projects</div></div>
       <div class="stat"><div class="stat-num">0</div><div class="stat-label">Assumed Knowledge</div></div>
     </div>
   </div>
@@ -95,10 +98,12 @@
     <span class="progress-label">Your Progress</span>
     <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
     <span class="progress-pct" id="progress-pct">0%</span>
-    <button id="reset-progress" onclick="resetProgress()" title="Reset progress">↺</button>
   </div>
+  <!-- Module content loads here dynamically -->
+  <section class="module visible" id="mod-home">
+    <!-- home content loads here -->
+  </section>
 
-  <section class="module visible" id="mod-home"></section>
 </main>
 
 <script src="main.js"></script>

@@ -1,198 +1,142 @@
-<div class="module-header"><div class="module-icon">🗺️</div><div class="module-meta"><div class="module-tag">Start Here</div><h2 class="module-title">Your DevOps Learning Roadmap</h2></div></div>
-<div class="section">
-<h3 class="section-title">What is DevOps?</h3>
-<p><strong>DevOps</strong> is the combination of two words: <em>Development</em> (writing software) and <em>Operations</em> (running and managing that software). In simple terms, DevOps is a way of working where the people who build software and the people who run it work together smoothly, automatically, and continuously.</p>
-<p>Before DevOps, developers would write code and "throw it over the wall" to operations teams who would then struggle to deploy it. Bugs were found late, deployments were scary, and things broke in production all the time.</p>
+<div class="module-header"><div class="module-icon">🗺️</div><div class="module-meta"><div class="module-tag">Start Here</div><h2 class="module-title">DevOps Zero to Hero — Your Complete Learning Path</h2></div></div>
+
+<!-- Hero stats -->
+<div style="display:flex;gap:32px;flex-wrap:wrap;margin:8px 0 32px;padding:24px;background:linear-gradient(135deg,rgba(0,212,170,.06),rgba(124,58,237,.06));border:1px solid var(--border);border-radius:12px">
+  <div><div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--heading)">25</div><div style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Modules</div></div>
+  <div><div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--heading)">150+</div><div style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Code Examples</div></div>
+  <div><div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--heading)">25</div><div style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Mini Projects</div></div>
+  <div><div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--heading)">0</div><div style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Assumed Knowledge</div></div>
+  <div style="margin-left:auto;display:flex;align-items:center"><button onclick="showModule('devopslife')" style="background:var(--accent);color:#000;border:none;padding:12px 24px;border-radius:8px;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer">Start Learning →</button></div>
 </div>
-<div class="callout callout-analogy"><div class="callout-label">🍕 Real-World Analogy</div><p>Think of a pizza restaurant. The <strong>chef</strong> (developer) makes the pizza, and the <strong>delivery team</strong> (operations) delivers it. In old-school IT, the chef makes the pizza and just hands it to delivery — but delivery doesn't know the right address, it's not packed properly, and it arrives cold. DevOps is like giving the chef and delivery team a shared system, clear communication, and automated processes — so every pizza is delivered hot, on time, every time.</p></div>
-<div class="section">
-<h3 class="section-title">Your Learning Path</h3>
-<p>Each module below builds on the previous one. Don't skip ahead — every concept is connected. Click any card to start learning!</p>
+
+<div class="section"><h3 class="section-title">What is DevOps?</h3>
+<p><strong>DevOps</strong> combines Development (writing software) and Operations (running it). Teams that practice DevOps ship faster, break less, and recover quicker when things go wrong.</p>
+<p>Before DevOps, developers wrote code and threw it over the wall to operations. Deployments were scary weekend events. Bugs were found in production. DevOps fixes this by automating everything and making collaboration the default.</p>
+</div>
+
+<div class="callout callout-analogy"><div class="callout-label">🍕 Real-World Analogy</div><p>Think of a pizza restaurant. The <strong>chef</strong> (developer) makes the pizza, the <strong>delivery team</strong> (operations) delivers it. Old-school IT: chef hands pizza to delivery — wrong address, cold, broken. DevOps: shared systems, automated processes, clear communication. Every pizza delivered hot, on time, every time.</p></div>
+
+<div class="section"><h3 class="section-title">Your Learning Path</h3>
+<p>25 modules ordered from zero to job-ready. Follow them in order — each builds on the last. Click any card to jump in.</p>
+
+<div style="margin:8px 0 12px;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--border);padding-bottom:8px">── Foundation</div>
 <div id="landing-grid">
-<div class="landing-card" onclick="showModule('devopslife')"><div class="lc-num">0.1</div><div class="lc-icon">🔄</div><div class="lc-title">DevOps Lifecycle</div></div>
-<div class="landing-card" onclick="showModule('networking')"><div class="lc-num">0.2</div><div class="lc-icon">🌐</div><div class="lc-title">Networking Basics</div></div>
-<div class="landing-card" onclick="showModule('yaml')"><div class="lc-num">0.3</div><div class="lc-icon">📝</div><div class="lc-title">YAML &amp; Config Files</div></div>
-<div class="landing-card" onclick="showModule('cloud')"><div class="lc-num">01</div><div class="lc-icon">☁️</div><div class="lc-title">Why Cloud Computing</div></div>
-<div class="landing-card" onclick="showModule('aws-fundamentals')"><div class="lc-num">02</div><div class="lc-icon">🔶</div><div class="lc-title">AWS Fundamentals</div></div>
-<div class="landing-card" onclick="showModule('aws-deepdive')"><div class="lc-num">03</div><div class="lc-icon">🔶</div><div class="lc-title">AWS Deep Dive</div></div>
-<div class="landing-card" onclick="showModule('linux')"><div class="lc-num">04</div><div class="lc-icon">🐧</div><div class="lc-title">Linux Basics</div></div>
-<div class="landing-card" onclick="showModule('shell')"><div class="lc-num">05</div><div class="lc-icon">⚡</div><div class="lc-title">Shell Scripting</div></div>
-<div class="landing-card" onclick="showModule('git')"><div class="lc-num">06</div><div class="lc-icon">🌿</div><div class="lc-title">Git &amp; GitHub</div></div>
-<div class="landing-card" onclick="showModule('maven')"><div class="lc-num">07</div><div class="lc-icon">🔨</div><div class="lc-title">Maven</div></div>
-<div class="landing-card" onclick="showModule('jenkins')"><div class="lc-num">08</div><div class="lc-icon">🤖</div><div class="lc-title">Jenkins CI/CD</div></div>
-<div class="landing-card" onclick="showModule('github-actions')"><div class="lc-num">08.5</div><div class="lc-icon">⚡</div><div class="lc-title">GitHub Actions</div></div>
-<div class="landing-card" onclick="showModule('docker')"><div class="lc-num">09</div><div class="lc-icon">🐳</div><div class="lc-title">Docker</div></div>
-<div class="landing-card" onclick="showModule('kubernetes')"><div class="lc-num">10</div><div class="lc-icon">☸️</div><div class="lc-title">Kubernetes</div></div>
-<div class="landing-card" onclick="showModule('helm')"><div class="lc-num">11</div><div class="lc-icon">⎈</div><div class="lc-title">Helm</div></div>
-<div class="landing-card" onclick="showModule('terraform')"><div class="lc-num">12</div><div class="lc-icon">🏗️</div><div class="lc-title">Terraform</div></div>
-<div class="landing-card" onclick="showModule('ansible')"><div class="lc-num">13</div><div class="lc-icon">⚙️</div><div class="lc-title">Ansible</div></div>
-<div class="landing-card" onclick="showModule('monitoring')"><div class="lc-num">14</div><div class="lc-icon">📊</div><div class="lc-title">Prometheus &amp; Grafana</div></div>
-<div class="landing-card" onclick="showModule('elk')"><div class="lc-num">15</div><div class="lc-icon">🔍</div><div class="lc-title">ELK Stack</div></div>
-<div class="landing-card" onclick="showModule('nginx')"><div class="lc-num">16</div><div class="lc-icon">🌐</div><div class="lc-title">Nginx</div></div>
-<div class="landing-card" onclick="showModule('vpc')"><div class="lc-num">17</div><div class="lc-icon">🔒</div><div class="lc-title">VPC &amp; Networking</div></div>
-<div class="landing-card" onclick="showModule('s3')"><div class="lc-num">18</div><div class="lc-icon">🪣</div><div class="lc-title">S3 Storage Classes</div></div>
-<div class="landing-card" onclick="showModule('aws-cli')"><div class="lc-num">19</div><div class="lc-icon">⌨️</div><div class="lc-title">AWS CLI</div></div>
-<div class="landing-card" onclick="showModule('lambda')"><div class="lc-num">20</div><div class="lc-icon">⚡</div><div class="lc-title">Lambda, RDS &amp; More</div></div>
-<div class="landing-card" onclick="showModule('security')"><div class="lc-num">21</div><div class="lc-icon">🔐</div><div class="lc-title">DevSecOps Basics</div></div>
-<div class="landing-card" onclick="showModule('interview')"><div class="lc-num">22</div><div class="lc-icon">🎯</div><div class="lc-title">Interview Prep</div></div>
-<div class="landing-card" onclick="showModule('nextsteps')"><div class="lc-num">23</div><div class="lc-icon">🚀</div><div class="lc-title">What's Next</div></div>
+<div class="landing-card" onclick="showModule('devopslife')"><div class="lc-num">01</div><div class="lc-icon">🔄</div><div class="lc-title">DevOps Lifecycle</div></div>
+<div class="landing-card" onclick="showModule('networking')"><div class="lc-num">02</div><div class="lc-icon">🌐</div><div class="lc-title">Networking Basics</div></div>
+<div class="landing-card" onclick="showModule('yaml')"><div class="lc-num">03</div><div class="lc-icon">📝</div><div class="lc-title">YAML & Config Files</div></div>
+</div>
+
+<div style="margin:20px 0 12px;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--border);padding-bottom:8px">── Cloud & Linux</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+<div class="landing-card" onclick="showModule('cloud')"><div class="lc-num">04</div><div class="lc-icon">☁️</div><div class="lc-title">Why Cloud Computing</div></div>
+<div class="landing-card" onclick="showModule('aws-fundamentals')"><div class="lc-num">05</div><div class="lc-icon">🔶</div><div class="lc-title">AWS Fundamentals</div></div>
+<div class="landing-card" onclick="showModule('aws-deepdive')"><div class="lc-num">06</div><div class="lc-icon">🔶</div><div class="lc-title">AWS Deep Dive</div></div>
+<div class="landing-card" onclick="showModule('linux')"><div class="lc-num">07</div><div class="lc-icon">🐧</div><div class="lc-title">Linux Basics</div></div>
+<div class="landing-card" onclick="showModule('shell')"><div class="lc-num">08</div><div class="lc-icon">⚡</div><div class="lc-title">Shell Scripting</div></div>
+<div class="landing-card" onclick="showModule('vpc')"><div class="lc-num">09</div><div class="lc-icon">🔒</div><div class="lc-title">VPC & Networking</div></div>
+</div>
+
+<div style="margin:20px 0 12px;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--border);padding-bottom:8px">── Code & CI/CD</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+<div class="landing-card" onclick="showModule('git')"><div class="lc-num">10</div><div class="lc-icon">🌿</div><div class="lc-title">Git & GitHub</div></div>
+<div class="landing-card" onclick="showModule('maven')"><div class="lc-num">11</div><div class="lc-icon">🔨</div><div class="lc-title">Maven</div></div>
+<div class="landing-card" onclick="showModule('jenkins')"><div class="lc-num">12</div><div class="lc-icon">🤖</div><div class="lc-title">Jenkins CI/CD</div></div>
+<div class="landing-card" onclick="showModule('github-actions')"><div class="lc-num">13</div><div class="lc-icon">⚡</div><div class="lc-title">GitHub Actions</div></div>
+</div>
+
+<div style="margin:20px 0 12px;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--border);padding-bottom:8px">── Containers & Orchestration</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+<div class="landing-card" onclick="showModule('docker')"><div class="lc-num">14</div><div class="lc-icon">🐳</div><div class="lc-title">Docker</div></div>
+<div class="landing-card" onclick="showModule('kubernetes')"><div class="lc-num">15</div><div class="lc-icon">☸️</div><div class="lc-title">Kubernetes</div></div>
+<div class="landing-card" onclick="showModule('helm')"><div class="lc-num">16</div><div class="lc-icon">⎈</div><div class="lc-title">Helm</div></div>
+</div>
+
+<div style="margin:20px 0 12px;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--border);padding-bottom:8px">── Infrastructure as Code</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+<div class="landing-card" onclick="showModule('terraform')"><div class="lc-num">17</div><div class="lc-icon">🏗️</div><div class="lc-title">Terraform</div></div>
+<div class="landing-card" onclick="showModule('ansible')"><div class="lc-num">18</div><div class="lc-icon">⚙️</div><div class="lc-title">Ansible</div></div>
+</div>
+
+<div style="margin:20px 0 12px;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--border);padding-bottom:8px">── Monitoring, Logging & Networking</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+<div class="landing-card" onclick="showModule('nginx')"><div class="lc-num">19</div><div class="lc-icon">🌐</div><div class="lc-title">Nginx</div></div>
+<div class="landing-card" onclick="showModule('monitoring')"><div class="lc-num">20</div><div class="lc-icon">📊</div><div class="lc-title">Prometheus & Grafana</div></div>
+<div class="landing-card" onclick="showModule('elk')"><div class="lc-num">21</div><div class="lc-icon">🔍</div><div class="lc-title">ELK Stack</div></div>
+</div>
+
+<div style="margin:20px 0 12px;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--border);padding-bottom:8px">── Career</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+<div class="landing-card" onclick="showModule('security')"><div class="lc-num">22</div><div class="lc-icon">🔐</div><div class="lc-title">DevSecOps Basics</div></div>
+<div class="landing-card" onclick="showModule('interview')"><div class="lc-num">23</div><div class="lc-icon">🎯</div><div class="lc-title">Interview Prep</div></div>
+<div class="landing-card" onclick="showModule('nextsteps')"><div class="lc-num">24</div><div class="lc-icon">🚀</div><div class="lc-title">What's Next</div></div>
 </div>
 </div>
-</div>
+
 <div class="section">
 <h3 class="section-title">The DevOps Infinity Loop</h3>
-<p>DevOps is often shown as an <strong>infinity loop (∞)</strong> — because the process never stops. You plan, build, test, deploy, monitor, and then use what you learn to plan again. This is called the <strong>DevOps Lifecycle</strong>.</p>
+<p>DevOps is an <strong>infinity loop (∞)</strong> — plan, build, test, deploy, monitor, repeat. Never stops improving.</p>
 <div class="svg-diagram">
 <svg font-family="'DM Mono', monospace" viewbox="0 0 800 340" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<marker id="arr" markerheight="8" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#00d4aa"></path></marker>
-</defs>
-<!-- background -->
+<defs><marker id="arr" markerheight="8" markerwidth="8" orient="auto" refx="6" refy="3"><path d="M0,0 L0,6 L8,3 z" fill="#00d4aa"></path></marker></defs>
 <rect fill="#111827" height="340" width="800"></rect>
-<!-- Left loop (Dev side) -->
 <ellipse cx="290" cy="170" fill="none" rx="180" ry="110" stroke="#1e2d45" stroke-width="2"></ellipse>
-<!-- Right loop (Ops side) -->
 <ellipse cx="510" cy="170" fill="none" rx="180" ry="110" stroke="#1e2d45" stroke-width="2"></ellipse>
-<!-- Left flow arrows - top arc -->
 <path d="M 200,100 Q 290,55 380,100" fill="none" marker-end="url(#arr)" stroke="#00d4aa" stroke-width="2"></path>
-<!-- Left flow arrows - bottom arc -->
 <path d="M 380,240 Q 290,285 200,240" fill="none" marker-end="url(#arr)" stroke="#00d4aa" stroke-width="2"></path>
-<!-- Right flow arrows - top arc -->
 <path d="M 420,100 Q 510,55 600,100" fill="none" marker-end="url(#arr)" stroke="#7c3aed" stroke-width="2"></path>
-<!-- Right flow arrows - bottom arc -->
 <path d="M 600,240 Q 510,285 420,240" fill="none" marker-end="url(#arr)" stroke="#7c3aed" stroke-width="2"></path>
-<!-- DEV label -->
 <text fill="#00d4aa" font-size="13" font-weight="bold" text-anchor="middle" x="290" y="28">DEV</text>
-<!-- OPS label -->
 <text fill="#7c3aed" font-size="13" font-weight="bold" text-anchor="middle" x="510" y="28">OPS</text>
-<!-- Nodes - Dev side -->
-<circle cx="200" cy="100" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
-<text fill="#00d4aa" font-size="16" text-anchor="middle" x="200" y="96">📋</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="200" y="110">PLAN</text>
-<circle cx="290" cy="62" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
-<text fill="#00d4aa" font-size="16" text-anchor="middle" x="290" y="58">💻</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="290" y="72">CODE</text>
-<circle cx="380" cy="100" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
-<text fill="#00d4aa" font-size="16" text-anchor="middle" x="380" y="96">🔨</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="380" y="110">BUILD</text>
-<circle cx="380" cy="240" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
-<text fill="#00d4aa" font-size="16" text-anchor="middle" x="380" y="236">🧪</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="380" y="250">TEST</text>
-<circle cx="290" cy="278" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
-<text fill="#00d4aa" font-size="16" text-anchor="middle" x="290" y="274">🔀</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="290" y="288">MERGE</text>
-<circle cx="200" cy="240" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle>
-<text fill="#00d4aa" font-size="16" text-anchor="middle" x="200" y="236">🔗</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="200" y="250">INTEGRATE</text>
-<!-- Nodes - Ops side -->
-<circle cx="420" cy="100" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
-<text fill="#7c3aed" font-size="16" text-anchor="middle" x="420" y="96">🚀</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="420" y="110">RELEASE</text>
-<circle cx="510" cy="62" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
-<text fill="#7c3aed" font-size="16" text-anchor="middle" x="510" y="58">📦</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="510" y="72">DEPLOY</text>
-<circle cx="600" cy="100" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
-<text fill="#7c3aed" font-size="16" text-anchor="middle" x="600" y="96">⚙️</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="600" y="110">OPERATE</text>
-<circle cx="600" cy="240" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
-<text fill="#7c3aed" font-size="16" text-anchor="middle" x="600" y="236">📊</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="600" y="250">MONITOR</text>
-<circle cx="510" cy="278" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
-<text fill="#7c3aed" font-size="16" text-anchor="middle" x="510" y="274">💬</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="510" y="288">FEEDBACK</text>
-<circle cx="420" cy="240" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle>
-<text fill="#7c3aed" font-size="16" text-anchor="middle" x="420" y="236">🔧</text>
-<text fill="#e2e8f0" font-size="9" text-anchor="middle" x="420" y="250">CONFIG</text>
-<!-- center -->
-<circle cx="400" cy="170" fill="#0a0e1a" r="22" stroke="#fbbf24" stroke-width="2"></circle>
-<text fill="#fbbf24" font-size="18" text-anchor="middle" x="400" y="166">∞</text>
-<text fill="#fbbf24" font-size="7" text-anchor="middle" x="400" y="178">DEVOPS</text>
+<circle cx="200" cy="100" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle><text fill="#00d4aa" font-size="16" text-anchor="middle" x="200" y="96">📋</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="200" y="110">PLAN</text>
+<circle cx="290" cy="62" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle><text fill="#00d4aa" font-size="16" text-anchor="middle" x="290" y="58">💻</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="290" y="72">CODE</text>
+<circle cx="380" cy="100" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle><text fill="#00d4aa" font-size="16" text-anchor="middle" x="380" y="96">🔨</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="380" y="110">BUILD</text>
+<circle cx="380" cy="240" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle><text fill="#00d4aa" font-size="16" text-anchor="middle" x="380" y="236">🧪</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="380" y="250">TEST</text>
+<circle cx="290" cy="278" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle><text fill="#00d4aa" font-size="16" text-anchor="middle" x="290" y="274">🔀</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="290" y="288">MERGE</text>
+<circle cx="200" cy="240" fill="#0a0e1a" r="28" stroke="#00d4aa" stroke-width="2"></circle><text fill="#00d4aa" font-size="16" text-anchor="middle" x="200" y="236">🔗</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="200" y="250">INTEGRATE</text>
+<circle cx="420" cy="100" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle><text fill="#7c3aed" font-size="16" text-anchor="middle" x="420" y="96">🚀</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="420" y="110">RELEASE</text>
+<circle cx="510" cy="62" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle><text fill="#7c3aed" font-size="16" text-anchor="middle" x="510" y="58">📦</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="510" y="72">DEPLOY</text>
+<circle cx="600" cy="100" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle><text fill="#7c3aed" font-size="16" text-anchor="middle" x="600" y="96">⚙️</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="600" y="110">OPERATE</text>
+<circle cx="600" cy="240" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle><text fill="#7c3aed" font-size="16" text-anchor="middle" x="600" y="236">📊</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="600" y="250">MONITOR</text>
+<circle cx="510" cy="278" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle><text fill="#7c3aed" font-size="16" text-anchor="middle" x="510" y="274">💬</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="510" y="288">FEEDBACK</text>
+<circle cx="420" cy="240" fill="#0a0e1a" r="28" stroke="#7c3aed" stroke-width="2"></circle><text fill="#7c3aed" font-size="16" text-anchor="middle" x="420" y="236">🔧</text><text fill="#e2e8f0" font-size="9" text-anchor="middle" x="420" y="250">CONFIG</text>
+<circle cx="400" cy="170" fill="#0a0e1a" r="22" stroke="#fbbf24" stroke-width="2"></circle><text fill="#fbbf24" font-size="18" text-anchor="middle" x="400" y="166">∞</text><text fill="#fbbf24" font-size="7" text-anchor="middle" x="400" y="178">DEVOPS</text>
 </svg>
 <div class="diagram-caption">The DevOps Infinity Loop — a continuous cycle of building, deploying, and improving</div>
 </div>
 </div>
-<div class="next-card" onclick="showModule('devopslife')"><div class="next-text"><div class="next-label">Start Your Journey →</div><div class="next-title">🔄 Module 00: DevOps Lifecycle</div><div class="next-why">Understand the big picture — what happens from when a developer writes code to when users see it live.</div></div><div class="next-arrow">→</div></div>
+
+<div class="next-card" onclick="showModule('devopslife')">
+  <div class="next-text"><div class="next-label">Start Your Journey →</div><div class="next-title">🔄 Module 01: DevOps Lifecycle</div><div class="next-why">Understand the big picture before diving into the tools.</div></div>
+  <div class="next-arrow">→</div>
+</div>
 
 <div class="gh-contrib-banner">
   <div class="gh-contrib-inner">
     <div class="gh-contrib-icon">⭐</div>
     <div class="gh-contrib-text">
       <div class="gh-contrib-title">This project is open source</div>
-      <div class="gh-contrib-desc">Help improve DevOps Buddy — fix errors, improve explanations, or contribute a full module. Every contribution helps someone learn DevOps.</div>
+      <div class="gh-contrib-desc">Help improve DevOps Zero to Hero — fix errors, improve explanations, or contribute a full module.</div>
     </div>
     <div class="gh-contrib-actions">
       <a href="https://github.com/Star-codi/devops-website" target="_blank" class="gh-contrib-btn primary">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        View on GitHub 
+        View on GitHub
       </a>
-      <a href="https://github.com/Star-codi/devops-website/blob/main/CONTRIBUTING.md" target="_blank" class="gh-contrib-btn secondary">
-        + How to Contribute
-      </a>
+      <a href="https://github.com/Star-codi/devops-website/blob/main/CONTRIBUTING.md" target="_blank" class="gh-contrib-btn secondary">+ Contribute</a>
     </div>
   </div>
 </div>
 
 <style>
-.gh-contrib-banner {
-  margin: 32px 0 8px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(35,134,54,.08) 0%, rgba(0,212,255,.06) 100%);
-  border: 1px solid rgba(35,134,54,.25);
-  overflow: hidden;
-}
-.gh-contrib-inner {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 20px 24px;
-  flex-wrap: wrap;
-}
-.gh-contrib-icon {
-  font-size: 28px;
-  flex-shrink: 0;
-}
-.gh-contrib-text {
-  flex: 1;
-  min-width: 200px;
-}
-.gh-contrib-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #f0f6fc;
-  margin-bottom: 5px;
-}
-.gh-contrib-desc {
-  font-size: 12px;
-  color: #8b949e;
-  line-height: 1.6;
-}
-.gh-contrib-actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-.gh-contrib-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: opacity .15s, transform .1s;
-  white-space: nowrap;
-}
-.gh-contrib-btn:hover { opacity: .85; transform: translateY(-1px); }
-.gh-contrib-btn.primary {
-  background: #238636;
-  color: #fff;
-  border: 1px solid rgba(255,255,255,.1);
-}
-.gh-contrib-btn.secondary {
-  background: transparent;
-  color: #c9d1d9;
-  border: 1px solid rgba(255,255,255,.15);
-}
+.gh-contrib-banner{margin:32px 0 8px;border-radius:12px;background:linear-gradient(135deg,rgba(35,134,54,.08),rgba(0,212,255,.06));border:1px solid rgba(35,134,54,.25);overflow:hidden}
+.gh-contrib-inner{display:flex;align-items:center;gap:20px;padding:20px 24px;flex-wrap:wrap}
+.gh-contrib-icon{font-size:28px;flex-shrink:0}
+.gh-contrib-text{flex:1;min-width:200px}
+.gh-contrib-title{font-size:15px;font-weight:700;color:#f0f6fc;margin-bottom:5px}
+.gh-contrib-desc{font-size:12px;color:#8b949e;line-height:1.6}
+.gh-contrib-actions{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.gh-contrib-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;transition:opacity .15s,transform .1s;white-space:nowrap}
+.gh-contrib-btn:hover{opacity:.85;transform:translateY(-1px)}
+.gh-contrib-btn.primary{background:#238636;color:#fff;border:1px solid rgba(255,255,255,.1)}
+.gh-contrib-btn.secondary{background:transparent;color:#c9d1d9;border:1px solid rgba(255,255,255,.15)}
 </style>
