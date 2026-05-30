@@ -59,6 +59,13 @@ function markNavVisited(id) {
   document.querySelectorAll('.nav-item').forEach(n => {
     if ((n.getAttribute('onclick') || '').includes(`'${id}'`)) {
       n.classList.add('visited');
+      // Inject check mark via JS if not already present
+      if (!n.querySelector('.nav-check')) {
+        const check = document.createElement('span');
+        check.className = 'nav-check';
+        check.textContent = '✓';
+        n.appendChild(check);
+      }
     }
   });
 }

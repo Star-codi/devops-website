@@ -13,6 +13,19 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DevOps Zero to Hero — Learn DevOps from Scratch</title>
+  <meta name="description" content="Free structured DevOps learning path — Linux, Docker, Kubernetes, AWS, Terraform, CI/CD and more. 28 modules, zero assumed knowledge.">
+  <meta name="keywords" content="DevOps, Kubernetes, Docker, AWS, Terraform, Jenkins, CI/CD, Linux, learn DevOps free">
+  <meta name="author" content="DevOps Zero to Hero">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://devopsbuddy.in">
+  <meta property="og:title" content="DevOps Zero to Hero — Learn DevOps from Scratch">
+  <meta property="og:description" content="Free structured DevOps learning path — Linux, Docker, Kubernetes, AWS, Terraform, CI/CD and more. 28 modules, zero assumed knowledge.">
+  <meta property="og:image" content="https://devopsbuddy.in/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DevOps Zero to Hero — Learn DevOps from Scratch">
+  <meta name="twitter:description" content="Free structured DevOps learning path. 28 modules from Linux basics to GitOps and cloud-native deployments.">
+  <meta name="twitter:image" content="https://devopsbuddy.in/og-image.png">
+  <link rel="canonical" href="https://devopsbuddy.in">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -32,52 +45,52 @@
     <a class="nav-item active" onclick="showModule('home')"><span class="nav-icon">🏠</span> Home</a>
 
     <div class="nav-section-label">Module 0 — Before You Begin</div>
-    <a class="nav-item" onclick="showModule('devopslife')"><span class="nav-icon">🔄</span> DevOps Lifecycle <span class="nav-num">0.1</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('networking')"><span class="nav-icon">🌐</span> Networking Basics <span class="nav-num">0.2</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('yaml')"><span class="nav-icon">📝</span> YAML & Config Files <span class="nav-num">0.3</span><span class="nav-check">✓</span></a>
+    <a class="nav-item" onclick="showModule('devopslife')"><span class="nav-icon">🔄</span> DevOps Lifecycle <span class="nav-num">0.1</span></a>
+    <a class="nav-item" onclick="showModule('networking')"><span class="nav-icon">🌐</span> Networking Basics <span class="nav-num">0.2</span></a>
+    <a class="nav-item" onclick="showModule('yaml')"><span class="nav-icon">📝</span> YAML & Config Files <span class="nav-num">0.3</span></a>
 
     <div class="nav-section-label">Module 1 — Linux & Scripting</div>
-    <a class="nav-item" onclick="showModule('linux')"><span class="nav-icon">🐧</span> Linux Basics <span class="nav-num">01</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('shell')"><span class="nav-icon">⚡</span> Shell Scripting <span class="nav-num">02</span><span class="nav-check">✓</span></a>
+    <a class="nav-item" onclick="showModule('linux')"><span class="nav-icon">🐧</span> Linux Basics <span class="nav-num">01</span></a>
+    <a class="nav-item" onclick="showModule('shell')"><span class="nav-icon">⚡</span> Shell Scripting <span class="nav-num">02</span></a>
 
     <div class="nav-section-label">Module 2 — Code & Version Control</div>
-    <a class="nav-item" onclick="showModule('git')"><span class="nav-icon">🌿</span> Git & GitHub <span class="nav-num">03</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('maven')"><span class="nav-icon">🔨</span> Maven <span class="nav-num">04</span><span class="nav-check">✓</span></a>
+    <a class="nav-item" onclick="showModule('git')"><span class="nav-icon">🌿</span> Git & GitHub <span class="nav-num">03</span></a>
+    <a class="nav-item" onclick="showModule('maven')"><span class="nav-icon">🔨</span> Maven <span class="nav-num">04</span></a>
 
     <div class="nav-section-label">Module 3 — Cloud Foundation</div>
-    <a class="nav-item" onclick="showModule('cloud')"><span class="nav-icon">☁️</span> Why Cloud Computing <span class="nav-num">05</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('aws-fundamentals')"><span class="nav-icon">🔶</span> AWS Fundamentals <span class="nav-num">06</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('aws-deepdive')"><span class="nav-icon">🔶</span> AWS Deep Dive <span class="nav-num">07</span><span class="nav-check">✓</span></a>
+    <a class="nav-item" onclick="showModule('cloud')"><span class="nav-icon">☁️</span> Why Cloud Computing <span class="nav-num">05</span></a>
+    <a class="nav-item" onclick="showModule('aws-fundamentals')"><span class="nav-icon">🔶</span> AWS Fundamentals <span class="nav-num">06</span></a>
+    <a class="nav-item" onclick="showModule('aws-deepdive')"><span class="nav-icon">🔶</span> AWS Deep Dive <span class="nav-num">07</span></a>
 
     <div class="nav-section-label">Module 4 — Containers & Orchestration</div>
-    <a class="nav-item" onclick="showModule('docker')"><span class="nav-icon">🐳</span> Docker <span class="nav-num">08</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('kubernetes')"><span class="nav-icon">☸️</span> Kubernetes <span class="nav-num">09</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('eks')"><span class="nav-icon">☸️</span> Amazon EKS <span class="nav-num">10</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('helm')"><span class="nav-icon">⎈</span> Helm <span class="nav-num">11</span><span class="nav-check">✓</span></a>
+    <a class="nav-item" onclick="showModule('docker')"><span class="nav-icon">🐳</span> Docker <span class="nav-num">08</span></a>
+    <a class="nav-item" onclick="showModule('kubernetes')"><span class="nav-icon">☸️</span> Kubernetes <span class="nav-num">09</span></a>
+    <a class="nav-item" onclick="showModule('eks')"><span class="nav-icon">☸️</span> Amazon EKS <span class="nav-num">10</span></a>
+    <a class="nav-item" onclick="showModule('helm')"><span class="nav-icon">⎈</span> Helm <span class="nav-num">11</span></a>
 
     <div class="nav-section-label">Module 5 — CI/CD & GitOps</div>
-    <a class="nav-item" onclick="showModule('jenkins')"><span class="nav-icon">🤖</span> Jenkins <span class="nav-num">12</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('github-actions')"><span class="nav-icon">⚡</span> GitHub Actions <span class="nav-num">13</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('argocd')"><span class="nav-icon">🔁</span> ArgoCD <span class="nav-num">14</span><span class="nav-check">✓</span></a>
+    <a class="nav-item" onclick="showModule('jenkins')"><span class="nav-icon">🤖</span> Jenkins <span class="nav-num">12</span></a>
+    <a class="nav-item" onclick="showModule('github-actions')"><span class="nav-icon">⚡</span> GitHub Actions <span class="nav-num">13</span></a>
+    <a class="nav-item" onclick="showModule('argocd')"><span class="nav-icon">🔁</span> ArgoCD <span class="nav-num">14</span></a>
 
     <div class="nav-section-label">Module 6 — IaC & Config Management</div>
-    <a class="nav-item" onclick="showModule('terraform')"><span class="nav-icon">🏗️</span> Terraform <span class="nav-num">15</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('ansible')"><span class="nav-icon">⚙️</span> Ansible <span class="nav-num">16</span><span class="nav-check">✓</span></a>
+    <a class="nav-item" onclick="showModule('terraform')"><span class="nav-icon">🏗️</span> Terraform <span class="nav-num">15</span></a>
+    <a class="nav-item" onclick="showModule('ansible')"><span class="nav-icon">⚙️</span> Ansible <span class="nav-num">16</span></a>
 
     <div class="nav-section-label">Module 7 — Networking & Observability</div>
-    <a class="nav-item" onclick="showModule('vpc')"><span class="nav-icon">🔒</span> VPC & Networking <span class="nav-num">17</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('nginx')"><span class="nav-icon">🌐</span> Nginx <span class="nav-num">18</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('elk')"><span class="nav-icon">🔍</span> ELK Stack <span class="nav-num">19</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('monitoring')"><span class="nav-icon">📊</span> Prometheus & Grafana <span class="nav-num">20</span><span class="nav-check">✓</span></a>
+    <a class="nav-item" onclick="showModule('vpc')"><span class="nav-icon">🔒</span> VPC & Networking <span class="nav-num">17</span></a>
+    <a class="nav-item" onclick="showModule('nginx')"><span class="nav-icon">🌐</span> Nginx <span class="nav-num">18</span></a>
+    <a class="nav-item" onclick="showModule('elk')"><span class="nav-icon">🔍</span> ELK Stack <span class="nav-num">19</span></a>
+    <a class="nav-item" onclick="showModule('monitoring')"><span class="nav-icon">📊</span> Prometheus & Grafana <span class="nav-num">20</span></a>
 
     <div class="nav-section-label">Module 8 — Security</div>
-    <a class="nav-item" onclick="showModule('sonarqube')"><span class="nav-icon">🔍</span> SonarQube <span class="nav-num">21</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('owasp')"><span class="nav-icon">🛡️</span> OWASP & ZAP <span class="nav-num">22</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('security')"><span class="nav-icon">🔐</span> DevSecOps Basics <span class="nav-num">23</span><span class="nav-check">✓</span></a>
+    <a class="nav-item" onclick="showModule('sonarqube')"><span class="nav-icon">🔍</span> SonarQube <span class="nav-num">21</span></a>
+    <a class="nav-item" onclick="showModule('owasp')"><span class="nav-icon">🛡️</span> OWASP & ZAP <span class="nav-num">22</span></a>
+    <a class="nav-item" onclick="showModule('security')"><span class="nav-icon">🔐</span> DevSecOps Basics <span class="nav-num">23</span></a>
 
     <div class="nav-section-label">Module 9 — Career</div>
-    <a class="nav-item" onclick="showModule('interview')"><span class="nav-icon">🎯</span> Interview Prep <span class="nav-num">24</span><span class="nav-check">✓</span></a>
-    <a class="nav-item" onclick="showModule('nextsteps')"><span class="nav-icon">🚀</span> What's Next <span class="nav-num">25</span><span class="nav-check">✓</span></a>
+    <a class="nav-item" onclick="showModule('interview')"><span class="nav-icon">🎯</span> Interview Prep <span class="nav-num">24</span></a>
+    <a class="nav-item" onclick="showModule('nextsteps')"><span class="nav-icon">🚀</span> What's Next <span class="nav-num">25</span></a>
   </nav>
 </aside>
 
@@ -87,7 +100,7 @@
     <h2>Master <span class="hl">DevOps</span> from<br><span class="hl2">absolute scratch</span></h2>
     <p>A structured, beginner-friendly journey through cloud computing, automation, containers, and monitoring — explained with real-world analogies and hands-on examples.</p>
     <div class="hero-stats">
-      <div class="stat"><div class="stat-num">26</div><div class="stat-label">Modules</div></div>
+      <div class="stat"><div class="stat-num">28</div><div class="stat-label">Modules</div></div>
       <div class="stat"><div class="stat-num">150+</div><div class="stat-label">Hands-on Examples</div></div>
       <div class="stat"><div class="stat-num">20</div><div class="stat-label">Mini Projects</div></div>
       <div class="stat"><div class="stat-num">0</div><div class="stat-label">Assumed Knowledge</div></div>
